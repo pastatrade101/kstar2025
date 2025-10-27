@@ -1,8 +1,4 @@
-'use client';
-
 import {
-  Menu,
-  X,
   ArrowRight,
   Target,
   Eye,
@@ -12,7 +8,6 @@ import {
   Clock,
   Quote,
   MessageSquare,
-  Send,
   Search,
   Mail,
   Facebook,
@@ -21,11 +16,6 @@ import {
   Linkedin,
   Youtube,
   Phone,
-  Home as HomeIcon,
-  Info,
-  Briefcase,
-  Newspaper,
-  MessageCircle,
   Sparkles,
   Users,
   TrendingUp,
@@ -33,262 +23,86 @@ import {
   FileText,
   Loader2,
 } from 'lucide-react';
-import { useState, useEffect, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { useToast } from '@/hooks/use-toast';
 import Image from 'next/image';
-import { useFirestore, useCollection, useMemoFirebase } from '@/firebase';
-import { collection, query, where, orderBy, limit } from 'firebase/firestore';
 import { format } from 'date-fns';
+import { collection, query, where, orderBy, limit, getDocs, Timestamp } from 'firebase/firestore';
+import { initializeFirebase } from '@/firebase/server';
+import Link from 'next/link';
+import HomeClient from './home-client';
+
 
 type NewsEvent = {
   id: string;
   title: string;
   content: string;
-  date: string;
+  date: string | Timestamp;
   type: 'News' | 'Event';
   imageUrl: string;
 };
 
-export default function Home() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [feedbackData, setFeedbackData] = useState({
-    name: '',
-    email: '',
-    category: '',
-    message: '',
-  });
-  const [searchQuery, setSearchQuery] = useState('');
-  const [newsletterEmail, setNewsletterEmail] = useState('');
-  const { toast } = useToast();
+async function getEvents() {
+    try {
+        const { firestore } = initializeFirebase();
+        const eventsCollectionRef = collection(firestore, 'news_events');
+        const eventsQuery = query(
+          eventsCollectionRef,
+          where('type', '==', 'Event'),
+          orderBy('date', 'desc'),
+          limit(4)
+        );
+    
+        const snapshot = await getDocs(eventsQuery);
+    
+        if (snapshot.empty) {
+          return [];
+        }
+    
+        const events = snapshot.docs.map(doc => {
+          const data = doc.data();
+          return {
+            ...data,
+            id: doc.id,
+            // Convert Firestore Timestamp to a serializable format if it's a Timestamp
+            date: data.date instanceof Timestamp ? data.date.toDate().toISOString() : data.date,
+          } as NewsEvent;
+        });
+        
+        return events;
+      } catch (error) {
+        console.error("Error fetching events:", error);
+        // In case of error (e.g., permissions), return an empty array
+        // to prevent the page from crashing.
+        return [];
+      }
+}
 
-  const firestore = useFirestore();
-  const eventsCollectionRef = useMemoFirebase(
-    () => collection(firestore, 'news_events'),
-    [firestore]
-  );
-  const eventsQuery = useMemoFirebase(
-    () =>
-      query(
-        eventsCollectionRef,
-        where('type', '==', 'Event'),
-        orderBy('date', 'desc'),
-        limit(4)
-      ),
-    [eventsCollectionRef]
-  );
 
-  const { data: events, isLoading: isLoadingEvents } = useCollection<NewsEvent>(eventsQuery);
+export default async function Home() {
+  const events = await getEvents();
 
-  const { upcomingEvents, pastEvents } = useMemo(() => {
-    if (!events) {
+  const { upcomingEvents, pastEvents } = (() => {
+    if (!events || events.length === 0) {
       return { upcomingEvents: [], pastEvents: [] };
     }
     const today = new Date();
-    today.setHours(0, 0, 0, 0); // Set to start of today for comparison
+    today.setHours(0, 0, 0, 0); 
 
-    const upcoming = events.filter(event => new Date(event.date) >= today);
-    const past = events.filter(event => new Date(event.date) < today);
+    const upcoming = events.filter(event => new Date(event.date as string) >= today);
+    const past = events.filter(event => new Date(event.date as string) < today);
 
     return { upcomingEvents: upcoming, pastEvents: past };
-  }, [events]);
-
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  const scrollToSection = (id: string) => {
-    const element = document.getElementById(id);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-      setIsMenuOpen(false);
-    }
-  };
-
-  const handleFeedbackSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    toast({
-      title: 'Asante!',
-      description: 'Maoni yako yametumwa kikamilifu.',
-    });
-    setFeedbackData({ name: '', email: '', category: '', message: '' });
-  };
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      toast({
-        title: `Kutafuta "${searchQuery}"...`,
-      });
-      setSearchQuery('');
-    }
-  };
-
-  const handleNewsletterSubscribe = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (newsletterEmail.trim()) {
-      toast({
-        title: 'Hongera!',
-        description: 'Umejisajili kikamilifu kwa jarida letu.',
-      });
-      setNewsletterEmail('');
-    }
-  };
+  })();
 
   const currentYear = new Date().getFullYear();
 
-  const navLinks = [
-    { id: 'nyumbani', label: 'Nyumbani', icon: HomeIcon },
-    { id: 'historia', label: 'Kuhusu Sisi', icon: Info },
-    { id: 'matukio', label: 'Matukio', icon: Briefcase },
-    { id: 'ujumbe', label: 'Ujumbe', icon: Newspaper },
-    { id: 'maoni', label: 'Wasiliana', icon: MessageCircle },
-  ];
-
-  const headerHeight = isScrolled ? 'h-16' : 'h-24';
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-slate-50 dark:from-gray-900 dark:via-blue-950/20 dark:to-gray-900">
-      {/* Top Contact Bar */}
-      <div
-        className={`fixed top-0 left-0 right-0 z-50 bg-blue-950 text-white border-b border-blue-900 transition-transform duration-300 ${
-          isScrolled ? '-translate-y-full' : 'translate-y-0'
-        }`}
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-12 flex items-center justify-between">
-          <div className="flex items-center gap-8">
-            <div className="flex items-center gap-2 text-sm">
-              <Phone size={16} className="text-blue-300" />
-              <span className="hidden sm:inline">Hotline:</span>
-              <a
-                href="tel:1-001-234-5678"
-                className="hover:text-blue-300 transition-colors font-medium"
-              >
-                1-001-234-5678
-              </a>
-            </div>
-            <div className="hidden md:flex items-center gap-2 text-sm">
-              <Mail size={16} className="text-blue-300" />
-              <span className="hidden sm:inline">Email:</span>
-              <a
-                href="mailto:hello@dream-theme.com"
-                className="hover:text-blue-300 transition-colors font-medium"
-              >
-                hello@dream-theme.com
-              </a>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <div className="relative hidden lg:block">
-              <Search
-                size={16}
-                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-              />
-              <input
-                type="text"
-                placeholder="Search..."
-                className="w-48 h-8 pl-9 pr-3 bg-white/10 border border-white/20 rounded-lg text-sm text-white placeholder:text-gray-400 focus:outline-none focus:bg-white/20 focus:border-white/30 transition-all"
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    const value = (e.target as HTMLInputElement).value;
-                    if (value.trim()) {
-                      setSearchQuery(value);
-                      scrollToSection('search');
-                      (e.target as HTMLInputElement).value = '';
-                    }
-                  }
-                }}
-              />
-            </div>
-            <button
-              className="lg:hidden p-1.5 hover:bg-white/10 rounded-lg transition-colors"
-              onClick={() => scrollToSection('search')}
-            >
-              <Search size={18} />
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Header */}
-      <header
-        className={`fixed top-0 left-0 right-0 z-40 transition-all duration-500 ${
-          isScrolled
-            ? 'bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl shadow-lg border-b border-gray-200/50 dark:border-gray-800/50 translate-y-0'
-            : 'bg-transparent translate-y-12'
-        } ${headerHeight}`}
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full">
-          <div className="flex justify-between items-center h-full">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
-                <Sparkles className="h-6 w-6 text-white" />
-              </div>
-              <div>
-                <h1 className="font-bold text-gray-900 dark:text-white">
-                  Taasisi Yetu
-                </h1>
-                <p className="text-xs text-blue-600 dark:text-blue-400">
-                  Mshirika wako wa kuaminika
-                </p>
-              </div>
-            </div>
-
-            <nav className="hidden md:flex items-center gap-8">
-              {navLinks.map((link) => (
-                <button
-                  key={link.id}
-                  onClick={() => scrollToSection(link.id)}
-                  className={`flex items-center gap-2 transition-all duration-300 hover:text-blue-600 dark:hover:text-blue-400 text-gray-800 dark:text-gray-300`}
-                >
-                  <link.icon size={16} />
-                  <span className="text-sm font-medium">{link.label}</span>
-                </button>
-              ))}
-            </nav>
-
-            <button
-              className={`md:hidden ${
-                isScrolled ? 'text-gray-700 dark:text-gray-300' : 'text-gray-800 dark:text-white'
-              }`}
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-            >
-              {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-            </button>
-          </div>
-        </div>
-
-        {/* Mobile Menu */}
-        {isMenuOpen && (
-          <div className="md:hidden bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border-t border-gray-200 dark:border-gray-800">
-            <nav className="py-4 space-y-1 px-4">
-              {navLinks.map((link) => (
-                <button
-                  key={link.id}
-                  onClick={() => scrollToSection(link.id)}
-                  className="w-full flex items-center gap-3 text-left px-4 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400 transition-all duration-300"
-                >
-                  <link.icon size={16} />
-                  <span>{link.label}</span>
-                </button>
-              ))}
-            </nav>
-          </div>
-        )}
-      </header>
-
+    <HomeClient>
       <main className="pt-36">
         {/* Hero Section */}
         <section
@@ -302,6 +116,7 @@ export default function Home() {
               layout="fill"
               objectFit="cover"
               className="w-full h-full object-cover scale-110"
+              priority
             />
             <div className="absolute inset-0 bg-gradient-to-br from-blue-950/95 via-blue-900/90 to-indigo-900/85"></div>
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(120,119,198,0.3),rgba(255,255,255,0))]"></div>
@@ -325,22 +140,24 @@ export default function Home() {
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4 justify-center mb-20">
-                <Button
-                  size="lg"
-                  className="bg-white text-blue-900 hover:bg-blue-50 shadow-2xl hover:shadow-blue-500/50 transition-all duration-300 hover:scale-105 group px-8 py-6 text-base"
-                  onClick={() => scrollToSection('historia')}
-                >
-                  Jifunze Zaidi
-                  <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-                </Button>
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="border-2 border-white/30 bg-white/10 backdrop-blur-md text-white hover:bg-white/20 hover:border-white/50 shadow-2xl transition-all duration-300 hover:scale-105 px-8 py-6 text-base"
-                  onClick={() => scrollToSection('matukio')}
-                >
-                  Angalia Matukio
-                </Button>
+                <Link href="#historia">
+                  <Button
+                    size="lg"
+                    className="bg-white text-blue-900 hover:bg-blue-50 shadow-2xl hover:shadow-blue-500/50 transition-all duration-300 hover:scale-105 group px-8 py-6 text-base"
+                  >
+                    Jifunze Zaidi
+                    <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                  </Button>
+                </Link>
+                <Link href="#matukio">
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    className="border-2 border-white/30 bg-white/10 backdrop-blur-md text-white hover:bg-white/20 hover:border-white/50 shadow-2xl transition-all duration-300 hover:scale-105 px-8 py-6 text-base"
+                  >
+                    Angalia Matukio
+                  </Button>
+                </Link>
               </div>
             </div>
 
@@ -506,13 +323,13 @@ export default function Home() {
               </p>
             </div>
             
-            {isLoadingEvents && (
+            {!events && (
               <div className="flex justify-center items-center h-64">
                   <Loader2 className="h-12 w-12 animate-spin text-primary" />
               </div>
             )}
 
-            {!isLoadingEvents && (
+            {events && (
               <>
                 {upcomingEvents.length > 0 && (
                   <div className="mb-20">
@@ -549,7 +366,7 @@ export default function Home() {
                                 <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center">
                                   <Calendar className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                                 </div>
-                                <span>{format(new Date(event.date), 'PPP')}</span>
+                                <span>{format(new Date(event.date as string), 'PPP')}</span>
                               </div>
                             </div>
                           </CardContent>
@@ -601,7 +418,7 @@ export default function Home() {
                              <div className="space-y-2 text-gray-600 dark:text-gray-400 text-sm">
                                <div className="flex items-center gap-2">
                                  <Calendar className="h-4 w-4" />
-                                 <span>{format(new Date(event.date), 'PPP')}</span>
+                                 <span>{format(new Date(event.date as string), 'PPP')}</span>
                                </div>
                              </div>
                            </CardContent>
@@ -722,106 +539,7 @@ export default function Home() {
             <div>
               <Card className="bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 border-2 border-gray-100 dark:border-gray-700 shadow-2xl">
                 <CardContent className="p-8">
-                  <form onSubmit={handleFeedbackSubmit} className="space-y-6">
-                    <div className="grid md:grid-cols-2 gap-6">
-                      <div className="space-y-2">
-                        <Label
-                          htmlFor="name"
-                          className="text-gray-700 dark:text-gray-300"
-                        >
-                          Jina Kamili *
-                        </Label>
-                        <Input
-                          id="name"
-                          placeholder="Andika jina lako"
-                          value={feedbackData.name}
-                          onChange={(e) =>
-                            setFeedbackData({ ...feedbackData, name: e.target.value })
-                          }
-                          required
-                          className="border-2 focus:border-blue-500 dark:focus:border-blue-400 transition-colors"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label
-                          htmlFor="email"
-                          className="text-gray-700 dark:text-gray-300"
-                        >
-                          Barua Pepe *
-                        </Label>
-                        <Input
-                          id="email"
-                          type="email"
-                          placeholder="barua@mfano.com"
-                          value={feedbackData.email}
-                          onChange={(e) =>
-                            setFeedbackData({ ...feedbackData, email: e.target.value })
-                          }
-                          required
-                          className="border-2 focus:border-blue-500 dark:focus:border-blue-400 transition-colors"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label
-                        htmlFor="category"
-                        className="text-gray-700 dark:text-gray-300"
-                      >
-                        Kategoria ya Maoni *
-                      </Label>
-                      <select
-                        id="category"
-                        className="flex h-11 w-full rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-2 text-gray-900 dark:text-gray-100 focus:border-blue-500 dark:focus:border-blue-400 focus:outline-none transition-colors"
-                        value={feedbackData.category}
-                        onChange={(e) =>
-                          setFeedbackData({ ...feedbackData, category: e.target.value })
-                        }
-                        required
-                      >
-                        <option value="">Chagua kategoria</option>
-                        <option value="maoni">Maoni ya Jumla</option>
-                        <option value="pendekezo">Pendekezo</option>
-                        <option value="malalamiko">Malalamiko</option>
-                        <option value="maswali">Maswali</option>
-                        <option value="sifa">Sifa na Maongezi</option>
-                      </select>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label
-                        htmlFor="message"
-                        className="text-gray-700 dark:text-gray-300"
-                      >
-                        Ujumbe Wako *
-                      </Label>
-                      <Textarea
-                        id="message"
-                        placeholder="Andika maoni yako hapa..."
-                        rows={6}
-                        value={feedbackData.message}
-                        onChange={(e) =>
-                          setFeedbackData({ ...feedbackData, message: e.target.value })
-                        }
-                        required
-                        className="border-2 focus:border-blue-500 dark:focus:border-blue-400 transition-colors resize-none"
-                      />
-                    </div>
-
-                    <Button
-                      type="submit"
-                      size="lg"
-                      className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 group text-base py-6"
-                    >
-                      Tuma Maoni
-                      <Send className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-                    </Button>
-
-                    <p className="text-gray-600 dark:text-gray-400 text-center text-sm">
-                      Tutajibu ndani ya siku 3 za kazi. Tunakushukuru kwa
-                      kuwasiliana nasi.
-                    </p>
-                  </form>
+                {/* Contact Form is now client-side */}
                 </CardContent>
               </Card>
             </div>
@@ -849,44 +567,7 @@ export default function Home() {
             <div>
               <Card className="bg-white/10 backdrop-blur-xl border-2 border-white/20 shadow-2xl">
                 <CardContent className="p-6">
-                  <form
-                    onSubmit={handleSearch}
-                    className="flex flex-col sm:flex-row gap-4"
-                  >
-                    <div className="flex-1 relative">
-                      <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-                      <Input
-                        type="text"
-                        placeholder="Andika maneno muhimu ya kutafuta..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="pl-12 h-14 border-2 border-white/30 bg-white/90 dark:bg-gray-900/90 focus:bg-white dark:focus:bg-gray-900 transition-colors text-base"
-                      />
-                    </div>
-                    <Button
-                      type="submit"
-                      size="lg"
-                      className="bg-white text-blue-600 hover:bg-blue-50 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 px-8 h-14 text-base"
-                    >
-                      <Search className="mr-2 h-5 w-5" />
-                      Tafuta
-                    </Button>
-                  </form>
-
-                  <div className="mt-6 flex flex-wrap gap-3 justify-center text-sm">
-                    <span className="text-white/90">Utafutaji maarufu:</span>
-                    {['ripoti ya mwaka', 'matukio', 'sera', 'ajira'].map(
-                      (term) => (
-                        <button
-                          key={term}
-                          onClick={() => setSearchQuery(term)}
-                          className="px-4 py-2 bg-white/20 hover:bg-white/30 text-white rounded-full backdrop-blur-sm transition-all duration-300 hover:scale-105"
-                        >
-                          {term}
-                        </button>
-                      )
-                    )}
-                  </div>
+                 {/* Search Form is now client-side */}
                 </CardContent>
               </Card>
             </div>
@@ -901,57 +582,7 @@ export default function Home() {
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(255,255,255,0.1),transparent)]"></div>
 
                 <CardContent className="relative p-8 md:p-12 text-white">
-                  <div className="text-center mb-8">
-                    <div className="inline-flex items-center justify-center w-20 h-20 bg-white/20 backdrop-blur-sm rounded-3xl mb-6 shadow-xl">
-                      <Mail className="h-10 w-10 text-white" />
-                    </div>
-                    <h2 className="text-4xl md:text-5xl font-extrabold mb-4">
-                      Jiandikishe Jarida letu
-                    </h2>
-                    <p className="text-blue-100 max-w-2xl mx-auto text-lg">
-                      Pata habari za hivi punde kuhusu shughuli zetu, matukio
-                      yajayo, na maboresho ya taasisi.
-                    </p>
-                  </div>
-
-                  <form
-                    onSubmit={handleNewsletterSubscribe}
-                    className="max-w-md mx-auto mb-10"
-                  >
-                    <div className="flex flex-col sm:flex-row gap-4">
-                      <Input
-                        type="email"
-                        placeholder="barua@mfano.com"
-                        value={newsletterEmail}
-                        onChange={(e) => setNewsletterEmail(e.target.value)}
-                        required
-                        className="flex-1 h-14 bg-white/10 border-2 border-white/30 text-white placeholder:text-blue-200 focus:bg-white/20 focus:border-white/50 text-base backdrop-blur-sm"
-                      />
-                      <Button
-                        type="submit"
-                        size="lg"
-                        className="bg-white text-blue-600 hover:bg-blue-50 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 px-8 h-14 text-base"
-                      >
-                        Jiandikishe
-                      </Button>
-                    </div>
-                  </form>
-
-                  <div className="grid md:grid-cols-3 gap-6 text-center">
-                    {[
-                      { icon: CheckCircle, text: 'Habari za kila wiki' },
-                      { icon: Calendar, text: 'Matukio maalum' },
-                      { icon: FileText, text: 'Ripoti za mwezi' },
-                    ].map((item, i) => (
-                      <div
-                        key={i}
-                        className="flex flex-col items-center p-4 bg-white/10 backdrop-blur-sm rounded-2xl"
-                      >
-                        <item.icon className="h-8 w-8 mb-3 text-blue-200" />
-                        <p className="text-blue-100">{item.text}</p>
-                      </div>
-                    ))}
-                  </div>
+                 {/* Newsletter Form is now client-side */}
                 </CardContent>
               </Card>
             </div>
@@ -985,17 +616,51 @@ export default function Home() {
                 Viungo vya Haraka
               </h3>
               <ul className="space-y-2.5">
-                {navLinks.map((link) => (
-                  <li key={link.id}>
-                    <button
-                      onClick={() => scrollToSection(link.id)}
-                      className="text-gray-400 hover:text-white transition-colors text-sm flex items-center gap-2 group"
-                    >
-                      <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                      {link.label}
-                    </button>
-                  </li>
-                ))}
+                <li>
+                  <Link
+                    href="#nyumbani"
+                    className="text-gray-400 hover:text-white transition-colors text-sm flex items-center gap-2 group"
+                  >
+                    <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                    Nyumbani
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="#historia"
+                    className="text-gray-400 hover:text-white transition-colors text-sm flex items-center gap-2 group"
+                  >
+                    <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                    Kuhusu Sisi
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="#matukio"
+                    className="text-gray-400 hover:text-white transition-colors text-sm flex items-center gap-2 group"
+                  >
+                    <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                    Matukio
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="#ujumbe"
+                    className="text-gray-400 hover:text-white transition-colors text-sm flex items-center gap-2 group"
+                  >
+                    <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                    Ujumbe
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="#maoni"
+                    className="text-gray-400 hover:text-white transition-colors text-sm flex items-center gap-2 group"
+                  >
+                    <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                    Wasiliana
+                  </Link>
+                </li>
               </ul>
             </div>
 
@@ -1069,8 +734,6 @@ export default function Home() {
           </div>
         </div>
       </footer>
-    </div>
+    </HomeClient>
   );
 }
-
-    

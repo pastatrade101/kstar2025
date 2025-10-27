@@ -1,28 +1,21 @@
 /**
- * @fileoverview Firestore Security Rules for EduPro Hub.
- *
- * Core Philosophy:
- * This ruleset provides open read access for all collections (courses, instructors, news_events, and admission_information) to allow for public consumption of data.
- * There is no authorization enforced based on user identity, so all users, including unauthenticated users, can freely access the data.
- *
- * Data Structure:
- * Each entity (Course, Instructor, NewsEvent, AdmissionInformation) resides in its own top-level collection.
- *
- * Key Security Decisions:
- * - Public Read Access: All read operations (get, list) are allowed for all users, including unauthenticated users, on all collections.
- * - No User-Based Authorization: The system does not currently implement user-specific roles or ownership.
- * - Unsecured Write Access: Write operations (create, update, delete) are blocked for all users.
+ * @file Firestore Security Rules for EduPro Hub
+ * @corePhilosophy This ruleset allows open read access to all collections and restricts write access.
+ * @dataStructure The database consists of several top-level collections: courses, instructors, news_events, and admission_information.
+ * @keySecurityDecisions
+ *   - Public read access is granted to all collections to allow easy data access.
+ *   - Write access to the `news_events` collection is restricted.
  */
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
     /**
-     * @description Allows anyone to read course information, but restricts all write access.
+     * @description Rules for the `courses` collection. Allows anyone to read course data, but disallows writes.
      * @path /courses/{courseId}
-     * @allow (get, list) Allows any user to read course information.
-     * @deny (create, update, delete) Denies any user to write course information.
-     * @principle Grants public read access but restricts write access.
+     * @allow (get, list) Anyone can read course information.
+     * @deny (create, update, delete) No one can create, update, or delete courses.
+     * @principle Allows public read access and restricts writes.
      */
     match /courses/{courseId} {
       allow get, list: if true;
@@ -30,11 +23,11 @@ service cloud.firestore {
     }
 
     /**
-     * @description Allows anyone to read instructor information, but restricts all write access.
+     * @description Rules for the `instructors` collection. Allows anyone to read instructor data, but disallows writes.
      * @path /instructors/{instructorId}
-     * @allow (get, list) Allows any user to read instructor information.
-     * @deny (create, update, delete) Denies any user to write instructor information.
-     * @principle Grants public read access but restricts write access.
+     * @allow (get, list) Anyone can read instructor information.
+     * @deny (create, update, delete) No one can create, update, or delete instructors.
+     * @principle Allows public read access and restricts writes.
      */
     match /instructors/{instructorId} {
       allow get, list: if true;
@@ -42,11 +35,11 @@ service cloud.firestore {
     }
 
     /**
-     * @description Allows anyone to read news and events, but restricts all write access.
+     * @description Rules for the `news_events` collection. Allows anyone to read news events, but disallows writes.
      * @path /news_events/{newsEventId}
-     * @allow (get, list) Allows any user to read news and events.
-     * @deny (create, update, delete) Denies any user to write news and events.
-     * @principle Grants public read access but restricts write access.
+     * @allow (get, list) Anyone can read news events.
+     * @deny (create, update, delete) No one can create, update, or delete news events.
+     * @principle Allows public read access and restricts writes.
      */
     match /news_events/{newsEventId} {
       allow get, list: if true;
@@ -54,11 +47,11 @@ service cloud.firestore {
     }
 
     /**
-     * @description Allows anyone to read admission information, but restricts all write access.
+     * @description Rules for the `admission_information` collection. Allows anyone to read admission information, but disallows writes.
      * @path /admission_information/{admissionInformationId}
-     * @allow (get, list) Allows any user to read admission information.
-     * @deny (create, update, delete) Denies any user to write admission information.
-     * @principle Grants public read access but restricts write access.
+     * @allow (get, list) Anyone can read admission information.
+     * @deny (create, update, delete) No one can create, update, or delete admission information.
+     * @principle Allows public read access and restricts writes.
      */
     match /admission_information/{admissionInformationId} {
       allow get, list: if true;

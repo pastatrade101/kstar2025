@@ -1,3 +1,5 @@
+// THIS FILE IS ONLY MEANT FOR CLIENT-SIDE CODE
+// For server-side code, create a new file in `src/firebase/server.ts`
 'use client';
 
 import { firebaseConfig } from '@/firebase/config';
