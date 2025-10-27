@@ -1,85 +1,69 @@
 /**
- * @fileoverview Firestore Security Rules for EduPro Hub.
- *
- * Core Philosophy:
- * This ruleset provides public read access for all collections while restricting write access.
- *
- * Data Structure:
- * The database consists of four top-level collections: `/courses`, `/instructors`, `/news_events`, and `/admission_information`.
- * Each collection stores data related to its respective entity.
- *
- * Key Security Decisions:
- * - Public read access is granted to all collections to allow open access to course information,
- *   instructor details, news events, and admission information.
- * - Write access to `/news_events` collection is explicitly denied to all users (even authenticated).
- * - Write access to all other collections is explicitly denied to all users.
+ * @file Firestore Security Rules for EduPro Hub
+ * @corePhilosophy This ruleset allows public read access to all collections while restricting write access.
+ * @dataStructure The database consists of top-level collections for courses, instructors, news events, and admission information.
+ * @keySecurityDecisions Write access to news_events is only allowed for authenticated users (admins).
+ * All other collections are read-only.
  */
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
     /**
-     * @description Rules for the /courses collection. Allows public read access and denies all write access.
+     * @description Allows public read access to course information and restricts write access.
      * @path /courses/{courseId}
-     * @allow get, list: Anyone can read course information.
-     * @allow create, update, delete: No one can create, update, or delete course information.
-     * @deny create, update, delete: All write operations are denied.
-     * @principle Allows public read access while denying all write access.
+     * @allow (get, list): Any user can read course information.
+     * @deny (create, update, delete): No one can create, update, or delete course information through the client.
+     * @principle Public read, no writes allowed.
      */
     match /courses/{courseId} {
-      allow get: if true;
-      allow list: if true;
-      allow create: if false;
-      allow update: if false;
-      allow delete: if false;
+      allow get, list: if true;
+      allow create, update, delete: if false;
     }
 
     /**
-     * @description Rules for the /instructors collection. Allows public read access and denies all write access.
+     * @description Allows public read access to instructor information and restricts write access.
      * @path /instructors/{instructorId}
-     * @allow get, list: Anyone can read instructor information.
-     * @allow create, update, delete: No one can create, update, or delete instructor information.
-     * @deny create, update, delete: All write operations are denied.
-     * @principle Allows public read access while denying all write access.
+     * @allow (get, list): Any user can read instructor information.
+     * @deny (create, update, delete): No one can create, update, or delete instructor information through the client.
+     * @principle Public read, no writes allowed.
      */
     match /instructors/{instructorId} {
-      allow get: if true;
-      allow list: if true;
-      allow create: if false;
-      allow update: if false;
-      allow delete: if false;
+      allow get, list: if true;
+      allow create, update, delete: if false;
     }
 
     /**
-     * @description Rules for the /news_events collection. Allows public read access and denies all write access.
+     * @description Allows public read access to news events and restricts write access to authenticated users.
      * @path /news_events/{newsEventId}
-     * @allow get, list: Anyone can read news events.
-     * @allow create, update, delete: No one can create, update, or delete news events.
-     * @deny create, update, delete: All write operations are denied.
-     * @principle Allows public read access while denying all write access.
+     * @allow (get, list): Any user can read news events.
+     * @allow (create): An authenticated user can create news events.
+     * @allow (update, delete): An authenticated user can update or delete news events.
+     * @deny (create, update, delete): A non-authenticated user cannot create, update, or delete news events.
+     * @principle Public read, authenticated writes.
      */
     match /news_events/{newsEventId} {
-      allow get: if true;
-      allow list: if true;
-      allow create: if false;
-      allow update: if false;
-      allow delete: if false;
+      allow get, list: if true;
+      allow create: if isSignedIn();
+      allow update: if isSignedIn() && resource != null;
+      allow delete: if isSignedIn() && resource != null;
     }
 
     /**
-     * @description Rules for the /admission_information collection. Allows public read access and denies all write access.
+     * @description Allows public read access to admission information and restricts write access.
      * @path /admission_information/{admissionInformationId}
-     * @allow get, list: Anyone can read admission information.
-     * @allow create, update, delete: No one can create, update, or delete admission information.
-     * @deny create, update, delete: All write operations are denied.
-     * @principle Allows public read access while denying all write access.
+     * @allow (get, list): Any user can read admission information.
+     * @deny (create, update, delete): No one can create, update, or delete admission information through the client.
+     * @principle Public read, no writes allowed.
      */
     match /admission_information/{admissionInformationId} {
-      allow get: if true;
-      allow list: if true;
-      allow create: if false;
-      allow update: if false;
-      allow delete: if false;
+      allow get, list: if true;
+      allow create, update, delete: if false;
     }
+  }
+
+  // Helper function to determine if a user is signed in
+  function isSignedIn() {
+    return request.auth != null;
   }
 }
