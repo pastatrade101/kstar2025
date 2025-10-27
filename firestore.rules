@@ -1,93 +1,85 @@
 /**
- * @file Overview
- * This ruleset defines access control for the EduPro Hub application, focusing on courses, instructors, news events, and admission information.
+ * @fileoverview Firestore Security Rules for EduPro Hub.
  *
  * Core Philosophy:
- * Each entity (Course, Instructor, NewsEvent, AdmissionInformation) is stored in its own top-level collection.
- * Read access is generally public, while write access is restricted based on the entity type.
+ * This ruleset provides public read access for all collections while restricting write access.
  *
  * Data Structure:
- * /courses/{courseId}: Stores course information.
- * /instructors/{instructorId}: Stores instructor information.
- * /news_events/{newsEventId}: Stores news and event information.
- * /admission_information/{admissionInformationId}: Stores admission information.
+ * The database consists of four top-level collections: `/courses`, `/instructors`, `/news_events`, and `/admission_information`.
+ * Each collection stores data related to its respective entity.
  *
  * Key Security Decisions:
- * - Public read access for all collections.
- * - No user-specific data or ownership model.
- * - News Events have owner-only write permissions (currently open to all authenticated users, but should be restricted to admins in future iterations).
- *
- * Denormalization for Authorization:
- *  - This implementation assumes an admin role is managed outside of Firestore Security Rules.
- *  - NewsEvent needs to have a owner id field.
- * Structural Segregation:
- *  - Data is separated into top-level collections based on entity type, simplifying access control.
+ * - Public read access is granted to all collections to allow open access to course information,
+ *   instructor details, news events, and admission information.
+ * - Write access to `/news_events` collection is explicitly denied to all users (even authenticated).
+ * - Write access to all other collections is explicitly denied to all users.
  */
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
     /**
-     * @description Controls access to course information.
+     * @description Rules for the /courses collection. Allows public read access and denies all write access.
      * @path /courses/{courseId}
-     * @allow get, list: Any user can read course information.
-     * @allow create, update, delete: No one can modify course information.
-     * @deny create, update, delete: Attempts to create, update, or delete course documents.
-     * @principle Public read access, no write access.
+     * @allow get, list: Anyone can read course information.
+     * @allow create, update, delete: No one can create, update, or delete course information.
+     * @deny create, update, delete: All write operations are denied.
+     * @principle Allows public read access while denying all write access.
      */
     match /courses/{courseId} {
-      allow get, list: if true;
-      allow create, update, delete: if false;
+      allow get: if true;
+      allow list: if true;
+      allow create: if false;
+      allow update: if false;
+      allow delete: if false;
     }
 
     /**
-     * @description Controls access to instructor information.
+     * @description Rules for the /instructors collection. Allows public read access and denies all write access.
      * @path /instructors/{instructorId}
-     * @allow get, list: Any user can read instructor information.
-     * @allow create, update, delete: No one can modify instructor information.
-     * @deny create, update, delete: Attempts to create, update, or delete instructor documents.
-     * @principle Public read access, no write access.
+     * @allow get, list: Anyone can read instructor information.
+     * @allow create, update, delete: No one can create, update, or delete instructor information.
+     * @deny create, update, delete: All write operations are denied.
+     * @principle Allows public read access while denying all write access.
      */
     match /instructors/{instructorId} {
-      allow get, list: if true;
-      allow create, update, delete: if false;
+      allow get: if true;
+      allow list: if true;
+      allow create: if false;
+      allow update: if false;
+      allow delete: if false;
     }
 
     /**
-     * @description Controls access to news and event information.
+     * @description Rules for the /news_events collection. Allows public read access and denies all write access.
      * @path /news_events/{newsEventId}
-     * @allow get, list: Any user can read news and event information.
-     * @allow create, update, delete: Only authenticated users can create, update or delete news and events.
-     * @deny create, update, delete: Attempts to create, update, or delete news event documents by unauthenticated users.
-     * @principle Public read access, authenticated-only write access (admin role to be implemented).
+     * @allow get, list: Anyone can read news events.
+     * @allow create, update, delete: No one can create, update, or delete news events.
+     * @deny create, update, delete: All write operations are denied.
+     * @principle Allows public read access while denying all write access.
      */
     match /news_events/{newsEventId} {
-      allow get, list: if true;
-      allow create: if isSignedIn();
-      allow update: if isSignedIn() && resource != null;
-      allow delete: if isSignedIn() && resource != null;
+      allow get: if true;
+      allow list: if true;
+      allow create: if false;
+      allow update: if false;
+      allow delete: if false;
     }
 
     /**
-     * @description Controls access to admission information.
+     * @description Rules for the /admission_information collection. Allows public read access and denies all write access.
      * @path /admission_information/{admissionInformationId}
-     * @allow get, list: Any user can read admission information.
-     * @allow create, update, delete: No one can modify admission information.
-     * @deny create, update, delete: Attempts to create, update, or delete admission information documents.
-     * @principle Public read access, no write access.
+     * @allow get, list: Anyone can read admission information.
+     * @allow create, update, delete: No one can create, update, or delete admission information.
+     * @deny create, update, delete: All write operations are denied.
+     * @principle Allows public read access while denying all write access.
      */
     match /admission_information/{admissionInformationId} {
-      allow get, list: if true;
-      allow create, update, delete: if false;
-    }
-
-    /**
-     * @description Checks if the user is signed in.
-     * @return True if the user is signed in, false otherwise.
-     * @principle Authentication required.
-     */
-    function isSignedIn() {
-      return request.auth != null;
+      allow get: if true;
+      allow list: if true;
+      allow create: if false;
+      allow update: if false;
+      allow delete: if false;
     }
   }
 }
