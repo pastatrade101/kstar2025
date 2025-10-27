@@ -1,0 +1,210 @@
+{
+  "entities": {
+    "Course": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Course",
+      "type": "object",
+      "description": "Represents a course offered by the institution.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the course."
+        },
+        "title": {
+          "type": "string",
+          "description": "Title of the course."
+        },
+        "description": {
+          "type": "string",
+          "description": "Detailed description of the course."
+        },
+        "schedule": {
+          "type": "string",
+          "description": "Schedule of the course (e.g., days, times)."
+        },
+        "instructorId": {
+          "type": "string",
+          "description": "Reference to the Instructor teaching the course. (Relationship: Instructor 1:N Course)"
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "description",
+        "schedule",
+        "instructorId"
+      ]
+    },
+    "Instructor": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Instructor",
+      "type": "object",
+      "description": "Represents a faculty member or instructor.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the instructor."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the instructor."
+        },
+        "contactInformation": {
+          "type": "string",
+          "description": "Contact information for the instructor (e.g., email, phone)."
+        },
+        "bio": {
+          "type": "string",
+          "description": "Biography of the instructor."
+        },
+        "researchInterests": {
+          "type": "string",
+          "description": "Research interests of the instructor."
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "contactInformation",
+        "bio",
+        "researchInterests"
+      ]
+    },
+    "NewsEvent": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "NewsEvent",
+      "type": "object",
+      "description": "Represents a news item or event.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the news event."
+        },
+        "title": {
+          "type": "string",
+          "description": "Title of the news event."
+        },
+        "content": {
+          "type": "string",
+          "description": "Content of the news event."
+        },
+        "date": {
+          "type": "string",
+          "description": "Date of the news event.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "content",
+        "date"
+      ]
+    },
+    "AdmissionInformation": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "AdmissionInformation",
+      "type": "object",
+      "description": "Represents admission information for prospective students.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the admission information."
+        },
+        "applicationProcedures": {
+          "type": "string",
+          "description": "Application procedures for prospective students."
+        },
+        "deadlines": {
+          "type": "string",
+          "description": "Application deadlines."
+        },
+        "financialAidOptions": {
+          "type": "string",
+          "description": "Financial aid options available to students."
+        }
+      },
+      "required": [
+        "id",
+        "applicationProcedures",
+        "deadlines",
+        "financialAidOptions"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/courses/{courseId}",
+        "definition": {
+          "entityName": "Course",
+          "schema": {
+            "$ref": "#/backend/entities/Course"
+          },
+          "description": "Stores information about courses.  No specific authorization fields are needed, as access is managed through structural segregation (separate collection).",
+          "params": [
+            {
+              "name": "courseId",
+              "description": "Unique identifier for the course."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/instructors/{instructorId}",
+        "definition": {
+          "entityName": "Instructor",
+          "schema": {
+            "$ref": "#/backend/entities/Instructor"
+          },
+          "description": "Stores information about instructors.  No specific authorization fields are needed, as access is managed through structural segregation (separate collection).",
+          "params": [
+            {
+              "name": "instructorId",
+              "description": "Unique identifier for the instructor."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/news_events/{newsEventId}",
+        "definition": {
+          "entityName": "NewsEvent",
+          "schema": {
+            "$ref": "#/backend/entities/NewsEvent"
+          },
+          "description": "Stores news events.  No specific authorization fields are needed, as access is managed through structural segregation (separate collection).",
+          "params": [
+            {
+              "name": "newsEventId",
+              "description": "Unique identifier for the news event."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/admission_information/{admissionInformationId}",
+        "definition": {
+          "entityName": "AdmissionInformation",
+          "schema": {
+            "$ref": "#/backend/entities/AdmissionInformation"
+          },
+          "description": "Stores admission information.  No specific authorization fields are needed, as access is managed through structural segregation (separate collection).",
+          "params": [
+            {
+              "name": "admissionInformationId",
+              "description": "Unique identifier for the admission information."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The Firestore structure is designed to efficiently manage data for the EduPro Hub application, focusing on courses, instructors, news events, and admission information. The structure prioritizes simplicity and ease of querying for the core features of the application, such as the course catalog, faculty directory, news & events, and admission information. It leverages structural segregation to ensure each collection contains homogeneous data with consistent security requirements. This design avoids hierarchical authorization dependencies. Each data entity has its own top-level collection. This approach supports the required QAPs by allowing secure list operations on each entity type."
+  }
+}

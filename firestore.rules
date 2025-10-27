@@ -1,0 +1,61 @@
+/**
+ * @fileOverview
+ * This ruleset enforces a public-read, owner-write security model for all collections.
+ * All data resides in top-level collections: /courses/{courseId}, /instructors/{instructorId}, /news_events/{newsEventId}, and /admission_information/{admissionInformationId}.
+ * Key Security Decisions:
+ * - Read permissions are public for all collections.
+ * - Write permissions (create, update, delete) are denied to all users, as no ownership field exists.
+ */
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    /**
+     * @description Grants public read access to course information but restricts write access.
+     * @path /courses/{courseId}
+     * @allow get, list: Everyone can read course information.
+     * @deny create, update, delete: No one can create, update, or delete courses without authentication and ownership.
+     * @principle Allows public reads, restricts writes due to missing ownership information.
+     */
+    match /courses/{courseId} {
+      allow get, list: if true;
+      allow create, update, delete: if false; // TODO: Add owner validation once the schema is updated with an ownership field.
+    }
+
+    /**
+     * @description Grants public read access to instructor information but restricts write access.
+     * @path /instructors/{instructorId}
+     * @allow get, list: Everyone can read instructor information.
+     * @deny create, update, delete: No one can create, update, or delete instructors without authentication and ownership.
+     * @principle Allows public reads, restricts writes due to missing ownership information.
+     */
+    match /instructors/{instructorId} {
+      allow get, list: if true;
+      allow create, update, delete: if false; // TODO: Add owner validation once the schema is updated with an ownership field.
+    }
+
+    /**
+     * @description Grants public read access to news events but restricts write access.
+     * @path /news_events/{newsEventId}
+     * @allow get, list: Everyone can read news events.
+     * @deny create, update, delete: No one can create, update, or delete news events without authentication and ownership.
+     * @principle Allows public reads, restricts writes due to missing ownership information.
+     */
+    match /news_events/{newsEventId} {
+      allow get, list: if true;
+      allow create, update, delete: if false; // TODO: Add owner validation once the schema is updated with an ownership field.
+    }
+
+    /**
+     * @description Grants public read access to admission information but restricts write access.
+     * @path /admission_information/{admissionInformationId}
+     * @allow get, list: Everyone can read admission information.
+     * @deny create, update, delete: No one can create, update, or delete admission information without authentication and ownership.
+     * @principle Allows public reads, restricts writes due to missing ownership information.
+     */
+    match /admission_information/{admissionInformationId} {
+      allow get, list: if true;
+      allow create, update, delete: if false; // TODO: Add owner validation once the schema is updated with an ownership field.
+    }
+  }
+}
