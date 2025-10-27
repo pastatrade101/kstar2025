@@ -97,38 +97,3 @@ export const faculty = [
     image: findImage('faculty-4'),
   },
 ];
-
-export const newsAndEvents = [
-  {
-    id: 'N001',
-    title: 'EduPro Hub Announces New Science Wing',
-    date: 'October 26, 2023',
-    description: 'The new state-of-the-art science wing, featuring advanced labs and collaborative research spaces, is set to open in Fall 2024. The building will support our growing STEM programs and foster interdisciplinary innovation.',
-    type: 'News',
-    image: findImage('news-1'),
-  },
-  {
-    id: 'N002',
-    title: 'Commencement Ceremony 2024',
-    date: 'May 15, 2024',
-    description: 'Join us in celebrating the achievements of the class of 2024. The ceremony will be held at the Grand Auditorium, with a keynote address from renowned author and alumna, Jane Doe.',
-    type: 'Event',
-    image: findImage('news-2'),
-  },
-  {
-    id: 'N003',
-    title: 'Library Receives Grant for Digital Archive Project',
-    date: 'October 15, 2023',
-    description: 'Our library has been awarded a significant grant to digitize its rare book collection, making these valuable historical documents accessible to researchers worldwide.',
-    type: 'News',
-    image: findImage('news-3'),
-  },
-  {
-    id: 'N004',
-    title: 'Annual Guest Lecture: Dr. Kenji Tanaka on AI and Society',
-    date: 'November 5, 2023',
-    description: 'We are honored to host Dr. Kenji Tanaka for a talk on the societal impacts of artificial intelligence. The event is free and open to the public.',
-    type: 'Event',
-    image: findImage('news-4'),
-  },
-];

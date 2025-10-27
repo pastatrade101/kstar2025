@@ -1,3 +1,5 @@
+'use client';
+
 import {
   Card,
   CardContent,
@@ -5,11 +7,29 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { newsAndEvents } from '@/lib/data';
 import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
+import { useFirestore, useCollection } from '@/firebase';
+import { collection, query, orderBy } from 'firebase/firestore';
+import { useMemoFirebase } from '@/firebase/provider';
+import { Loader2 } from 'lucide-react';
+import { format } from 'date-fns';
+
+type NewsEvent = {
+  id: string;
+  title: string;
+  content: string;
+  date: string;
+  type: 'News' | 'Event';
+  imageUrl: string;
+};
 
 export default function NewsAndEventsPage() {
+  const firestore = useFirestore();
+  const newsCollectionRef = useMemoFirebase(() => collection(firestore, 'news_events'), [firestore]);
+  const newsQuery = useMemoFirebase(() => query(newsCollectionRef, orderBy('date', 'desc')), [newsCollectionRef]);
+  const { data: newsAndEvents, isLoading, error } = useCollection<NewsEvent>(newsQuery);
+
   return (
     <div className="flex flex-col gap-8 p-4 md:p-8">
       <header>
@@ -21,23 +41,40 @@ export default function NewsAndEventsPage() {
         </p>
       </header>
 
+      {isLoading && (
+        <div className="flex justify-center items-center h-64">
+          <Loader2 className="h-12 w-12 animate-spin text-primary" />
+        </div>
+      )}
+
+      {error && (
+        <div className="text-center text-destructive py-16">
+            <p>Error loading news and events.</p>
+        </div>
+      )}
+
+      {!isLoading && !error && newsAndEvents?.length === 0 && (
+          <div className="text-center text-muted-foreground py-16">
+              <p>No news or events have been posted yet.</p>
+          </div>
+      )}
+
       <div className="space-y-8">
-        {newsAndEvents.map((item) => (
+        {newsAndEvents?.map((item) => (
           <Card key={item.id} className="overflow-hidden md:flex md:flex-row">
             <div className="md:w-1/3">
               <Image
-                src={item.image.imageUrl}
+                src={item.imageUrl}
                 alt={item.title}
                 width={600}
                 height={400}
                 className="w-full h-48 md:h-full object-cover"
-                data-ai-hint={item.image.imageHint}
               />
             </div>
             <div className="md:w-2/3">
               <CardHeader>
                 <div className='flex items-center justify-between'>
-                    <CardDescription>{item.date}</CardDescription>
+                    <CardDescription>{format(new Date(item.date), 'PPP')}</CardDescription>
                     <Badge variant={item.type === 'Event' ? 'default' : 'secondary'}>
                         {item.type}
                     </Badge>
@@ -45,7 +82,7 @@ export default function NewsAndEventsPage() {
                 <CardTitle className="font-headline text-2xl">{item.title}</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-foreground/80">{item.description}</p>
+                <p className="text-foreground/80">{item.content}</p>
               </CardContent>
             </div>
           </Card>

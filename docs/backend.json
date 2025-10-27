@@ -76,10 +76,6 @@
       "type": "object",
       "description": "Represents a news item or event.",
       "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the news event."
-        },
         "title": {
           "type": "string",
           "description": "Title of the news event."
@@ -91,14 +87,24 @@
         "date": {
           "type": "string",
           "description": "Date of the news event.",
-          "format": "date-time"
+          "format": "date"
+        },
+        "type": {
+            "type": "string",
+            "enum": ["News", "Event"],
+            "description": "The type of the item."
+        },
+        "imageUrl": {
+            "type": "string",
+            "description": "URL of the image for the news/event."
         }
       },
       "required": [
-        "id",
         "title",
         "content",
-        "date"
+        "date",
+        "type",
+        "imageUrl"
       ]
     },
     "AdmissionInformation": {
@@ -134,8 +140,7 @@
   },
   "auth": {
     "providers": [
-      "password",
-      "anonymous"
+      "password"
     ]
   },
   "firestore": {
@@ -179,7 +184,7 @@
           "schema": {
             "$ref": "#/backend/entities/NewsEvent"
           },
-          "description": "Stores news events.  No specific authorization fields are needed, as access is managed through structural segregation (separate collection).",
+          "description": "Stores news events. Authenticated admins can create, update, and delete. All users can read.",
           "params": [
             {
               "name": "newsEventId",
