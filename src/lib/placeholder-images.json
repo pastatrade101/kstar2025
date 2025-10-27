@@ -1,3 +1,88 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "faculty-1",
+      "description": "Portrait of Dr. Evelyn Reed",
+      "imageUrl": "https://images.unsplash.com/photo-1557053910-d9eadeed1c58?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHx3b21hbiUyMHBvcnRyYWl0fGVufDB8fHx8MTc2MTQ5MDEzNHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "woman portrait"
+    },
+    {
+      "id": "faculty-2",
+      "description": "Portrait of Dr. Samuel Chen",
+      "imageUrl": "https://images.unsplash.com/photo-1624395213043-fa2e123b2656?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxtYW4lMjBwb3J0cmFpdHxlbnwwfHx8fDE3NjE0NzAyMTJ8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "man portrait"
+    },
+    {
+      "id": "faculty-3",
+      "description": "Portrait of Dr. Maria Garcia",
+      "imageUrl": "https://images.unsplash.com/photo-1620862242704-93e77e90a83e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8d29tYW4lMjBwb3J0cmFpdCUyMHNtaWxpbmd8ZW58MHx8fHwxNzYxNTQ2ODk5fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "woman portrait smiling"
+    },
+    {
+      "id": "faculty-4",
+      "description": "Portrait of Dr. Ben Carter",
+      "imageUrl": "https://images.unsplash.com/photo-1555601997-78d28e026a86?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8bWFuJTIwcG9ydHJhaXQlMjBnbGFzc2VzfGVufDB8fHx8MTc2MTUzMjUyOXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "man portrait glasses"
+    },
+    {
+      "id": "course-1",
+      "description": "Abstract art representing modern art",
+      "imageUrl": "https://images.unsplash.com/photo-1615184697985-c9bde1b07da7?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxtb2Rlcm4lMjBhcnR8ZW58MHx8fHwxNzYxNTQ2ODk5fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "modern art"
+    },
+    {
+      "id": "course-2",
+      "description": "Scientific equipment in a lab",
+      "imageUrl": "https://images.unsplash.com/photo-1518152006812-edab29b069ac?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxzY2llbmNlJTIwbGFifGVufDB8fHx8MTc2MTQ1MTc4OXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "science lab"
+    },
+    {
+      "id": "course-3",
+      "description": "Ancient ruins, representing history",
+      "imageUrl": "https://images.unsplash.com/photo-1513733582371-0adb4dac50f6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxhbmNpZW50JTIwcnVpbnN8ZW58MHx8fHwxNzYxNTM4ODgwfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "ancient ruins"
+    },
+    {
+      "id": "course-4",
+      "description": "A person writing code on a laptop",
+      "imageUrl": "https://images.unsplash.com/photo-1653387141060-9a9834f47777?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxwcm9ncmFtbWluZyUyMGNvZGV8ZW58MHx8fHwxNzYxNTA0NzY2fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "programming code"
+    },
+    {
+      "id": "course-5",
+      "description": "A bookshelf filled with classic literature",
+      "imageUrl": "https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8bGlicmFyeSUyMGJvb2tzfGVufDB8fHx8MTc2MTUzNDg3M3ww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "library books"
+    },
+    {
+      "id": "course-6",
+      "description": "A calculator and graphs for a mathematics course",
+      "imageUrl": "https://images.unsplash.com/photo-1754304342312-cace9df82c6e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxtYXRoZW1hdGljcyUyMGdyYXBofGVufDB8fHx8MTc2MTU0Njg5OXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "mathematics graph"
+    },
+    {
+      "id": "news-1",
+      "description": "University campus on a sunny day",
+      "imageUrl": "https://images.unsplash.com/photo-1592280771190-3e2e4d571952?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHx1bml2ZXJzaXR5JTIwY2FtcHVzfGVufDB8fHx8MTc2MTQ0ODEzNnww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "university campus"
+    },
+    {
+      "id": "news-2",
+      "description": "Students in a graduation ceremony",
+      "imageUrl": "https://images.unsplash.com/photo-1607013407627-6ee814329547?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxncmFkdWF0aW9uJTIwY2VyZW1vbnl8ZW58MHx8fHwxNzYxNTM5NDIwfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "graduation ceremony"
+    },
+    {
+      "id": "news-3",
+      "description": "Students collaborating in a library",
+      "imageUrl": "https://images.unsplash.com/photo-1758270704763-22072a90d3b6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxzdHVkZW50cyUyMGNvbGxhYm9yYXRpbmd8ZW58MHx8fHwxNzYxNTQwMTYyfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "students collaborating"
+    },
+    {
+      "id": "news-4",
+      "description": "A guest speaker at a lectern",
+      "imageUrl": "https://images.unsplash.com/photo-1646369505567-3a9cbb052342?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxndWVzdCUyMHNwZWFrZXJ8ZW58MHx8fHwxNzYxNTA1NjIzfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "guest speaker"
+    }
+  ]
 }
