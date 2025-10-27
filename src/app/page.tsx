@@ -262,7 +262,7 @@ export default function Home() {
                   className={`flex items-center gap-2 transition-all duration-300 hover:text-blue-600 dark:hover:text-blue-400 ${
                     isScrolled
                       ? 'text-gray-700 dark:text-gray-300'
-                      : 'text-white'
+                      : 'text-gray-800 dark:text-white'
                   }`}
                 >
                   <link.icon size={16} />
