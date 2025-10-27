@@ -1,76 +1,93 @@
 /**
- * @file Firestore Security Rules for EduPro Hub
- * @description This ruleset enforces read access for all users on news_events, courses, instructors and admission_information
- * while restricting write access.
+ * @file Overview
+ * This ruleset defines access control for the EduPro Hub application, focusing on courses, instructors, news events, and admission information.
+ *
+ * Core Philosophy:
+ * Each entity (Course, Instructor, NewsEvent, AdmissionInformation) is stored in its own top-level collection.
+ * Read access is generally public, while write access is restricted based on the entity type.
  *
  * Data Structure:
- * - /courses/{courseId}: Stores course information. Public read, restricted write.
- * - /instructors/{instructorId}: Stores instructor information. Public read, restricted write.
- * - /news_events/{newsEventId}: Stores news and events. Public read, restricted write.
- * - /admission_information/{admissionInformationId}: Stores admission information. Public read, restricted write.
+ * /courses/{courseId}: Stores course information.
+ * /instructors/{instructorId}: Stores instructor information.
+ * /news_events/{newsEventId}: Stores news and event information.
+ * /admission_information/{admissionInformationId}: Stores admission information.
  *
  * Key Security Decisions:
- * - Public read access to all collections, allowing any user to fetch data.
- * - Write access is disabled for all collections.
+ * - Public read access for all collections.
+ * - No user-specific data or ownership model.
+ * - News Events have owner-only write permissions (currently open to all authenticated users, but should be restricted to admins in future iterations).
+ *
+ * Denormalization for Authorization:
+ *  - This implementation assumes an admin role is managed outside of Firestore Security Rules.
+ *  - NewsEvent needs to have a owner id field.
+ * Structural Segregation:
+ *  - Data is separated into top-level collections based on entity type, simplifying access control.
  */
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
     /**
-     * @description Allows anyone to read courses, but restricts all write operations.
+     * @description Controls access to course information.
      * @path /courses/{courseId}
-     * @allow (get, list) - Any user can read course information.
-     * @deny (create, update, delete) - No user can create, update, or delete course information.
-     * @principle Allows public read access while preventing unauthorized data modification.
+     * @allow get, list: Any user can read course information.
+     * @allow create, update, delete: No one can modify course information.
+     * @deny create, update, delete: Attempts to create, update, or delete course documents.
+     * @principle Public read access, no write access.
      */
     match /courses/{courseId} {
       allow get, list: if true;
-      allow create: if false;
-      allow update: if false;
-      allow delete: if false;
+      allow create, update, delete: if false;
     }
 
     /**
-     * @description Allows anyone to read instructor information, but restricts all write operations.
+     * @description Controls access to instructor information.
      * @path /instructors/{instructorId}
-     * @allow (get, list) - Any user can read instructor information.
-     * @deny (create, update, delete) - No user can create, update, or delete instructor information.
-     * @principle Allows public read access while preventing unauthorized data modification.
+     * @allow get, list: Any user can read instructor information.
+     * @allow create, update, delete: No one can modify instructor information.
+     * @deny create, update, delete: Attempts to create, update, or delete instructor documents.
+     * @principle Public read access, no write access.
      */
     match /instructors/{instructorId} {
       allow get, list: if true;
-      allow create: if false;
-      allow update: if false;
-      allow delete: if false;
+      allow create, update, delete: if false;
     }
 
     /**
-     * @description Allows anyone to read news events, but restricts all write operations.
+     * @description Controls access to news and event information.
      * @path /news_events/{newsEventId}
-     * @allow (get, list) - Any user can read news event information.
-     * @deny (create, update, delete) - No user can create, update, or delete news event information.
-     * @principle Allows public read access while preventing unauthorized data modification.
+     * @allow get, list: Any user can read news and event information.
+     * @allow create, update, delete: Only authenticated users can create, update or delete news and events.
+     * @deny create, update, delete: Attempts to create, update, or delete news event documents by unauthenticated users.
+     * @principle Public read access, authenticated-only write access (admin role to be implemented).
      */
     match /news_events/{newsEventId} {
       allow get, list: if true;
-      allow create: if false;
-      allow update: if false;
-      allow delete: if false;
+      allow create: if isSignedIn();
+      allow update: if isSignedIn() && resource != null;
+      allow delete: if isSignedIn() && resource != null;
     }
 
     /**
-     * @description Allows anyone to read admission information, but restricts all write operations.
+     * @description Controls access to admission information.
      * @path /admission_information/{admissionInformationId}
-     * @allow (get, list) - Any user can read admission information.
-     * @deny (create, update, delete) - No user can create, update, or delete admission information.
-     * @principle Allows public read access while preventing unauthorized data modification.
+     * @allow get, list: Any user can read admission information.
+     * @allow create, update, delete: No one can modify admission information.
+     * @deny create, update, delete: Attempts to create, update, or delete admission information documents.
+     * @principle Public read access, no write access.
      */
     match /admission_information/{admissionInformationId} {
       allow get, list: if true;
-      allow create: if false;
-      allow update: if false;
-      allow delete: if false;
+      allow create, update, delete: if false;
+    }
+
+    /**
+     * @description Checks if the user is signed in.
+     * @return True if the user is signed in, false otherwise.
+     * @principle Authentication required.
+     */
+    function isSignedIn() {
+      return request.auth != null;
     }
   }
 }
