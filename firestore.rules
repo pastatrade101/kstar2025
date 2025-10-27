@@ -1,61 +1,86 @@
 /**
- * @fileOverview
- * This ruleset enforces a public-read, owner-write security model for all collections.
- * All data resides in top-level collections: /courses/{courseId}, /instructors/{instructorId}, /news_events/{newsEventId}, and /admission_information/{admissionInformationId}.
+ * @fileoverview Firestore Security Rules for EduPro Hub application.
+ *
+ * Core Philosophy:
+ * This ruleset focuses on providing open read access while restricting write access to authorized users.
+ *
+ * Data Structure:
+ * - /courses/{courseId}: Stores course information. Publicly readable.
+ * - /instructors/{instructorId}: Stores instructor information. Publicly readable.
+ * - /news_events/{newsEventId}: Stores news and event information. Publicly readable, writeable by authorized users.
+ * - /admission_information/{admissionInformationId}: Stores admission information. Publicly readable.
+ *
  * Key Security Decisions:
- * - Read permissions are public for all collections.
- * - Write permissions (create, update, delete) are denied to all users, as no ownership field exists.
+ * - Public read access is granted for all collections to facilitate easy data retrieval.
+ * - Write access to the 'news_events' collection is restricted to authenticated users.  Future versions
+ *   should enhance this to role-based access (e.g., admins).
+ * - No user-specific data trees are present in this version.
+ *
+ * Denormalization for Authorization:
+ * - This version doesn't require denormalization as write access is based solely on authentication status.
+ *   Future iterations with role-based access would benefit from a denormalized 'roles' map on a user document.
+ *
+ * Structural Segregation:
+ * - The data is segregated into different top-level collections based on entity type.
  */
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
     /**
-     * @description Grants public read access to course information but restricts write access.
+     * @description Allows anyone to read course information.
      * @path /courses/{courseId}
-     * @allow get, list: Everyone can read course information.
-     * @deny create, update, delete: No one can create, update, or delete courses without authentication and ownership.
-     * @principle Allows public reads, restricts writes due to missing ownership information.
+     * @allow (get, list): Anyone can read courses.
+     * @deny (create, update, delete): No one can modify course data through the client.
+     * @principle Grants public read access for course details.
      */
     match /courses/{courseId} {
       allow get, list: if true;
-      allow create, update, delete: if false; // TODO: Add owner validation once the schema is updated with an ownership field.
+      allow create, update, delete: if false;
     }
 
     /**
-     * @description Grants public read access to instructor information but restricts write access.
+     * @description Allows anyone to read instructor information.
      * @path /instructors/{instructorId}
-     * @allow get, list: Everyone can read instructor information.
-     * @deny create, update, delete: No one can create, update, or delete instructors without authentication and ownership.
-     * @principle Allows public reads, restricts writes due to missing ownership information.
+     * @allow (get, list): Anyone can read instructors.
+     * @deny (create, update, delete): No one can modify instructor data through the client.
+     * @principle Grants public read access for instructor details.
      */
     match /instructors/{instructorId} {
       allow get, list: if true;
-      allow create, update, delete: if false; // TODO: Add owner validation once the schema is updated with an ownership field.
+      allow create, update, delete: if false;
     }
 
     /**
-     * @description Grants public read access to news events but restricts write access.
+     * @description Allows authenticated users to create, update, and delete news events, and allows anyone to read news events.
      * @path /news_events/{newsEventId}
-     * @allow get, list: Everyone can read news events.
-     * @deny create, update, delete: No one can create, update, or delete news events without authentication and ownership.
-     * @principle Allows public reads, restricts writes due to missing ownership information.
+     * @allow (get, list): Anyone can read news events.
+     * @allow (create, update, delete): Authenticated users can modify news events.
+     * @deny (create, update, delete): Unauthenticated users can not modify news events.
+     * @principle Requires authentication for modifying news events.
      */
     match /news_events/{newsEventId} {
       allow get, list: if true;
-      allow create, update, delete: if false; // TODO: Add owner validation once the schema is updated with an ownership field.
+      allow create: if isSignedIn();
+      allow update: if isSignedIn() && resource != null;
+      allow delete: if isSignedIn() && resource != null;
     }
 
     /**
-     * @description Grants public read access to admission information but restricts write access.
+     * @description Allows anyone to read admission information.
      * @path /admission_information/{admissionInformationId}
-     * @allow get, list: Everyone can read admission information.
-     * @deny create, update, delete: No one can create, update, or delete admission information without authentication and ownership.
-     * @principle Allows public reads, restricts writes due to missing ownership information.
+     * @allow (get, list): Anyone can read admission information.
+     * @deny (create, update, delete): No one can modify admission information through the client.
+     * @principle Grants public read access for admission details.
      */
     match /admission_information/{admissionInformationId} {
       allow get, list: if true;
-      allow create, update, delete: if false; // TODO: Add owner validation once the schema is updated with an ownership field.
+      allow create, update, delete: if false;
+    }
+
+    // Helper function to determine if a user is signed in
+    function isSignedIn() {
+      return request.auth != null;
     }
   }
 }
