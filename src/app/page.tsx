@@ -31,8 +31,9 @@ import {
   TrendingUp,
   Zap,
   FileText,
+  Loader2,
 } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -41,6 +42,18 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import Image from 'next/image';
+import { useFirestore, useCollection, useMemoFirebase } from '@/firebase';
+import { collection, query, where, orderBy, limit } from 'firebase/firestore';
+import { format } from 'date-fns';
+
+type NewsEvent = {
+  id: string;
+  title: string;
+  content: string;
+  date: string;
+  type: 'News' | 'Event';
+  imageUrl: string;
+};
 
 export default function Home() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -54,6 +67,38 @@ export default function Home() {
   const [searchQuery, setSearchQuery] = useState('');
   const [newsletterEmail, setNewsletterEmail] = useState('');
   const { toast } = useToast();
+
+  const firestore = useFirestore();
+  const eventsCollectionRef = useMemoFirebase(
+    () => collection(firestore, 'news_events'),
+    [firestore]
+  );
+  const eventsQuery = useMemoFirebase(
+    () =>
+      query(
+        eventsCollectionRef,
+        where('type', '==', 'Event'),
+        orderBy('date', 'desc'),
+        limit(4)
+      ),
+    [eventsCollectionRef]
+  );
+
+  const { data: events, isLoading: isLoadingEvents } = useCollection<NewsEvent>(eventsQuery);
+
+  const { upcomingEvents, pastEvents } = useMemo(() => {
+    if (!events) {
+      return { upcomingEvents: [], pastEvents: [] };
+    }
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Set to start of today for comparison
+
+    const upcoming = events.filter(event => new Date(event.date) >= today);
+    const past = events.filter(event => new Date(event.date) < today);
+
+    return { upcomingEvents: upcoming, pastEvents: past };
+  }, [events]);
+
 
   useEffect(() => {
     const handleScroll = () => {
@@ -101,59 +146,6 @@ export default function Home() {
     }
   };
 
-  const events = [
-    {
-      id: 1,
-      title: 'Mkutano wa Wadau wa Kitaifa',
-      description:
-        'Mkutano mkubwa wa wadau kutoka mikoa yote ili kujadili mipango ya siku zijazo na kubadilishana uzoefu.',
-      date: '15 Novemba 2024',
-      time: '9:00 AM - 4:00 PM',
-      location: 'Ukumbi Mkuu, Dar es Salaam',
-      type: 'past',
-      image:
-        'https://images.unsplash.com/photo-1531058020387-3be344556be6?w=800&q=80',
-    },
-    {
-      id: 2,
-      title: 'Warsha ya Ujenzi wa Uwezo',
-      description:
-        'Mafunzo ya ujenzi wa uwezo kwa wafanyakazi na washirika wa taasisi katika nyanja mbalimbali za utendaji.',
-      date: '28 Disemba 2024',
-      time: '8:00 AM - 5:00 PM',
-      location: 'Kituo cha Mafunzo, Arusha',
-      type: 'past',
-      image:
-        'https://images.unsplash.com/photo-1716703435453-a7733d600d68?w=800&q=80',
-    },
-    {
-      id: 3,
-      title: 'Siku ya Jamii',
-      description:
-        'Sherehe maalum ya kushirikiana na jamii, kukutana na wadau, na kuonyesha mafanikio ya mwaka uliopita.',
-      date: '15 Februari 2025',
-      time: '10:00 AM - 3:00 PM',
-      location: 'Uwanja wa Michezo, Mwanza',
-      type: 'upcoming',
-      image:
-        'https://images.unsplash.com/photo-1625246433906-6cfa33544b31?w=800&q=80',
-    },
-    {
-      id: 4,
-      title: 'Mkutano wa Mwaka wa Bodi',
-      description:
-        'Mkutano wa kila mwaka wa wajumbe wa bodi kujadili sera, bajeti, na mipango ya mkakati.',
-      date: '20 Machi 2025',
-      time: '9:00 AM - 1:00 PM',
-      location: 'Chumba cha Bodi, Ofisi Kuu',
-      type: 'upcoming',
-      image:
-        'https://images.unsplash.com/photo-1531058020387-3be344556be6?w=800&q=80',
-    },
-  ];
-
-  const upcomingEvents = events.filter((e) => e.type === 'upcoming');
-  const pastEvents = events.filter((e) => e.type === 'past');
   const currentYear = new Date().getFullYear();
 
   const navLinks = [
@@ -259,11 +251,7 @@ export default function Home() {
                 <button
                   key={link.id}
                   onClick={() => scrollToSection(link.id)}
-                  className={`flex items-center gap-2 transition-all duration-300 hover:text-blue-600 dark:hover:text-blue-400 ${
-                    isScrolled
-                      ? 'text-gray-700 dark:text-gray-300'
-                      : 'text-gray-800 dark:text-white'
-                  }`}
+                  className={`flex items-center gap-2 transition-all duration-300 hover:text-blue-600 dark:hover:text-blue-400 text-gray-800 dark:text-gray-300`}
                 >
                   <link.icon size={16} />
                   <span className="text-sm font-medium">{link.label}</span>
@@ -273,7 +261,7 @@ export default function Home() {
 
             <button
               className={`md:hidden ${
-                isScrolled ? 'text-gray-700 dark:text-gray-300' : 'text-white'
+                isScrolled ? 'text-gray-700 dark:text-gray-300' : 'text-gray-800 dark:text-white'
               }`}
               onClick={() => setIsMenuOpen(!isMenuOpen)}
             >
@@ -517,121 +505,126 @@ export default function Home() {
                 na wadau wetu katika shughuli mbalimbali.
               </p>
             </div>
-
-            <div className="mb-20">
-              <h3 className="text-3xl font-bold text-green-600 dark:text-green-400 mb-8 flex items-center gap-3">
-                <Zap className="h-8 w-8" />
-                Matukio Yanayokuja
-              </h3>
-              <div className="grid md:grid-cols-2 gap-8">
-                {upcomingEvents.map((event) => (
-                  <div key={event.id}>
-                    <Card className="overflow-hidden group bg-white dark:bg-gray-800 border-2 border-gray-100 dark:border-gray-700 hover:border-green-200 dark:hover:border-green-800 hover:shadow-2xl transition-all duration-500">
-                      <div className="relative h-56 overflow-hidden">
-                        <Image
-                          src={event.image}
-                          alt={event.title}
-                          layout="fill"
-                          objectFit="cover"
-                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-                        <Badge className="absolute top-4 right-4 bg-green-500 text-white border-0 shadow-lg">
-                          Ijayo
-                        </Badge>
-                      </div>
-                      <CardContent className="p-6">
-                        <h4 className="font-bold text-xl mb-3 text-gray-900 dark:text-white">
-                          {event.title}
-                        </h4>
-                        <p className="text-gray-600 dark:text-gray-400 mb-4">
-                          {event.description}
-                        </p>
-                        <div className="space-y-2.5 text-gray-700 dark:text-gray-300">
-                          <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center">
-                              <Calendar className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                            </div>
-                            <span>{event.date}</span>
-                          </div>
-                          <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center">
-                              <Clock className="h-5 w-5 text-purple-600 dark:text-purple-400" />
-                            </div>
-                            <span>{event.time}</span>
-                          </div>
-                          <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 bg-orange-100 dark:bg-orange-900/30 rounded-lg flex items-center justify-center">
-                              <MapPin className="h-5 w-5 text-orange-600 dark:text-orange-400" />
-                            </div>
-                            <span>{event.location}</span>
-                          </div>
-                        </div>
-                      </CardContent>
-                      <CardFooter>
-                        <Button className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 shadow-lg group">
-                          Jisajili Sasa
-                          <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                        </Button>
-                      </CardFooter>
-                    </Card>
-                  </div>
-                ))}
+            
+            {isLoadingEvents && (
+              <div className="flex justify-center items-center h-64">
+                  <Loader2 className="h-12 w-12 animate-spin text-primary" />
               </div>
-            </div>
+            )}
 
-            <div>
-              <h3 className="text-3xl font-bold text-gray-600 dark:text-gray-400 mb-8">
-                Matukio Yaliyopita
-              </h3>
-              <div className="grid md:grid-cols-2 gap-8">
-                {pastEvents.map((event) => (
-                  <div key={event.id}>
-                    <Card className="overflow-hidden group bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-all duration-500 opacity-80 hover:opacity-100">
-                      <div className="relative h-56 overflow-hidden">
-                        <Image
-                          src={event.image}
-                          alt={event.title}
-                          layout="fill"
-                          objectFit="cover"
-                          className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-                        <Badge
-                          variant="outline"
-                          className="absolute top-4 right-4 bg-white/90 dark:bg-gray-900/90"
-                        >
-                          Imepita
-                        </Badge>
+            {!isLoadingEvents && (
+              <>
+                {upcomingEvents.length > 0 && (
+                  <div className="mb-20">
+                  <h3 className="text-3xl font-bold text-green-600 dark:text-green-400 mb-8 flex items-center gap-3">
+                    <Zap className="h-8 w-8" />
+                    Matukio Yanayokuja
+                  </h3>
+                  <div className="grid md:grid-cols-2 gap-8">
+                    {upcomingEvents.map((event) => (
+                      <div key={event.id}>
+                        <Card className="overflow-hidden group bg-white dark:bg-gray-800 border-2 border-gray-100 dark:border-gray-700 hover:border-green-200 dark:hover:border-green-800 hover:shadow-2xl transition-all duration-500">
+                          <div className="relative h-56 overflow-hidden">
+                            <Image
+                              src={event.imageUrl}
+                              alt={event.title}
+                              layout="fill"
+                              objectFit="cover"
+                              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                            <Badge className="absolute top-4 right-4 bg-green-500 text-white border-0 shadow-lg">
+                              Ijayo
+                            </Badge>
+                          </div>
+                          <CardContent className="p-6">
+                            <h4 className="font-bold text-xl mb-3 text-gray-900 dark:text-white">
+                              {event.title}
+                            </h4>
+                            <p className="text-gray-600 dark:text-gray-400 mb-4 line-clamp-2">
+                              {event.content}
+                            </p>
+                            <div className="space-y-2.5 text-gray-700 dark:text-gray-300">
+                              <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center">
+                                  <Calendar className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                                </div>
+                                <span>{format(new Date(event.date), 'PPP')}</span>
+                              </div>
+                            </div>
+                          </CardContent>
+                          <CardFooter>
+                            <Button className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 shadow-lg group">
+                              Jisajili Sasa
+                              <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                            </Button>
+                          </CardFooter>
+                        </Card>
                       </div>
-                      <CardContent className="p-6">
-                        <h4 className="font-bold text-xl mb-3 text-gray-900 dark:text-white">
-                          {event.title}
-                        </h4>
-                        <p className="text-gray-600 dark:text-gray-400 mb-4">
-                          {event.description}
-                        </p>
-                        <div className="space-y-2 text-gray-600 dark:text-gray-400 text-sm">
-                          <div className="flex items-center gap-2">
-                            <Calendar className="h-4 w-4" />
-                            <span>{event.date}</span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <MapPin className="h-4 w-4" />
-                            <span>{event.location}</span>
-                          </div>
-                        </div>
-                      </CardContent>
-                      <CardFooter>
-                        <Button variant="outline" className="w-full">
-                          Angalia Picha
-                        </Button>
-                      </CardFooter>
-                    </Card>
+                    ))}
                   </div>
-                ))}
-              </div>
-            </div>
+                </div>
+                )}
+
+                {pastEvents.length > 0 && (
+                   <div>
+                   <h3 className="text-3xl font-bold text-gray-600 dark:text-gray-400 mb-8">
+                     Matukio Yaliyopita
+                   </h3>
+                   <div className="grid md:grid-cols-2 gap-8">
+                     {pastEvents.map((event) => (
+                       <div key={event.id}>
+                         <Card className="overflow-hidden group bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-all duration-500 opacity-80 hover:opacity-100">
+                           <div className="relative h-56 overflow-hidden">
+                             <Image
+                               src={event.imageUrl}
+                               alt={event.title}
+                               layout="fill"
+                               objectFit="cover"
+                               className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
+                             />
+                             <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                             <Badge
+                               variant="outline"
+                               className="absolute top-4 right-4 bg-white/90 dark:bg-gray-900/90"
+                             >
+                               Imepita
+                             </Badge>
+                           </div>
+                           <CardContent className="p-6">
+                             <h4 className="font-bold text-xl mb-3 text-gray-900 dark:text-white">
+                               {event.title}
+                             </h4>
+                             <p className="text-gray-600 dark:text-gray-400 mb-4 line-clamp-2">
+                               {event.content}
+                             </p>
+                             <div className="space-y-2 text-gray-600 dark:text-gray-400 text-sm">
+                               <div className="flex items-center gap-2">
+                                 <Calendar className="h-4 w-4" />
+                                 <span>{format(new Date(event.date), 'PPP')}</span>
+                               </div>
+                             </div>
+                           </CardContent>
+                           <CardFooter>
+                             <Button variant="outline" className="w-full">
+                               Angalia Picha
+                             </Button>
+                           </CardFooter>
+                         </Card>
+                       </div>
+                     ))}
+                   </div>
+                 </div>
+                )}
+
+                {events?.length === 0 && (
+                   <div className="text-center text-muted-foreground py-16">
+                      <p>No events have been posted yet. Check back soon!</p>
+                  </div>
+                )}
+              </>
+            )}
+
           </div>
         </section>
 
@@ -1079,3 +1072,5 @@ export default function Home() {
     </div>
   );
 }
+
+    
