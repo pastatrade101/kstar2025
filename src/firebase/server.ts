@@ -1,6 +1,6 @@
 // IMPORTANT: This file is meant for server-side code and should only be
 // imported by server-side modules.
-import { initializeApp, getApp, getApps, FirebaseApp } from 'firebase-admin/app';
+import { initializeApp, getApp, getApps, App, cert, ServiceAccount } from 'firebase-admin/app';
 import { getAuth } from 'firebase-admin/auth';
 import { getFirestore } from 'firebase-admin/firestore';
 import { firebaseConfig } from './config';
@@ -13,8 +13,9 @@ export function initializeFirebase() {
   }
 
   // If not initialized, initialize with credentials
+  // In a deployed environment, these credentials will be auto-discovered.
+  // In a local environment, you may need to set GOOGLE_APPLICATION_CREDENTIALS.
   const app = initializeApp({
-    // Use the projectId from the client-side config
     projectId: firebaseConfig.projectId,
   });
 
@@ -22,7 +23,7 @@ export function initializeFirebase() {
 }
 
 // Helper function to get the SDKs
-function getSdks(app: FirebaseApp) {
+function getSdks(app: App) {
   return {
     app,
     auth: getAuth(app),
