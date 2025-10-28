@@ -31,7 +31,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import Image from 'next/image';
 import { format } from 'date-fns';
-import { collection, query, where, orderBy, limit, getDocs, Timestamp } from 'firebase/firestore';
+import { collection, query, where, orderBy, limit, getDocs, Timestamp } from 'firebase-admin/firestore';
 import { initializeFirebase } from '@/firebase/server';
 import Link from 'next/link';
 import HomeClient from './home-client';
@@ -49,15 +49,13 @@ type NewsEvent = {
 async function getEvents() {
     try {
         const { firestore } = initializeFirebase();
-        const eventsCollectionRef = collection(firestore, 'news_events');
-        const eventsQuery = query(
-          eventsCollectionRef,
-          where('type', '==', 'Event'),
-          orderBy('date', 'desc'),
-          limit(4)
-        );
+        const eventsCollectionRef = firestore.collection('news_events');
+        const eventsQuery = eventsCollectionRef
+          .where('type', '==', 'Event')
+          .orderBy('date', 'desc')
+          .limit(4);
     
-        const snapshot = await getDocs(eventsQuery);
+        const snapshot = await eventsQuery.get();
     
         if (snapshot.empty) {
           return [];
@@ -68,8 +66,8 @@ async function getEvents() {
           return {
             ...data,
             id: doc.id,
-            // Convert Firestore Timestamp to a serializable format if it's a Timestamp
-            date: data.date instanceof Timestamp ? data.date.toDate().toISOString() : data.date,
+            // Convert Firestore Timestamp to a serializable format
+            date: (data.date as Timestamp).toDate().toISOString(),
           } as NewsEvent;
         });
         

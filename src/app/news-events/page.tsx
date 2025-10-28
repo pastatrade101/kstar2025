@@ -9,7 +9,7 @@ import {
   import { Badge } from '@/components/ui/badge';
   import { Loader2 } from 'lucide-react';
   import { format } from 'date-fns';
-  import { collection, query, orderBy, getDocs, Timestamp } from 'firebase/firestore';
+  import { collection, query, orderBy, getDocs, Timestamp } from 'firebase-admin/firestore';
   import { initializeFirebase } from '@/firebase/server';
   
   
@@ -25,9 +25,9 @@ import {
   async function getNewsAndEvents() {
     try {
       const { firestore } = initializeFirebase();
-      const newsCollectionRef = collection(firestore, 'news_events');
-      const newsQuery = query(newsCollectionRef, orderBy('date', 'desc'));
-      const snapshot = await getDocs(newsQuery);
+      const newsCollectionRef = firestore.collection('news_events');
+      const newsQuery = newsCollectionRef.orderBy('date', 'desc');
+      const snapshot = await newsQuery.get();
   
       if (snapshot.empty) {
         return [];
@@ -38,7 +38,7 @@ import {
         return {
           ...data,
           id: doc.id,
-          date: data.date instanceof Timestamp ? data.date.toDate().toISOString() : data.date,
+          date: (data.date as Timestamp).toDate().toISOString(),
         } as NewsEvent;
       });
   
