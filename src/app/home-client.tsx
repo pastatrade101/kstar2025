@@ -5,175 +5,111 @@ import {
   Menu,
   X,
   ArrowRight,
-  Search,
-  Mail,
-  Phone,
-  MessageSquare,
   Home as HomeIcon,
   Info,
   Briefcase,
-  Newspaper,
-  MessageCircle as MessageCircleIcon,
+  Star,
+  MessageSquare,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 
 export default function HomeClient({ children }: { children: React.ReactNode }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
 
   const navLinks = [
-    { id: 'home', label: 'Home', icon: HomeIcon },
-    { id: 'about', label: 'About Us', icon: Info },
-    { id: 'services', label: 'Services', icon: Briefcase },
-    { id: 'objectives', label: 'Objectives', icon: Newspaper },
-    { id: 'contact', label: 'Contact', icon: MessageCircleIcon },
+    { id: 'home', label: 'Home' },
+    { id: 'about', label: 'About' },
+    { id: 'services', label: 'Services' },
+    { id: 'values', label: 'Values' },
+    { id: 'contact', label: 'Contact' },
   ];
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
+      setIsScrolled(window.scrollY > 20);
     };
     window.addEventListener('scroll', handleScroll);
+    handleScroll(); // Check on initial load
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const scrollToSection = (id: string) => {
+  const scrollToSection = (id: string) => (e: React.MouseEvent) => {
+    e.preventDefault();
     const element = document.getElementById(id);
     if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
+      const headerOffset = 80; // Approximate height of the sticky header
+      const elementPosition = element.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth',
+      });
       setIsMenuOpen(false);
     }
   };
-
-  const headerHeight = isScrolled ? 'h-16' : 'h-24';
-
+  
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-slate-50 dark:from-gray-900 dark:via-blue-950/20 dark:to-gray-900">
-      <div
-        className={`fixed top-0 left-0 right-0 z-50 bg-blue-950 text-white border-b border-blue-900 transition-transform duration-300 ${
-          isScrolled ? '-translate-y-full' : 'translate-y-0'
+    <div className="min-h-screen bg-background text-foreground">
+      <header
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+          isScrolled ? 'bg-background/80 backdrop-blur-xl border-b border-border' : 'bg-transparent'
         }`}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-12 flex items-center justify-between">
-          <div className="flex items-center gap-8">
-            <div className="flex items-center gap-2 text-sm">
-              <Phone size={16} className="text-blue-300" />
-              <span className="hidden sm:inline">Hotline:</span>
-              <a
-                href="tel:1-001-234-5678"
-                className="hover:text-blue-300 transition-colors font-medium"
-              >
-                1-001-234-5678
-              </a>
-            </div>
-            <div className="hidden md:flex items-center gap-2 text-sm">
-              <Mail size={16} className="text-blue-300" />
-              <span className="hidden sm:inline">Email:</span>
-              <a
-                href="mailto:hello@dream-theme.com"
-                className="hover:text-blue-300 transition-colors font-medium"
-              >
-                hello@dream-theme.com
-              </a>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <div className="relative hidden lg:block">
-              <Search
-                size={16}
-                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-              />
-              <input
-                type="text"
-                placeholder="Search..."
-                className="w-48 h-8 pl-9 pr-3 bg-white/10 border border-white/20 rounded-lg text-sm text-white placeholder:text-gray-400 focus:outline-none focus:bg-white/20 focus:border-white/30 transition-all"
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    const value = (e.target as HTMLInputElement).value;
-                    if (value.trim()) {
-                      // Implement search functionality
-                    }
-                  }
-                }}
-              />
-            </div>
-            <button
-              className="lg:hidden p-1.5 hover:bg-white/10 rounded-lg transition-colors"
-            >
-              <Search size={18} />
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <header
-        className={`fixed top-0 left-0 right-0 z-40 transition-all duration-500 ${
-          isScrolled
-            ? 'bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl shadow-lg border-b border-gray-200/50 dark:border-gray-800/50 translate-y-0'
-            : 'bg-transparent translate-y-12'
-        } ${headerHeight}`}
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full">
-          <div className="flex justify-between items-center h-full">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
-                <MessageSquare className="h-6 w-6 text-white" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-20">
+            <Link href="/" className="flex items-center gap-2">
+              <div className="w-8 h-8 bg-primary text-primary-foreground rounded-lg flex items-center justify-center">
+                <Star className="h-5 w-5" />
               </div>
-              <div>
-                <h1 className="font-bold text-gray-900 dark:text-white">
-                  Kstar International
-                </h1>
-                <p className="text-xs text-blue-600 dark:text-blue-400">
-                  Turn your desires into reality
-                </p>
-              </div>
-            </div>
+              <span className="font-bold text-lg">
+                Kstar International
+              </span>
+            </Link>
 
-            <nav className="hidden md:flex items-center gap-8">
+            <nav className="hidden md:flex items-center gap-2">
               {navLinks.map((link) => (
-                <button
-                  key={link.id}
-                  onClick={() => scrollToSection(link.id)}
-                  className={`flex items-center gap-2 transition-all duration-300 hover:text-blue-600 dark:hover:text-blue-400 text-gray-800 dark:text-gray-300`}
-                >
-                  <link.icon size={16} />
-                  <span className="text-sm font-medium">{link.label}</span>
-                </button>
+                <Button key={link.id} variant="ghost" asChild>
+                  <Link href={`#${link.id}`} onClick={scrollToSection(link.id)}>
+                    {link.label}
+                  </Link>
+                </Button>
               ))}
             </nav>
-            <div className='hidden md:flex'>
-                <Button onClick={() => scrollToSection('contact')}>
-                    Contact Us
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
+            
+            <div className="flex items-center gap-4">
+              <Button asChild className="hidden md:flex">
+                <Link href="#contact" onClick={scrollToSection('contact')}>
+                  Get In Touch
+                </Link>
+              </Button>
+
+              <button
+                className="md:hidden"
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                aria-label="Toggle menu"
+              >
+                {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+              </button>
             </div>
-
-
-            <button
-              className={`md:hidden ${
-                isScrolled ? 'text-gray-700 dark:text-gray-300' : 'text-gray-800 dark:text-white'
-              }`}
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-            >
-              {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-            </button>
           </div>
         </div>
 
         {isMenuOpen && (
-          <div className="md:hidden bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border-t border-gray-200 dark:border-gray-800">
+          <div className="md:hidden bg-background border-t border-border">
             <nav className="py-4 space-y-1 px-4">
               {navLinks.map((link) => (
-                <button
-                  key={link.id}
-                  onClick={() => scrollToSection(link.id)}
-                  className="w-full flex items-center gap-3 text-left px-4 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400 transition-all duration-300"
-                >
-                  <link.icon size={16} />
-                  <span>{link.label}</span>
-                </button>
+                 <Button key={link.id} variant="ghost" className="w-full justify-start" asChild>
+                    <Link href={`#${link.id}`} onClick={scrollToSection(link.id)}>
+                      {link.label}
+                    </Link>
+                  </Button>
               ))}
+              <Button asChild className="w-full mt-2">
+                <Link href="#contact" onClick={scrollToSection('contact')}>Get In Touch</Link>
+              </Button>
             </nav>
           </div>
         )}

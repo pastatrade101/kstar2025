@@ -83,6 +83,51 @@
       "description": "A guest speaker at a lectern",
       "imageUrl": "https://images.unsplash.com/photo-1646369505567-3a9cbb052342?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxndWVzdCUyMHNwZWFrZXJ8ZW58MHx8fHwxNzYxNTA1NjIzfDA&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "guest speaker"
+    },
+    {
+      "id": "service-1",
+      "imageUrl": "https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=800&q=80",
+      "imageHint": "creative team brainstorming"
+    },
+    {
+      "id": "service-2",
+      "imageUrl": "https://images.unsplash.com/photo-1517048676732-d65bc937f952?w=800&q=80",
+      "imageHint": "people discussion meeting"
+    },
+    {
+      "id": "service-3",
+      "imageUrl": "https://images.unsplash.com/photo-1543269865-cbf427effbad?w=800&q=80",
+      "imageHint": "global network connection"
+    },
+    {
+      "id": "service-4",
+      "imageUrl": "https://images.unsplash.com/photo-1573164713988-8665fc963095?w=800&q=80",
+      "imageHint": "business competition award"
+    },
+    {
+      "id": "service-5",
+      "imageUrl": "https://images.unsplash.com/photo-1531545514256-b1400bc00f31?w=800&q=80",
+      "imageHint": "talent development workshop"
+    },
+    {
+      "id": "service-6",
+      "imageUrl": "https://images.unsplash.com/photo-1511578194003-06242ea3e3a4?w=800&q=80",
+      "imageHint": "event management concert"
+    },
+    {
+      "id": "dept-creativity",
+      "imageUrl": "https://images.unsplash.com/photo-1497091071254-cc9b2ba7c48a?w=800&q=80",
+      "imageHint": "art supplies creativity"
+    },
+    {
+      "id": "dept-sports",
+      "imageUrl": "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=800&q=80",
+      "imageHint": "soccer field sports"
+    },
+    {
+      "id": "dept-music",
+      "imageUrl": "https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=800&q=80",
+      "imageHint": "music studio headphones"
     }
   ]
 }
