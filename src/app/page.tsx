@@ -3,29 +3,23 @@ import {
   Target,
   Eye,
   CheckCircle,
-  Quote,
-  MessageSquare,
-  Mail,
-  Facebook,
-  Twitter,
-  Instagram,
-  Linkedin,
-  Youtube,
-  Phone,
-  Sparkles,
-  Users,
-  TrendingUp,
-  MapPin,
   HeartHandshake,
   Lightbulb,
   ThumbsUp,
   Scale,
-  Goal,
-  Building,
-  BarChart,
-  Code,
+  Users,
+  Sparkles,
   Globe,
-  Award
+  TrendingUp,
+  Award,
+  Mail,
+  MapPin,
+  Phone,
+  Facebook,
+  Twitter,
+  Instagram,
+  Linkedin,
+  Youtube
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -42,27 +36,21 @@ export default async function Home() {
   const currentYear = new Date().getFullYear();
 
   const coreValues = [
-    { icon: Users, title: "Team Work", description: "We increase the ability to solve problems efficiently and effectively." },
-    { icon: HeartHandshake, title: "Trust", description: "We aim to be reliable to our beneficiaries, building a firm foundation." },
-    { icon: ThumbsUp, title: "Mutual Respect", description: "We respect the values, ideas, and beliefs of others." },
-    { icon: Scale, title: "Integrity", description: "We tell the truth and treat everyone with respect and zeal." },
+    { icon: Users, title: "Team Work", description: "We increase the ability to solve problems and obtain solutions in a more efficiently and effectively way." },
+    { icon: HeartHandshake, title: "Trust", description: "Without trust there is no a firm foundation, realising this major value, Kstar is aiming at being reliable to the beneficiaries." },
+    { icon: ThumbsUp, title: "Mutual Respect", description: "We respect the values, ideas and beliefs of others whilst not imposing our own on others." },
+    { icon: Scale, title: "Integrity", description: "The company tells the truth, hence is accountable and reliable, and treats workers, stakeholders, and customers with respect and zeal." },
     { icon: Lightbulb, title: "Constructive Self-Criticism", description: "We are always looking for ways to improve and grow." },
     { icon: CheckCircle, title: "Honesty", description: "We believe in being truthful in all our endeavors." }
   ];
 
   const services = [
-    { title: "Discovering & Promoting Creativity", icon: Sparkles, image: PlaceHolderImages.find(p => p.id === 'service-1') },
-    { title: "Conducting Constructive Dialogues", icon: Users, image: PlaceHolderImages.find(p => p.id === 'service-2') },
-    { title: "Connecting People Globally", icon: Globe, image: PlaceHolderImages.find(p => p.id === 'service-3') },
-    { title: "Business Idea Competitions", icon: Lightbulb, image: PlaceHolderImages.find(p => p.id === 'service-4') },
-    { title: "Talent Development", icon: TrendingUp, image: PlaceHolderImages.find(p => p.id === 'service-5') },
-    { title: "Event Production & Management", icon: Award, image: PlaceHolderImages.find(p => p.id === 'service-6') },
-  ];
-
-  const departments = [
-    { name: "Creativity", image: PlaceHolderImages.find(p => p.id === 'dept-creativity') },
-    { name: "Sports", image: PlaceHolderImages.find(p => p.id === 'dept-sports') },
-    { name: "Music", image: PlaceHolderImages.find(p => p.id === 'dept-music') },
+    { title: "Discovering & Promoting Creativity", icon: Sparkles, image: PlaceHolderImages.find(p => p.id === 'service-1'), description: "With the help of Kstar there would be a developmental model for promoting creative individuals as well as with their productivity in order to expand their concepts, talents, giftedness so as to include co-cognitive traits and to promote social capital." },
+    { title: "Conducting Constructive Dialogues", icon: Users, image: PlaceHolderImages.find(p => p.id === 'service-2'), description: "This aims at general experience that suggests the best dialogues to unleash different views on the ongoing crosscutting issues within the nation as well as globally so as to gain different views and understanding." },
+    { title: "Connecting People Globally", icon: Globe, image: PlaceHolderImages.find(p => p.id === 'service-3'), description: "The mutual aim is to connect people and the ideas from different parts of the world through global innovation plattforms for the current as well as the next generation and the forth coming ones." },
+    { title: "Business Idea Competitions", icon: Lightbulb, image: PlaceHolderImages.find(p => p.id === 'service-4'), description: "These business ideas tend to attract investments, bring people with the same objectives and interests together, grow existing businesses." },
+    { title: "Talent Development", icon: TrendingUp, image: PlaceHolderImages.find(p => p.id === 'service-5'), description: "Focusing on how average performance can become over achievers, this is done to the both created and borned talents because any talent can be developed and honed." },
+    { title: "Event Production & Management", icon: Award, image: PlaceHolderImages.find(p => p.id === 'service-6'), description: "Any entertainment event should have a clear and a well understood master plan so as to be achieved smoothly. The most important is to brand the event to be conducted as well as the venue where it will be taking place." },
   ];
 
   return (
@@ -71,9 +59,9 @@ export default async function Home() {
         {/* Hero Section */}
         <section
           id="home"
-          className="relative min-h-screen flex items-center justify-center overflow-hidden"
+          className="relative min-h-screen flex items-center justify-center overflow-hidden bg-white"
         >
-          <div className="absolute inset-0 z-0">
+          <div className="absolute inset-0 z-0 opacity-10">
             <Image
               src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1920&q=80"
               alt="Creative individuals working together"
@@ -82,9 +70,9 @@ export default async function Home() {
               priority
               data-ai-hint="creative team collaboration"
             />
-            <div className="absolute inset-0 bg-background/80 backdrop-blur-sm"></div>
-            <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent"></div>
           </div>
+           <div className="absolute inset-0 bg-gradient-to-t from-white via-white/80 to-transparent"></div>
+
 
           <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <Badge
@@ -99,7 +87,7 @@ export default async function Home() {
             </h1>
 
             <p className="text-lg md:text-xl text-muted-foreground mb-10 max-w-3xl mx-auto">
-              Kstar International is the bridge and place of hope for all creative individuals. Discover your life purpose, fulfill your passion, and make the community proud.
+              Kstar International Limited is established to serve the creative individual to fullfil their Purpose, Passion and Plans. The company is the bridge and place of hope for all creative induviduals.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -119,25 +107,20 @@ export default async function Home() {
         </section>
 
         {/* About Us Section */}
-        <section id="about" className="py-20 md:py-32">
+        <section id="about" className="py-20 md:py-32 bg-secondary/50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-16">
+              <Badge>About Us</Badge>
+              <h2 className="text-3xl md:text-4xl font-bold mt-4 mb-6">
+                Our Story, Mission, and Vision
+              </h2>
+               <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+                Founded on 29th June, 2020 by Founder and CEO Mwacha, Joseph Alphonce and the Company Director Robert A. Mwacha. Our motto is "Turn your desires into reality" or "Badili matamanio yako kuwa kweli".
+              </p>
+            </div>
             <div className="grid md:grid-cols-2 gap-12 items-center">
-              <div>
-                <Badge>About Us</Badge>
-                <h2 className="text-3xl md:text-4xl font-bold mt-4 mb-6">
-                  Our Story & Purpose
-                </h2>
-                <div className="space-y-4 text-muted-foreground text-lg">
-                  <p>
-                    Kstar International Limited was founded on 29th June, 2020 by Founder and CEO Mwacha, Joseph Alphonce and the Company Director Robert A. Mwacha.
-                  </p>
-                  <p>
-                    Our motto is "Turn your desires into reality" or "Badili matamanio yako kuwa kweli".
-                  </p>
-                </div>
-              </div>
               <div className="space-y-8">
-                <Card className="bg-secondary/50 border-border/50">
+                <Card className="bg-background border-border/50">
                   <CardHeader className="flex-row gap-4 items-center">
                     <div className="flex-shrink-0 w-12 h-12 bg-primary/10 text-primary rounded-lg flex items-center justify-center">
                       <Eye className="w-6 h-6" />
@@ -148,7 +131,7 @@ export default async function Home() {
                     <p>To make a better life for the creative individuals.</p>
                   </CardContent>
                 </Card>
-                <Card className="bg-secondary/50 border-border/50">
+                <Card className="bg-background border-border/50">
                   <CardHeader className="flex-row gap-4 items-center">
                     <div className="flex-shrink-0 w-12 h-12 bg-primary/10 text-primary rounded-lg flex items-center justify-center">
                       <Target className="w-6 h-6" />
@@ -160,12 +143,15 @@ export default async function Home() {
                   </CardContent>
                 </Card>
               </div>
+               <div>
+                 <Image src="https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=800&q=80" alt="Our Team" width={800} height={600} className="rounded-2xl shadow-xl" data-ai-hint="professional team meeting"/>
+              </div>
             </div>
           </div>
         </section>
 
         {/* Services Section */}
-        <section id="services" className="py-20 md:py-32 bg-secondary/30">
+        <section id="services" className="py-20 md:py-32 bg-background">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center max-w-3xl mx-auto">
               <Badge>Our Services</Badge>
@@ -176,7 +162,7 @@ export default async function Home() {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-16">
               {services.map((service) => (
-                <Card key={service.title} className="bg-card/50 backdrop-blur-sm border-border/50 overflow-hidden group">
+                <Card key={service.title} className="bg-card/50 border-border/50 overflow-hidden group hover:shadow-xl transition-shadow duration-300">
                   <div className="aspect-video overflow-hidden">
                     <Image
                       src={service.image?.imageUrl ?? ''}
@@ -195,6 +181,9 @@ export default async function Home() {
                       <span className="flex-1">{service.title}</span>
                     </CardTitle>
                   </CardHeader>
+                   <CardContent>
+                    <p className="text-muted-foreground text-sm">{service.description}</p>
+                  </CardContent>
                 </Card>
               ))}
             </div>
@@ -202,7 +191,7 @@ export default async function Home() {
         </section>
 
         {/* Core Values Section */}
-        <section id="values" className="py-20 md:py-32">
+        <section id="values" className="py-20 md:py-32 bg-secondary/50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center max-w-3xl mx-auto">
               <Badge>Core Values</Badge>
@@ -210,7 +199,7 @@ export default async function Home() {
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mt-16">
               {coreValues.map((value) => (
-                <div key={value.title} className="bg-secondary/30 p-6 rounded-lg text-center">
+                <div key={value.title} className="bg-background p-6 rounded-lg text-center shadow-sm hover:shadow-lg transition-shadow">
                   <div className="inline-block bg-primary/10 text-primary p-3 rounded-full mb-4">
                     <value.icon className="h-7 w-7" />
                   </div>
@@ -289,13 +278,13 @@ export default async function Home() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-background border-t">
+      <footer className="bg-foreground text-background">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="grid md:grid-cols-4 gap-10 mb-12">
             <div>
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 bg-primary text-primary-foreground rounded-xl flex items-center justify-center">
-                  <Sparkles className="h-6 w-6" />
+                <div className="w-10 h-10 bg-primary text-primary-foreground rounded-xl flex items-center justify-center font-bold">
+                  K
                 </div>
                 <span className="font-bold text-lg">
                   Kstar International
@@ -307,7 +296,7 @@ export default async function Home() {
             </div>
 
             <div>
-              <h3 className="font-semibold mb-4">
+              <h3 className="font-semibold mb-4 text-white">
                 Quick Links
               </h3>
               <ul className="space-y-2.5">
@@ -331,7 +320,7 @@ export default async function Home() {
             </div>
 
             <div>
-              <h3 className="font-semibold mb-4">Contact Us</h3>
+              <h3 className="font-semibold mb-4 text-white">Contact Us</h3>
               <ul className="space-y-3 text-sm">
                 <li className="flex items-start gap-3">
                   <MapPin className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
@@ -351,7 +340,7 @@ export default async function Home() {
             </div>
 
             <div>
-              <h3 className="font-semibold mb-4">
+              <h3 className="font-semibold mb-4 text-white">
                 Follow Us
               </h3>
               <p className="text-muted-foreground mb-4 text-sm">
@@ -365,7 +354,7 @@ export default async function Home() {
                   { icon: Linkedin, href: '#' },
                   { icon: Youtube, href: '#' },
                 ].map((social, i) => (
-                  <Button asChild key={i} variant="outline" size="icon">
+                  <Button asChild key={i} variant="outline" size="icon" className="bg-white/10 text-white hover:bg-white/20">
                     <a href={social.href}>
                       <social.icon className="h-5 w-5" />
                     </a>
