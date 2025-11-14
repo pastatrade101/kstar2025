@@ -9,10 +9,6 @@ import {
   Mail,
   Phone,
   MessageSquare,
-  Send,
-  FileText,
-  Calendar,
-  CheckCircle,
   Home as HomeIcon,
   Info,
   Briefcase,
@@ -20,22 +16,17 @@ import {
   MessageCircle as MessageCircleIcon,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { useToast } from '@/hooks/use-toast';
 
 export default function HomeClient({ children }: { children: React.ReactNode }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  const { toast } = useToast();
 
   const navLinks = [
-    { id: 'nyumbani', label: 'Nyumbani', icon: HomeIcon },
-    { id: 'historia', label: 'Kuhusu Sisi', icon: Info },
-    { id: 'matukio', label: 'Matukio', icon: Briefcase },
-    { id: 'ujumbe', label: 'Ujumbe', icon: Newspaper },
-    { id: 'maoni', label: 'Wasiliana', icon: MessageCircleIcon },
+    { id: 'home', label: 'Home', icon: HomeIcon },
+    { id: 'about', label: 'About Us', icon: Info },
+    { id: 'services', label: 'Services', icon: Briefcase },
+    { id: 'objectives', label: 'Objectives', icon: Newspaper },
+    { id: 'contact', label: 'Contact', icon: MessageCircleIcon },
   ];
 
   useEffect(() => {
@@ -58,7 +49,6 @@ export default function HomeClient({ children }: { children: React.ReactNode }) 
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-slate-50 dark:from-gray-900 dark:via-blue-950/20 dark:to-gray-900">
-      {/* Top Contact Bar */}
       <div
         className={`fixed top-0 left-0 right-0 z-50 bg-blue-950 text-white border-b border-blue-900 transition-transform duration-300 ${
           isScrolled ? '-translate-y-full' : 'translate-y-0'
@@ -102,8 +92,7 @@ export default function HomeClient({ children }: { children: React.ReactNode }) 
                   if (e.key === 'Enter') {
                     const value = (e.target as HTMLInputElement).value;
                     if (value.trim()) {
-                      scrollToSection('search');
-                      (e.target as HTMLInputElement).value = '';
+                      // Implement search functionality
                     }
                   }
                 }}
@@ -111,7 +100,6 @@ export default function HomeClient({ children }: { children: React.ReactNode }) 
             </div>
             <button
               className="lg:hidden p-1.5 hover:bg-white/10 rounded-lg transition-colors"
-              onClick={() => scrollToSection('search')}
             >
               <Search size={18} />
             </button>
@@ -119,7 +107,6 @@ export default function HomeClient({ children }: { children: React.ReactNode }) 
         </div>
       </div>
 
-      {/* Header */}
       <header
         className={`fixed top-0 left-0 right-0 z-40 transition-all duration-500 ${
           isScrolled
@@ -131,14 +118,14 @@ export default function HomeClient({ children }: { children: React.ReactNode }) 
           <div className="flex justify-between items-center h-full">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
-                <Mail className="h-6 w-6 text-white" />
+                <MessageSquare className="h-6 w-6 text-white" />
               </div>
               <div>
                 <h1 className="font-bold text-gray-900 dark:text-white">
-                  Taasisi Yetu
+                  Kstar International
                 </h1>
                 <p className="text-xs text-blue-600 dark:text-blue-400">
-                  Mshirika wako wa kuaminika
+                  Turn your desires into reality
                 </p>
               </div>
             </div>
@@ -155,6 +142,13 @@ export default function HomeClient({ children }: { children: React.ReactNode }) 
                 </button>
               ))}
             </nav>
+            <div className='hidden md:flex'>
+                <Button onClick={() => scrollToSection('contact')}>
+                    Contact Us
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+            </div>
+
 
             <button
               className={`md:hidden ${
@@ -167,7 +161,6 @@ export default function HomeClient({ children }: { children: React.ReactNode }) 
           </div>
         </div>
 
-        {/* Mobile Menu */}
         {isMenuOpen && (
           <div className="md:hidden bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border-t border-gray-200 dark:border-gray-800">
             <nav className="py-4 space-y-1 px-4">
