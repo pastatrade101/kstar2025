@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useFirestore, useCollection } from '@/firebase';
 import { collection, query, orderBy } from 'firebase/firestore';
 import { useMemoFirebase } from '@/firebase/provider';
-import { Loader2, Inbox, Mail, User, Search } from 'lucide-react';
+import { Loader2, Inbox, Mail, User, Search, File, Archive, Trash2, Star, Edit, ChevronDown, Clock, CheckCircle2 } from 'lucide-react';
 import { format, formatDistanceToNow } from 'date-fns';
 import { Card, CardContent } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -13,6 +13,8 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Checkbox } from '@/components/ui/checkbox';
 
 
 type ContactSubmission = {
@@ -63,123 +65,217 @@ export default function ContactsPage() {
     const date = new Date(timestamp.seconds * 1000);
     return formatDistanceToNow(date, { addSuffix: true });
   }
+  
+  const totalSubmissions = submissions?.length ?? 0;
+  // These would be calculated fields in a real app
+  const repliedCount = 0; 
+  const pendingCount = totalSubmissions;
+
 
   return (
-    <div className="h-screen flex flex-col bg-muted/20 antialiased">
-      <div className="flex-1 grid grid-cols-[320px_1fr] overflow-hidden">
-        {/* Sidebar */}
-        <aside className="border-r bg-background flex flex-col">
-           <div className="p-4 border-b">
-            <h1 className="font-headline text-2xl font-bold flex items-center gap-2 mb-4">
-              Messages
-            </h1>
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input placeholder="Search conversations..." className="pl-9" />
-            </div>
-          </div>
-           <div className="flex gap-2 p-2 border-b">
-            <Button variant="default" size="sm" className="flex-1">
-              All
+    <div className="h-screen flex flex-row bg-muted/20 antialiased">
+      {/* Sidebar */}
+      <aside className="w-64 border-r bg-background flex flex-col h-full">
+         <div className="p-4 border-b">
+           <div className='flex items-center justify-between'>
+            <h2 className="font-headline text-xl font-bold flex items-center gap-2">
+              Inbox
+            </h2>
+            <Button variant="ghost" size="sm" className="text-muted-foreground">
+              <ChevronDown className="h-4 w-4" />
             </Button>
-            <Button variant="ghost" size="sm" className="flex-1 text-muted-foreground">
-              Groups
+           </div>
+          </div>
+
+          <div className="p-2 border-b">
+            <Button variant="outline" className='w-full'>
+              <Edit className="h-4 w-4 mr-2"/>
+              Compose
             </Button>
           </div>
 
           <ScrollArea className="flex-1">
-            {isLoadingSubmissions && (
-              <div className="p-4 text-center grid place-content-center h-full">
-                <Loader2 className="h-6 w-6 animate-spin mx-auto text-muted-foreground" />
+            <div className="p-2">
+              <Button variant="ghost" className="w-full justify-start gap-3 px-3 py-2 text-primary bg-primary/10">
+                <Inbox className="h-4 w-4" />
+                <span>Inbox</span>
+                {totalSubmissions > 0 && <Badge variant="default" className="ml-auto">{totalSubmissions}</Badge>}
+              </Button>
+               <Button variant="ghost" className="w-full justify-start gap-3 px-3 py-2">
+                <Star className="h-4 w-4" />
+                <span>Starred</span>
+              </Button>
+              <Button variant="ghost" className="w-full justify-start gap-3 px-3 py-2">
+                <Send className="h-4 w-4" />
+                <span>Sent</span>
+              </Button>
+              <Button variant="ghost" className="w-full justify-start gap-3 px-3 py-2">
+                <File className="h-4 w-4" />
+                <span>Drafts</span>
+              </Button>
+               <Button variant="ghost" className="w-full justify-start gap-3 px-3 py-2">
+                <Archive className="h-4 w-4" />
+                <span>Archive</span>
+              </Button>
+               <Button variant="ghost" className="w-full justify-start gap-3 px-3 py-2">
+                <Trash2 className="h-4 w-4" />
+                <span>Trash</span>
+              </Button>
+            </div>
+             <div className="p-4 pt-2">
+              <div className="text-xs text-muted-foreground mb-2 font-semibold tracking-wider">STATS</div>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between text-sm">
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <Mail className="size-3" />
+                    <span>Total</span>
+                  </div>
+                  <span className="font-medium">{totalSubmissions}</span>
+                </div>
+                <div className="flex items-center justify-between text-sm">
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <CheckCircle2 className="size-3" />
+                    <span>Replied</span>
+                  </div>
+                  <span className="font-medium">{repliedCount}</span>
+                </div>
+                <div className="flex items-center justify-between text-sm">
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <Clock className="size-3" />
+                    <span>Pending</span>
+                  </div>
+                  <span className="font-medium">{pendingCount}</span>
+                </div>
               </div>
-            )}
-            {error && <div className="p-4 text-destructive">Error: {error.message}</div>}
-            {!isLoadingSubmissions && submissions?.length === 0 && (
-              <div className="p-4 text-center text-muted-foreground grid place-content-center h-full">
-                <p>No submissions yet.</p>
-              </div>
-            )}
-            <ul className='p-2'>
-              {submissions?.map((submission) => (
-                <li key={submission.id}>
-                  <button
-                    className={cn(
-                      'w-full text-left p-3 hover:bg-accent transition-colors rounded-lg',
-                      selectedSubmission?.id === submission.id && 'bg-accent'
-                    )}
-                    onClick={() => setSelectedSubmission(submission)}
-                  >
-                   <div className="flex items-start gap-3">
-                     <Avatar className="size-12">
-                        <AvatarFallback>{getInitials(submission.name)}</AvatarFallback>
-                      </Avatar>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="font-semibold truncate">{submission.name}</span>
-                          <span className="text-xs text-muted-foreground ml-2 shrink-0">{formatDate(submission.submittedAt)}</span>
-                        </div>
-                        <p className="text-sm text-muted-foreground truncate">
-                          {submission.subject}
-                        </p>
-                      </div>
-                   </div>
-                  </button>
-                </li>
-              ))}
-            </ul>
+            </div>
           </ScrollArea>
         </aside>
 
-        {/* Main Content */}
-        <main className="overflow-y-auto bg-white flex flex-col">
-          {selectedSubmission ? (
-            <>
-               <header className="p-4 border-b flex items-center justify-between bg-background">
-                <div className="flex items-center gap-3">
-                  <div className="relative">
-                    <Avatar className="size-11">
-                      <AvatarFallback>{getInitials(selectedSubmission.name)}</AvatarFallback>
-                    </Avatar>
-                    <div className="absolute bottom-0 right-0 size-3 bg-green-500 rounded-full border-2 border-background" />
-                  </div>
-                  <div>
-                    <h3 className='font-semibold'>{selectedSubmission.name}</h3>
-                    <p className="text-sm text-muted-foreground">Online</p>
-                  </div>
+      {/* Message List */}
+      <div className="w-96 border-r bg-background/80 flex flex-col h-full">
+         <div className="p-4 border-b">
+            <h1 className="font-headline text-lg font-bold flex items-center justify-between mb-4">
+              <span>All Messages</span>
+              <span className='text-sm font-medium text-muted-foreground'>{totalSubmissions} messages</span>
+            </h1>
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input placeholder="Search messages..." className="pl-9" />
+            </div>
+             <div className="flex gap-2 mt-3">
+              <Badge variant="secondary" className="cursor-pointer">All</Badge>
+              <Badge variant="outline" className="cursor-pointer">Unread</Badge>
+              <Badge variant="outline" className="cursor-pointer">Starred</Badge>
+            </div>
+          </div>
+          <ScrollArea className="flex-1">
+              {isLoadingSubmissions && (
+                <div className="p-4 text-center grid place-content-center h-full">
+                  <Loader2 className="h-6 w-6 animate-spin mx-auto text-muted-foreground" />
                 </div>
-              </header>
-
-              <ScrollArea className="flex-1 p-4">
-                <div className="space-y-4 max-w-4xl mx-auto">
-                    <div className="flex gap-3 flex-row">
-                      <Avatar className="size-8 shrink-0">
-                        <AvatarFallback>{getInitials(selectedSubmission.name)}</AvatarFallback>
-                      </Avatar>
-                      
-                      <div className="flex flex-col items-start max-w-[70%]">
-                        <div className="rounded-2xl px-4 py-2 bg-accent">
-                          <p className='font-semibold mb-2'>{selectedSubmission.subject}</p>
-                          <p>{selectedSubmission.message}</p>
+              )}
+              {error && <div className="p-4 text-destructive">Error: {error.message}</div>}
+              {!isLoadingSubmissions && totalSubmissions === 0 && (
+                <div className="p-4 text-center text-muted-foreground grid place-content-center h-full">
+                  <p>No submissions yet.</p>
+                </div>
+              )}
+              <div>
+                {submissions?.map((submission) => (
+                  <button
+                    key={submission.id}
+                    onClick={() => setSelectedSubmission(submission)}
+                    className={cn(
+                      'w-full text-left p-4 border-b hover:bg-accent transition-colors',
+                      selectedSubmission?.id === submission.id && 'bg-accent'
+                    )}
+                  >
+                  <div className="flex items-start gap-4">
+                    <Checkbox checked={selectedSubmission?.id === submission.id} className="mt-1" />
+                    <div className="flex-1 min-w-0">
+                       <div className="flex items-center gap-2 mb-1">
+                          <span className="font-semibold truncate">{submission.name}</span>
+                          <div className="size-2 rounded-full bg-primary shrink-0" />
+                          <span className="text-xs text-muted-foreground ml-auto shrink-0">{formatDate(submission.submittedAt)}</span>
                         </div>
-                         {selectedSubmission.submittedAt && (
-                           <span className="text-xs text-muted-foreground mt-1">{format(new Date(selectedSubmission.submittedAt.seconds * 1000), "p")}</span>
-                         )}
+
+                        <div className="text-sm font-medium mb-2 truncate">
+                          {submission.subject}
+                        </div>
+                        
+                        <p className="text-sm text-muted-foreground line-clamp-2">
+                          {submission.message}
+                        </p>
+                    </div>
+                  </div>
+                  </button>
+                ))}
+              </div>
+          </ScrollArea>
+      </div>
+
+      {/* Main Content */}
+      <main className="overflow-y-auto bg-white flex flex-col flex-1">
+        {isLoadingSubmissions && !selectedSubmission && (
+           <div className="flex-1 flex items-center justify-center">
+            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+          </div>
+        )}
+        {!isLoadingSubmissions && !selectedSubmission ? (
+            <div className="flex-1 flex items-center justify-center bg-muted/50">
+            <div className="text-center text-muted-foreground">
+              <Inbox className="h-16 w-16 mx-auto mb-4" />
+              <h3 className="text-xl font-semibold">Select a message</h3>
+              <p>Choose a conversation from the list to view its content.</p>
+            </div>
+          </div>
+        ) : selectedSubmission && (
+          <>
+            <header className="p-4 border-b flex items-center justify-between bg-background/80">
+              <h3 className='font-semibold text-lg truncate'>{selectedSubmission.subject}</h3>
+               <div className="flex items-center gap-1">
+                <Button size="icon" variant="ghost"> <Star className="h-4 w-4"/> </Button>
+                <Button size="icon" variant="ghost"> <Archive className="h-4 w-4"/> </Button>
+                <Button size="icon" variant="ghost"> <Trash2 className="h-4 w-4"/> </Button>
+               </div>
+            </header>
+
+            <ScrollArea className="flex-1 p-6">
+              <div className="max-w-4xl mx-auto">
+                <div className="flex items-start gap-4">
+                  <Avatar className="size-12">
+                    <AvatarFallback>{getInitials(selectedSubmission.name)}</AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className='font-semibold'>{selectedSubmission.name}</p>
+                        <p className="text-sm text-muted-foreground">to <span className="font-medium text-foreground">me</span></p>
+                      </div>
+                      <div className="text-sm text-muted-foreground">
+                        {selectedSubmission.submittedAt && format(new Date(selectedSubmission.submittedAt.seconds * 1000), "MMM d, yyyy, h:mm a")}
                       </div>
                     </div>
+                  </div>
                 </div>
-              </ScrollArea>
-            </>
-          ) : (
-             <div className="flex-1 flex items-center justify-center bg-muted/50">
-              <div className="text-center text-muted-foreground">
-                <Inbox className="h-16 w-16 mx-auto mb-4" />
-                <h3 className="text-xl font-semibold">Select a message</h3>
-                <p>Choose a conversation from the left to start viewing messages.</p>
+
+                <Separator className="my-6" />
+
+                <div className="prose max-w-none text-foreground text-base">
+                  <p className="whitespace-pre-wrap">{selectedSubmission.message}</p>
+                </div>
+
+              </div>
+            </ScrollArea>
+             <div className="p-4 border-t bg-background/80">
+              <div className="max-w-4xl mx-auto flex items-center gap-2">
+                <Button variant="outline">Reply</Button>
+                <Button variant="outline">Forward</Button>
               </div>
             </div>
-          )}
-        </main>
-      </div>
+          </>
+        )}
+      </main>
     </div>
   );
 }
