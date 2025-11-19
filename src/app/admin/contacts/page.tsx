@@ -182,11 +182,11 @@ export default function ContactsPage() {
               )}
               <div>
                 {submissions?.map((submission) => (
-                  <button
+                  <div
                     key={submission.id}
                     onClick={() => setSelectedSubmission(submission)}
                     className={cn(
-                      'w-full text-left p-4 border-b hover:bg-accent transition-colors',
+                      'w-full text-left p-4 border-b hover:bg-accent transition-colors cursor-pointer',
                       selectedSubmission?.id === submission.id && 'bg-accent'
                     )}
                   >
@@ -208,7 +208,7 @@ export default function ContactsPage() {
                         </p>
                     </div>
                   </div>
-                  </button>
+                  </div>
                 ))}
               </div>
           </ScrollArea>
