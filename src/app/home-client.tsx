@@ -10,7 +10,6 @@ import Link from 'next/link';
 
 export default function HomeClient({ children }: { children: React.ReactNode }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isScrolled, setIsScrolled] = useState(false);
 
   const navLinks = [
     { id: 'home', label: 'Home' },
@@ -19,15 +18,6 @@ export default function HomeClient({ children }: { children: React.ReactNode }) 
     { id: 'values', label: 'Values' },
     { id: 'contact', label: 'Contact' },
   ];
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
-    };
-    window.addEventListener('scroll', handleScroll);
-    handleScroll(); // Check on initial load
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
   const scrollToSection = (id: string) => (e: React.MouseEvent) => {
     e.preventDefault();
@@ -48,9 +38,7 @@ export default function HomeClient({ children }: { children: React.ReactNode }) 
   return (
     <div className="min-h-screen bg-background text-foreground">
        <header
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-          isScrolled ? 'bg-background/80 backdrop-blur-xl border-b' : 'bg-transparent'
-        }`}
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-background/80 backdrop-blur-xl border-b`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-20">
