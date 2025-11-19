@@ -331,7 +331,7 @@ export default function Home() {
                 {[
                   { icon: Facebook, href: '#' },
                   { icon: Twitter, href: '#' },
-                  { icon: Instagram, href: '#' },
+                  { icon: Instagram, href: 'https://www.instagram.com/kstar_international/' },
                   { icon: Linkedin, href: '#' },
                   { icon: Youtube, href: '#' },
                 ].map((social, i) => (
