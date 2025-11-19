@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useFirestore, useCollection } from '@/firebase';
 import { collection, query, orderBy } from 'firebase/firestore';
 import { useMemoFirebase } from '@/firebase/provider';
-import { Loader2, Inbox, Mail, User, Search, File, Archive, Trash2, Star, Edit, ChevronDown, Clock, CheckCircle2 } from 'lucide-react';
+import { Loader2, Inbox, Mail, User, Search, File, Archive, Trash2, Star, Edit, ChevronDown, Clock, CheckCircle2, Send } from 'lucide-react';
 import { format, formatDistanceToNow } from 'date-fns';
 import { Card, CardContent } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
