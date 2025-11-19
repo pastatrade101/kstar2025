@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useFirestore, useCollection, deleteDocumentNonBlocking } from '@/firebase';
+import { useFirestore, useCollection, deleteDocumentNonBlocking, updateDocumentNonBlocking } from '@/firebase';
 import { collection, query, orderBy, doc } from 'firebase/firestore';
 import { useMemoFirebase } from '@/firebase/provider';
 import { Loader2, Inbox, Mail, User, Search, File, Archive, Trash2, Star, Edit, ChevronDown, Clock, CheckCircle2, Send, X } from 'lucide-react';
@@ -49,6 +49,8 @@ type ContactSubmission = {
     seconds: number;
     nanoseconds: number;
   } | null;
+  starred?: boolean;
+  isRead?: boolean;
 };
 
 export default function ContactsPage() {
@@ -71,11 +73,20 @@ export default function ContactsPage() {
   const [isComposeOpen, setIsComposeOpen] = useState(false);
   const [composeTo, setComposeTo] = useState('');
   const [composeSubject, setComposeSubject] = useState('');
+  
+  const handleSelectSubmission = (submission: ContactSubmission) => {
+    setSelectedSubmission(submission);
+    if (!submission.isRead && firestore) {
+        const itemRef = doc(firestore, 'contact_submissions', submission.id);
+        updateDocumentNonBlocking(itemRef, { isRead: true });
+    }
+  };
 
   useEffect(() => {
     if (submissions && submissions.length > 0 && !selectedSubmission) {
-      setSelectedSubmission(submissions[0]);
+      handleSelectSubmission(submissions[0]);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [submissions, selectedSubmission]);
 
   const handleDelete = () => {
@@ -119,6 +130,20 @@ export default function ContactsPage() {
     });
     setIsComposeOpen(false);
   };
+  
+  const handleToggleStar = (e: React.MouseEvent, submission: ContactSubmission) => {
+    e.stopPropagation();
+    if (!firestore) return;
+    const itemRef = doc(firestore, 'contact_submissions', submission.id);
+    const newStarredStatus = !submission.starred;
+    updateDocumentNonBlocking(itemRef, { starred: newStarredStatus });
+
+    // Update local state immediately for better UX
+    if (selectedSubmission?.id === submission.id) {
+        setSelectedSubmission(prev => prev ? { ...prev, starred: newStarredStatus } : null);
+    }
+  };
+
 
   const getInitials = (name: string) => {
     if (!name) return '?';
@@ -136,7 +161,7 @@ export default function ContactsPage() {
   }
   
   const totalSubmissions = submissions?.length ?? 0;
-  // These would be calculated fields in a real app
+  const unreadCount = submissions?.filter(s => !s.isRead).length ?? 0;
   const repliedCount = 0; 
   const pendingCount = totalSubmissions;
 
@@ -169,7 +194,7 @@ export default function ContactsPage() {
                 <Button variant="ghost" className="w-full justify-start gap-3 px-3 py-2 text-accent-foreground bg-accent">
                   <Inbox className="h-4 w-4" />
                   <span>Inbox</span>
-                  {totalSubmissions > 0 && <Badge variant="default" className="ml-auto">{totalSubmissions}</Badge>}
+                  {unreadCount > 0 && <Badge variant="default" className="ml-auto">{unreadCount}</Badge>}
                 </Button>
                 <Button variant="ghost" className="w-full justify-start gap-3 px-3 py-2">
                   <Star className="h-4 w-4" />
@@ -254,26 +279,31 @@ export default function ContactsPage() {
                   {submissions?.map((submission) => (
                     <div
                       key={submission.id}
-                      onClick={() => setSelectedSubmission(submission)}
+                      onClick={() => handleSelectSubmission(submission)}
                       className={cn(
                         'w-full text-left p-4 border-b hover:bg-accent transition-colors cursor-pointer',
                         selectedSubmission?.id === submission.id && 'bg-accent text-accent-foreground'
                       )}
                     >
                     <div className="flex items-start gap-4">
-                      <Checkbox checked={selectedSubmission?.id === submission.id} className="mt-1" />
+                      <div className='flex items-center gap-2 mt-1'>
+                        <Checkbox checked={selectedSubmission?.id === submission.id} />
+                        <button onClick={(e) => handleToggleStar(e, submission)}>
+                            <Star className={cn('size-4', submission.starred ? 'fill-yellow-400 text-yellow-400' : 'text-muted-foreground hover:text-foreground')} />
+                        </button>
+                      </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
-                            <span className="font-semibold truncate">{submission.name}</span>
-                            <div className={cn('size-2 rounded-full shrink-0', selectedSubmission?.id === submission.id ? 'bg-accent-foreground' : 'bg-primary')} />
+                            <span className={cn("font-semibold truncate", !submission.isRead && "text-foreground")}>{submission.name}</span>
+                            {!submission.isRead && <div className={cn('size-2 rounded-full shrink-0', selectedSubmission?.id === submission.id ? 'bg-accent-foreground' : 'bg-primary')} />}
                             <span className={cn('text-xs ml-auto shrink-0', selectedSubmission?.id === submission.id ? 'text-accent-foreground/80' : 'text-muted-foreground')}>{formatDate(submission.submittedAt)}</span>
                           </div>
 
-                          <div className="text-sm font-medium mb-2 truncate">
+                          <div className={cn("text-sm font-medium mb-2 truncate", !submission.isRead && "text-foreground")}>
                             {submission.subject}
                           </div>
                           
-                          <p className={cn('text-sm line-clamp-2', selectedSubmission?.id === submission.id ? 'text-accent-foreground/80' : 'text-muted-foreground')}>
+                          <p className={cn('text-sm line-clamp-2', selectedSubmission?.id === submission.id ? 'text-accent-foreground/80' : 'text-muted-foreground', !submission.isRead && 'text-foreground/80')}>
                             {submission.message}
                           </p>
                       </div>
@@ -304,7 +334,9 @@ export default function ContactsPage() {
               <header className="p-4 border-b flex items-center justify-between bg-background/80">
                 <h3 className='font-semibold text-lg truncate'>{selectedSubmission.subject}</h3>
                 <div className="flex items-center gap-1">
-                  <Button size="icon" variant="ghost"> <Star className="h-4 w-4"/> </Button>
+                  <Button size="icon" variant="ghost" onClick={(e) => handleToggleStar(e, selectedSubmission)}> 
+                    <Star className={cn('size-4', selectedSubmission.starred ? 'fill-yellow-400 text-yellow-400' : 'text-muted-foreground')} />
+                  </Button>
                   <Button size="icon" variant="ghost"> <Archive className="h-4 w-4"/> </Button>
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
@@ -338,7 +370,7 @@ export default function ContactsPage() {
                     <div className="flex-1">
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className='font-semibold'>{selectedSubmission.name}</p>
+                          <p className='font-semibold text-foreground'>{selectedSubmission.name}</p>
                           <p className="text-sm text-muted-foreground">to <span className="font-medium text-foreground">me</span> &lt;{selectedSubmission.email}&gt;</p>
                         </div>
                         <div className="text-sm text-foreground">
@@ -350,7 +382,7 @@ export default function ContactsPage() {
 
                   <Separator className="my-6" />
 
-                  <div className="prose-lg max-w-none text-foreground">
+                  <div className="prose-lg max-w-none">
                     <p className="whitespace-pre-wrap text-foreground">{selectedSubmission.message}</p>
                   </div>
 
@@ -398,5 +430,3 @@ export default function ContactsPage() {
     </>
   );
 }
-
-    

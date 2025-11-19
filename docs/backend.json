@@ -167,6 +167,14 @@
           "type": "string",
           "format": "date-time",
           "description": "The timestamp when the form was submitted."
+        },
+        "starred": {
+          "type": "boolean",
+          "description": "Whether the submission has been marked as important."
+        },
+        "isRead": {
+            "type": "boolean",
+            "description": "Whether the submission has been read by an admin."
         }
       },
       "required": [
@@ -256,7 +264,7 @@
           "schema": {
             "$ref": "#/backend/entities/ContactSubmission"
           },
-          "description": "Stores contact form submissions. Publicly writable, but not readable or updatable by the public.",
+          "description": "Stores contact form submissions. Publicly writable, but readable, updatable, and deletable by admins.",
           "params": [
             {
               "name": "submissionId",
