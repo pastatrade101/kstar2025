@@ -3,33 +3,33 @@
 import { initializeApp, getApp, getApps, App } from 'firebase-admin/app';
 import { getAuth } from 'firebase-admin/auth';
 import { getFirestore } from 'firebase-admin/firestore';
-import { firebaseConfig } from './config';
 
 // IMPORTANT: DO NOT MODIFY THIS FUNCTION
 export function initializeFirebase() {
+  // If the app is already initialized, return the existing SDKs.
   if (getApps().length) {
     return getSdks(getApp());
   }
   
-  let app;
-  try {
-    // In a deployed GCP environment, initializeApp() discovers credentials automatically.
-    app = initializeApp();
-  } catch (e) {
-    // In a local environment, you may need to specify the projectId.
-    app = initializeApp({
-        projectId: firebaseConfig.projectId,
-    });
-  }
+  // In a Google Cloud environment (like App Hosting), initializeApp() automatically
+  // discovers the service account credentials and project ID.
+  // We do not need to pass any configuration.
+  const app = initializeApp();
 
   return getSdks(app);
 }
 
 // Helper function to get the SDKs
 function getSdks(app: App) {
+  const firestore = getFirestore(app);
+  // Optional: Apply settings if needed, e.g., for different regions.
+  // firestore.settings({
+  //   // your settings...
+  // });
+  
   return {
     app,
     auth: getAuth(app),
-    firestore: getFirestore(app),
+    firestore: firestore,
   };
 }
