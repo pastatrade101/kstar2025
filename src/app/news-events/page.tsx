@@ -1,3 +1,5 @@
+'use client';
+
 import {
     Card,
     CardContent,
@@ -9,7 +11,9 @@ import {
   import { Badge } from '@/components/ui/badge';
   import { Loader2 } from 'lucide-react';
   import { format } from 'date-fns';
-  import { initializeFirebase } from '@/firebase/server';
+  import { useFirestore, useCollection } from '@/firebase';
+  import { useMemoFirebase } from '@/firebase/provider';
+  import { collection, query, orderBy } from 'firebase/firestore';
   
   
   type NewsEvent = {
@@ -20,35 +24,12 @@ import {
     type: 'News' | 'Event';
     imageUrl: string;
   };
-  
-  async function getNewsAndEvents() {
-    try {
-      const { firestore } = initializeFirebase();
-      const newsCollectionRef = firestore.collection('news_events');
-      const newsQuery = newsCollectionRef.orderBy('date', 'desc');
-      const snapshot = await newsQuery.get();
-  
-      if (snapshot.empty) {
-        return [];
-      }
-  
-      const newsAndEvents = snapshot.docs.map(doc => {
-        const data = doc.data();
-        return {
-          ...data,
-          id: doc.id,
-        } as NewsEvent;
-      });
-  
-      return newsAndEvents;
-    } catch (error) {
-      console.error("Error fetching news and events:", error);
-      return [];
-    }
-  }
-  
-  export default async function NewsAndEventsPage() {
-    const newsAndEvents = await getNewsAndEvents();
+    
+  export default function NewsAndEventsPage() {
+    const firestore = useFirestore();
+    const newsCollectionRef = useMemoFirebase(() => (firestore ? collection(firestore, 'news_events') : null), [firestore]);
+    const newsQuery = useMemoFirebase(() => (newsCollectionRef ? query(newsCollectionRef, orderBy('date', 'desc')) : null), [newsCollectionRef]);
+    const { data: newsAndEvents, isLoading } = useCollection<NewsEvent>(newsQuery);
   
     return (
       <div className="flex flex-col gap-8 p-4 md:p-8">
@@ -61,13 +42,13 @@ import {
           </p>
         </header>
   
-        {!newsAndEvents && (
+        {isLoading && (
           <div className="flex justify-center items-center h-64">
             <Loader2 className="h-12 w-12 animate-spin text-primary" />
           </div>
         )}
   
-        {newsAndEvents?.length === 0 && (
+        {!isLoading && newsAndEvents?.length === 0 && (
             <div className="text-center text-muted-foreground py-16">
                 <p>No news or events have been posted yet.</p>
             </div>
