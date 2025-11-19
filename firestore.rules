@@ -57,5 +57,17 @@ service cloud.firestore {
       allow get, list: if true;
       allow create, update, delete: if false;
     }
+
+    /**
+     * @description Rules for the `contact_submissions` collection. Allows anyone to create a new submission, but no one can read, update, or delete them.
+     * @path /contact_submissions/{submissionId}
+     * @allow (create) Anyone can create a new contact submission.
+     * @deny (get, list, update, delete) No one can read, update, or delete submissions.
+     * @principle Allows public write access for the contact form and restricts all other access.
+     */
+    match /contact_submissions/{submissionId} {
+        allow create: if true;
+        allow get, list, update, delete: if false;
+    }
   }
 }

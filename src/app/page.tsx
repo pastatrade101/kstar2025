@@ -31,6 +31,7 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
+import ContactForm from '@/components/contact-form';
 
 export default async function Home() {
   const currentYear = new Date().getFullYear();
@@ -59,7 +60,7 @@ export default async function Home() {
         {/* Hero Section */}
         <section
           id="home"
-          className="relative pt-32 pb-20 flex items-center justify-center overflow-hidden"
+          className="relative pt-32 pb-20 flex items-center justify-center overflow-hidden min-h-[80vh]"
         >
           <div className="absolute inset-0 z-0">
              <Image
@@ -70,8 +71,7 @@ export default async function Home() {
               priority
               data-ai-hint="creative team collaboration"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/50 to-transparent"></div>
-            <div className="absolute inset-0 bg-black/40"></div>
+            <div className="absolute inset-0 bg-black/60"></div>
           </div>
 
 
@@ -249,29 +249,7 @@ export default async function Home() {
           <div className="max-w-2xl mx-auto mt-12 px-4">
             <Card>
               <CardContent className="p-8">
-                <form className="space-y-6">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <Label htmlFor="name">Full Name</Label>
-                      <Input id="name" placeholder="John Doe" />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="email">Email Address</Label>
-                      <Input id="email" type="email" placeholder="john@example.com" />
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="subject">Subject</Label>
-                    <Input id="subject" placeholder="Question about your services" />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="message">Message</Label>
-                    <Textarea id="message" placeholder="Your message here..." rows={5} />
-                  </div>
-                  <Button type="submit" className="w-full" size="lg">
-                    Send Message
-                  </Button>
-                </form>
+                <ContactForm />
               </CardContent>
             </Card>
           </div>
