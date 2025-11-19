@@ -33,7 +33,6 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import ContactForm from '@/components/contact-form';
-import { Timestamp } from 'firebase-admin/firestore';
 import { initializeFirebase } from '@/firebase/server';
 import { format } from 'date-fns';
 
@@ -41,7 +40,7 @@ type NewsEvent = {
     id: string;
     title: string;
     content: string;
-    date: string | Timestamp;
+    date: string;
     type: 'News' | 'Event';
     imageUrl: string;
   };
@@ -62,7 +61,6 @@ async function getRecentNewsAndEvents() {
         return {
           ...data,
           id: doc.id,
-          date: (data.date as Timestamp).toDate().toISOString(),
         } as NewsEvent;
       });
   

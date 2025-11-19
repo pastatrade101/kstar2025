@@ -9,7 +9,6 @@ import {
   import { Badge } from '@/components/ui/badge';
   import { Loader2 } from 'lucide-react';
   import { format } from 'date-fns';
-  import { Timestamp } from 'firebase-admin/firestore';
   import { initializeFirebase } from '@/firebase/server';
   
   
@@ -17,7 +16,7 @@ import {
     id: string;
     title: string;
     content: string;
-    date: string | Timestamp;
+    date: string;
     type: 'News' | 'Event';
     imageUrl: string;
   };
@@ -38,7 +37,6 @@ import {
         return {
           ...data,
           id: doc.id,
-          date: (data.date as Timestamp).toDate().toISOString(),
         } as NewsEvent;
       });
   
