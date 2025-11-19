@@ -59,10 +59,10 @@ export default async function Home() {
         {/* Hero Section */}
         <section
           id="home"
-          className="relative min-h-screen flex items-center justify-center overflow-hidden bg-white"
+          className="relative pt-48 pb-32 flex items-center justify-center overflow-hidden bg-white"
         >
-          <div className="absolute inset-0 z-0 opacity-10">
-            <Image
+          <div className="absolute inset-0 z-0">
+             <Image
               src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1920&q=80"
               alt="Creative individuals working together"
               fill
@@ -70,8 +70,9 @@ export default async function Home() {
               priority
               data-ai-hint="creative team collaboration"
             />
+            <div className="absolute inset-0 bg-gradient-to-t from-white via-white/50 to-transparent"></div>
+            <div className="absolute inset-0 bg-white/40"></div>
           </div>
-           <div className="absolute inset-0 bg-gradient-to-t from-white via-white/80 to-transparent"></div>
 
 
           <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
