@@ -1,20 +1,31 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useFirestore, useCollection } from '@/firebase';
-import { collection, query, orderBy } from 'firebase/firestore';
+import { useFirestore, useCollection, deleteDocumentNonBlocking } from '@/firebase';
+import { collection, query, orderBy, doc } from 'firebase/firestore';
 import { useMemoFirebase } from '@/firebase/provider';
 import { Loader2, Inbox, Mail, User, Search, File, Archive, Trash2, Star, Edit, ChevronDown, Clock, CheckCircle2, Send } from 'lucide-react';
 import { format, formatDistanceToNow } from 'date-fns';
 import { Card, CardContent } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 
 
 type ContactSubmission = {
@@ -51,6 +62,26 @@ export default function ContactsPage() {
       setSelectedSubmission(submissions[0]);
     }
   }, [submissions, selectedSubmission]);
+
+  const handleDelete = () => {
+    if (!firestore || !selectedSubmission) return;
+
+    const itemRef = doc(firestore, 'contact_submissions', selectedSubmission.id);
+    deleteDocumentNonBlocking(itemRef);
+
+    // After deleting, select the next submission or clear the view
+    if (submissions) {
+        const currentIndex = submissions.findIndex(s => s.id === selectedSubmission.id);
+        if (submissions.length > 1) {
+            // Select next or previous
+            const nextIndex = currentIndex === submissions.length - 1 ? currentIndex - 1 : currentIndex + 1;
+            setSelectedSubmission(submissions[nextIndex]);
+        } else {
+            // Last one was deleted
+            setSelectedSubmission(null);
+        }
+    }
+  };
 
   const getInitials = (name: string) => {
     const names = name.split(' ');
@@ -236,7 +267,26 @@ export default function ContactsPage() {
                <div className="flex items-center gap-1">
                 <Button size="icon" variant="ghost"> <Star className="h-4 w-4"/> </Button>
                 <Button size="icon" variant="ghost"> <Archive className="h-4 w-4"/> </Button>
-                <Button size="icon" variant="ghost"> <Trash2 className="h-4 w-4"/> </Button>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button size="icon" variant="ghost">
+                      <Trash2 className="h-4 w-4 text-destructive" />
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        This action cannot be undone. This will permanently delete this message
+                        and remove the data from our servers.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction onClick={handleDelete}>Delete</AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
                </div>
             </header>
 
@@ -250,7 +300,7 @@ export default function ContactsPage() {
                     <div className="flex items-center justify-between">
                       <div>
                         <p className='font-semibold'>{selectedSubmission.name}</p>
-                        <p className="text-sm text-muted-foreground">to <span className="font-medium text-foreground">me</span></p>
+                        <p className="text-sm text-muted-foreground">to <span className="font-medium text-foreground">me</span> &lt;{selectedSubmission.email}&gt;</p>
                       </div>
                       <div className="text-sm text-foreground">
                         {selectedSubmission.submittedAt && format(new Date(selectedSubmission.submittedAt.seconds * 1000), "MMM d, yyyy, h:mm a")}
@@ -262,7 +312,7 @@ export default function ContactsPage() {
                 <Separator className="my-6" />
 
                 <div className="prose max-w-none text-foreground text-base">
-                  <p className="whitespace-pre-wrap">{selectedSubmission.message}</p>
+                  <p className="whitespace-pre-wrap text-foreground">{selectedSubmission.message}</p>
                 </div>
 
               </div>
