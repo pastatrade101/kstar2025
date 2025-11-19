@@ -23,7 +23,7 @@ type NewsEvent = {
 export default function RecentNews() {
     const firestore = useFirestore();
     const newsCollectionRef = useMemoFirebase(() => (firestore ? collection(firestore, 'news_events') : null), [firestore]);
-    const newsQuery = useMemoFirebase(() => (newsCollectionRef ? query(newsCollectionRef, orderBy('date', 'desc'), limit(3)) : null), [newsCollectionRef]);
+    const newsQuery = useMemoFirebase(() => (newsCollectionRef ? query(newsCollectionRef, orderBy('date', 'desc'), limit(6)) : null), [newsCollectionRef]);
     const { data: recentNews, isLoading } = useCollection<NewsEvent>(newsQuery);
 
     if (isLoading) {
