@@ -59,7 +59,7 @@ export default async function Home() {
         {/* Hero Section */}
         <section
           id="home"
-          className="relative pt-48 pb-32 flex items-center justify-center overflow-hidden bg-white"
+          className="relative pt-32 pb-20 flex items-center justify-center overflow-hidden"
         >
           <div className="absolute inset-0 z-0">
              <Image
@@ -70,24 +70,24 @@ export default async function Home() {
               priority
               data-ai-hint="creative team collaboration"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-white via-white/50 to-transparent"></div>
-            <div className="absolute inset-0 bg-white/40"></div>
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/50 to-transparent"></div>
+            <div className="absolute inset-0 bg-black/40"></div>
           </div>
 
 
-          <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-white">
             <Badge
               variant="outline"
-              className="mb-6 border-primary/30 bg-primary/10 text-primary font-medium"
+              className="mb-6 bg-white/10 text-white border-white/20 font-medium"
             >
               Welcome to Kstar International
             </Badge>
 
-            <h1 className="text-4xl md:text-6xl font-extrabold mb-6 tracking-tight text-foreground">
+            <h1 className="text-4xl md:text-6xl font-extrabold mb-6 tracking-tight">
               Turn Your Desires Into Reality
             </h1>
 
-            <p className="text-lg md:text-xl text-muted-foreground mb-10 max-w-3xl mx-auto">
+            <p className="text-lg md:text-xl text-slate-200 mb-10 max-w-3xl mx-auto">
               Kstar International Limited is established to serve the creative individual to fullfil their Purpose, Passion and Plans. The company is the bridge and place of hope for all creative induviduals.
             </p>
 
