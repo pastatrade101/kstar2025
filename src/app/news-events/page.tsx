@@ -38,7 +38,7 @@ import {
             News & Events
           </h1>
           <p className="text-muted-foreground mt-2">
-            Stay up-to-date with everything happening at EduPro Hub.
+            Stay up-to-date with everything happening at Kstar International.
           </p>
         </header>
   
