@@ -63,17 +63,17 @@ service cloud.firestore {
     }
 
     /**
-     * @description Rules for the `contact_submissions` collection. Allows anyone to create, but only admins can read.
+     * @description Rules for the `contact_submissions` collection. Allows anyone to create, but only admins can read and delete.
      * @path /contact_submissions/{submissionId}
      * @allow (create) Anyone can create a new contact submission.
-     * @allow (get, list) Only admins can read submissions.
-     * @deny (update, delete) No one can update or delete submissions.
-     * @principle Allows public write for contact form, and restricted read access for admins.
+     * @allow (get, list, delete) Only admins can read or delete submissions.
+     * @deny (update) No one can update submissions.
+     * @principle Allows public write for contact form, and restricted read/delete access for admins.
      */
     match /contact_submissions/{submissionId} {
         allow create: if true;
-        allow get, list: if isAdmin();
-        allow update, delete: if false;
+        allow get, list, delete: if isAdmin();
+        allow update: if false;
     }
   }
 }
