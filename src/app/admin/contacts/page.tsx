@@ -187,7 +187,7 @@ export default function ContactsPage() {
                     onClick={() => setSelectedSubmission(submission)}
                     className={cn(
                       'w-full text-left p-4 border-b hover:bg-accent transition-colors cursor-pointer',
-                      selectedSubmission?.id === submission.id && 'bg-accent'
+                      selectedSubmission?.id === submission.id && 'bg-accent text-accent-foreground'
                     )}
                   >
                   <div className="flex items-start gap-4">
@@ -195,15 +195,15 @@ export default function ContactsPage() {
                     <div className="flex-1 min-w-0">
                        <div className="flex items-center gap-2 mb-1">
                           <span className="font-semibold truncate">{submission.name}</span>
-                          <div className="size-2 rounded-full bg-primary shrink-0" />
-                          <span className="text-xs text-muted-foreground ml-auto shrink-0">{formatDate(submission.submittedAt)}</span>
+                          <div className={cn('size-2 rounded-full shrink-0', selectedSubmission?.id === submission.id ? 'bg-accent-foreground' : 'bg-primary')} />
+                          <span className={cn('text-xs ml-auto shrink-0', selectedSubmission?.id === submission.id ? 'text-accent-foreground/80' : 'text-muted-foreground')}>{formatDate(submission.submittedAt)}</span>
                         </div>
 
                         <div className="text-sm font-medium mb-2 truncate">
                           {submission.subject}
                         </div>
                         
-                        <p className="text-sm text-muted-foreground line-clamp-2">
+                        <p className={cn('text-sm line-clamp-2', selectedSubmission?.id === submission.id ? 'text-accent-foreground/80' : 'text-muted-foreground')}>
                           {submission.message}
                         </p>
                     </div>
@@ -252,7 +252,7 @@ export default function ContactsPage() {
                         <p className='font-semibold'>{selectedSubmission.name}</p>
                         <p className="text-sm text-muted-foreground">to <span className="font-medium text-foreground">me</span></p>
                       </div>
-                      <div className="text-sm text-muted-foreground">
+                      <div className="text-sm text-foreground">
                         {selectedSubmission.submittedAt && format(new Date(selectedSubmission.submittedAt.seconds * 1000), "MMM d, yyyy, h:mm a")}
                       </div>
                     </div>
