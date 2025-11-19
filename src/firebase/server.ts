@@ -7,17 +7,20 @@ import { firebaseConfig } from './config';
 
 // IMPORTANT: DO NOT MODIFY THIS FUNCTION
 export function initializeFirebase() {
-  // Check if the app is already initialized
   if (getApps().length) {
     return getSdks(getApp());
   }
-
-  // If not initialized, initialize with credentials.
-  // In a deployed environment, these credentials will be auto-discovered.
-  // In a local environment, you may need to set GOOGLE_APPLICATION_CREDENTIALS.
-  const app = initializeApp({
-    projectId: firebaseConfig.projectId,
-  });
+  
+  let app;
+  try {
+    // In a deployed GCP environment, initializeApp() discovers credentials automatically.
+    app = initializeApp();
+  } catch (e) {
+    // In a local environment, you may need to specify the projectId.
+    app = initializeApp({
+        projectId: firebaseConfig.projectId,
+    });
+  }
 
   return getSdks(app);
 }
