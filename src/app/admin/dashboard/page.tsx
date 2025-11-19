@@ -11,7 +11,7 @@ import {
   import { useRouter } from 'next/navigation';
   import { useEffect } from 'react';
   import { Button } from '@/components/ui/button';
-  import { Loader2, LogOut, ArrowRight } from 'lucide-react';
+  import { Loader2, LogOut, ArrowRight, Inbox } from 'lucide-react';
   import Link from 'next/link';
   
   export default function AdminDashboardPage() {
@@ -50,16 +50,15 @@ import {
             </Button>
         </header>
 
-        <main>
+        <main className='grid md:grid-cols-2 gap-8'>
           <Card>
             <CardHeader>
               <CardTitle>Manage News & Events</CardTitle>
               <CardDescription>
-                Here you can create, edit, and delete news and events.
+                Create, edit, and delete news and events.
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <p className='mb-4'>Click the button below to manage your news and events.</p>
               <Button asChild>
                 <Link href="/admin/news">
                     Manage News & Events
@@ -68,8 +67,24 @@ import {
               </Button>
             </CardContent>
           </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>View Contact Submissions</CardTitle>
+              <CardDescription>
+                Read and manage messages from your website visitors.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button asChild>
+                <Link href="/admin/contacts">
+                    View Submissions
+                    <Inbox className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
+            </CardContent>
+          </Card>
         </main>
       </div>
     );
   }
-  

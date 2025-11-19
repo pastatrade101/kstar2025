@@ -10,6 +10,10 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
+    function isAdmin() {
+      return request.auth != null;
+    }
+
     /**
      * @description Rules for the `courses` collection. Allows anyone to read course data, but disallows writes.
      * @path /courses/{courseId}
@@ -35,15 +39,15 @@ service cloud.firestore {
     }
 
     /**
-     * @description Rules for the `news_events` collection. Allows anyone to read news events, but disallows writes.
+     * @description Rules for the `news_events` collection. Allows admins to write, and anyone to read.
      * @path /news_events/{newsEventId}
      * @allow (get, list) Anyone can read news events.
-     * @deny (create, update, delete) No one can create, update, or delete news events.
-     * @principle Allows public read access and restricts writes.
+     * @allow (create, update, delete) Only admins can manage news and events.
+     * @principle Allows public read access and restricts writes to admins.
      */
     match /news_events/{newsEventId} {
       allow get, list: if true;
-      allow create, update, delete: if false;
+      allow create, update, delete: if isAdmin();
     }
 
     /**
@@ -59,15 +63,17 @@ service cloud.firestore {
     }
 
     /**
-     * @description Rules for the `contact_submissions` collection. Allows anyone to create a new submission, but no one can read, update, or delete them.
+     * @description Rules for the `contact_submissions` collection. Allows anyone to create, but only admins can read.
      * @path /contact_submissions/{submissionId}
      * @allow (create) Anyone can create a new contact submission.
-     * @deny (get, list, update, delete) No one can read, update, or delete submissions.
-     * @principle Allows public write access for the contact form and restricts all other access.
+     * @allow (get, list) Only admins can read submissions.
+     * @deny (update, delete) No one can update or delete submissions.
+     * @principle Allows public write for contact form, and restricted read access for admins.
      */
     match /contact_submissions/{submissionId} {
         allow create: if true;
-        allow get, list, update, delete: if false;
+        allow get, list: if isAdmin();
+        allow update, delete: if false;
     }
   }
 }
