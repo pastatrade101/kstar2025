@@ -1,12 +1,12 @@
 'use client';
 
 import { useState } from 'react';
-import { useFirestore, useCollection, useUser } from '@/firebase';
+import { useFirestore, useCollection } from '@/firebase';
 import { collection, query, orderBy } from 'firebase/firestore';
 import { useMemoFirebase } from '@/firebase/provider';
-import { Loader2, Inbox, Mail, User, Clock, ChevronRight } from 'lucide-react';
+import { Loader2, Inbox, Mail, User } from 'lucide-react';
 import { format, formatDistanceToNow } from 'date-fns';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -25,27 +25,21 @@ type ContactSubmission = {
 };
 
 export default function ContactsPage() {
-  const { isUserLoading } = useUser();
   const firestore = useFirestore();
   const submissionsCollectionRef = useMemoFirebase(
-    () => collection(firestore, 'contact_submissions'),
+    () => (firestore ? collection(firestore, 'contact_submissions') : null),
     [firestore]
   );
   const submissionsQuery = useMemoFirebase(
-    () => query(submissionsCollectionRef, orderBy('submittedAt', 'desc')),
+    () =>
+      submissionsCollectionRef
+        ? query(submissionsCollectionRef, orderBy('submittedAt', 'desc'))
+        : null,
     [submissionsCollectionRef]
   );
 
   const { data: submissions, isLoading: isLoadingSubmissions, error } = useCollection<ContactSubmission>(submissionsQuery);
   const [selectedSubmission, setSelectedSubmission] = useState<ContactSubmission | null>(null);
-
-  if (isUserLoading) {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        <Loader2 className="h-12 w-12 animate-spin" />
-      </div>
-    );
-  }
 
   const getInitials = (name: string) => {
     const names = name.split(' ');
@@ -61,61 +55,70 @@ export default function ContactsPage() {
     return formatDistanceToNow(date, { addSuffix: true });
   }
 
+  // Effect to select the first submission once data loads
+  useState(() => {
+    if (submissions && submissions.length > 0 && !selectedSubmission) {
+      setSelectedSubmission(submissions[0]);
+    }
+  });
+
   return (
-    <div className="min-h-screen bg-muted/40">
-      <div className="h-screen flex flex-col">
-        <header className="p-4 border-b bg-background">
-          <h1 className="font-headline text-2xl font-bold flex items-center gap-2">
-            <Inbox /> Contact Submissions
-          </h1>
-        </header>
+    <div className="h-screen flex flex-col bg-muted/20 antialiased">
+      <div className="flex-1 grid grid-cols-[320px_1fr] overflow-hidden">
+        {/* Sidebar */}
+        <aside className="border-r bg-background flex flex-col">
+          <div className="p-4 border-b">
+            <h1 className="font-headline text-2xl font-bold flex items-center gap-2">
+              <Inbox /> Inbox
+            </h1>
+            <p className='text-muted-foreground text-sm'>{submissions?.length ?? 0} messages</p>
+          </div>
+          <ScrollArea className="flex-1">
+            {isLoadingSubmissions && (
+              <div className="p-4 text-center grid place-content-center h-full">
+                <Loader2 className="h-6 w-6 animate-spin mx-auto text-muted-foreground" />
+              </div>
+            )}
+            {error && <div className="p-4 text-destructive">Error: {error.message}</div>}
+            {!isLoadingSubmissions && submissions?.length === 0 && (
+              <div className="p-4 text-center text-muted-foreground grid place-content-center h-full">
+                <p>No submissions yet.</p>
+              </div>
+            )}
+            <ul className='p-2'>
+              {submissions?.map((submission) => (
+                <li key={submission.id}>
+                  <button
+                    className={cn(
+                      'w-full text-left p-3 hover:bg-accent transition-colors rounded-lg',
+                      selectedSubmission?.id === submission.id && 'bg-accent'
+                    )}
+                    onClick={() => setSelectedSubmission(submission)}
+                  >
+                    <div className='flex justify-between items-start mb-1'>
+                      <p className="font-semibold text-sm truncate">{submission.name}</p>
+                      <p className="text-xs text-muted-foreground shrink-0">{formatDate(submission.submittedAt)}</p>
+                    </div>
+                    <p className="text-sm font-medium truncate">{submission.subject}</p>
+                    <p className="text-xs text-muted-foreground truncate">{submission.email}</p>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </ScrollArea>
+        </aside>
 
-        <div className="flex-1 grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 overflow-hidden">
-          <aside className="md:col-span-1 lg:col-span-1 border-r overflow-y-auto">
-            <ScrollArea className="h-full">
-              {isLoadingSubmissions && (
-                <div className="p-4 text-center">
-                  <Loader2 className="h-6 w-6 animate-spin mx-auto" />
-                </div>
-              )}
-              {error && <div className="p-4 text-destructive">Error: {error.message}</div>}
-              {!isLoadingSubmissions && submissions?.length === 0 && (
-                <div className="p-4 text-center text-muted-foreground">No submissions yet.</div>
-              )}
-              <ul>
-                {submissions?.map((submission, index) => (
-                  <li key={submission.id}>
-                    <button
-                      className={cn(
-                        'w-full text-left p-4 hover:bg-accent transition-colors',
-                        selectedSubmission?.id === submission.id && 'bg-accent'
-                      )}
-                      onClick={() => setSelectedSubmission(submission)}
-                    >
-                      <div className='flex justify-between items-start'>
-                        <p className="font-semibold text-sm">{submission.name}</p>
-                        <p className="text-xs text-muted-foreground">{formatDate(submission.submittedAt)}</p>
-                      </div>
-                      <p className="text-sm font-medium truncate">{submission.subject}</p>
-                      <p className="text-xs text-muted-foreground truncate">{submission.email}</p>
-                    </button>
-                    {index < submissions.length - 1 && <Separator />}
-                  </li>
-                ))}
-              </ul>
-            </ScrollArea>
-          </aside>
-
-          <main className="md:col-span-2 lg:col-span-3 overflow-y-auto">
-            <ScrollArea className="h-full">
-              {selectedSubmission ? (
-                <div className="p-4 md:p-8">
-                  <header className="flex items-start gap-4 mb-8">
-                    <Avatar className="h-12 w-12">
+        {/* Main Content */}
+        <main className="overflow-y-auto bg-white flex flex-col">
+          {selectedSubmission ? (
+            <>
+              <header className="p-4 border-b bg-background/80 backdrop-blur-sm sticky top-0 z-10">
+                <div className='flex items-start gap-4'>
+                    <Avatar className="h-11 w-11">
                       <AvatarFallback>{getInitials(selectedSubmission.name)}</AvatarFallback>
                     </Avatar>
                     <div className='flex-1'>
-                      <h2 className="font-bold text-2xl">{selectedSubmission.subject}</h2>
+                      <h2 className="font-bold text-lg">{selectedSubmission.subject}</h2>
                       <div className='text-sm text-muted-foreground flex items-center gap-4'>
                           <div className='flex items-center gap-1.5'>
                               <User className='h-4 w-4'/>
@@ -127,7 +130,7 @@ export default function ContactsPage() {
                           </a>
                       </div>
                     </div>
-                     <div className='text-right text-sm text-muted-foreground'>
+                     <div className='text-right text-xs text-muted-foreground shrink-0'>
                          {selectedSubmission.submittedAt && (
                           <>
                             <div>{format(new Date(selectedSubmission.submittedAt.seconds * 1000), "PPP")}</div>
@@ -135,23 +138,29 @@ export default function ContactsPage() {
                           </>
                          )}
                      </div>
-                  </header>
-                  <Separator className='my-6' />
-                  <div className="prose dark:prose-invert max-w-none text-foreground/90 whitespace-pre-wrap leading-relaxed">
-                    {selectedSubmission.message}
-                  </div>
                 </div>
-              ) : (
-                <div className="flex h-full items-center justify-center text-muted-foreground">
-                  <div className='text-center'>
-                    <Inbox className="h-16 w-16 mx-auto mb-4" />
-                    <p>Select a submission to read</p>
-                  </div>
+              </header>
+              <ScrollArea className="flex-1">
+                <div className="p-8">
+                  <Card>
+                    <CardContent className="p-6">
+                      <div className="prose dark:prose-invert max-w-none text-foreground/90 whitespace-pre-wrap leading-relaxed">
+                        {selectedSubmission.message}
+                      </div>
+                    </CardContent>
+                  </Card>
                 </div>
-              )}
-            </ScrollArea>
-          </main>
-        </div>
+              </ScrollArea>
+            </>
+          ) : (
+            <div className="flex h-full items-center justify-center text-muted-foreground">
+              <div className='text-center'>
+                <Inbox className="h-16 w-16 mx-auto mb-4" />
+                <p>Select a submission to read</p>
+              </div>
+            </div>
+          )}
+        </main>
       </div>
     </div>
   );
