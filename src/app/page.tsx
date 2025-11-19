@@ -33,7 +33,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import ContactForm from '@/components/contact-form';
-import { collection, query, orderBy, getDocs, Timestamp, limit } from 'firebase-admin/firestore';
+import { Timestamp } from 'firebase-admin/firestore';
 import { initializeFirebase } from '@/firebase/server';
 import { format } from 'date-fns';
 
@@ -50,8 +50,8 @@ async function getRecentNewsAndEvents() {
     try {
       const { firestore } = initializeFirebase();
       const newsCollectionRef = firestore.collection('news_events');
-      const newsQuery = query(newsCollectionRef, orderBy('date', 'desc'), limit(3));
-      const snapshot = await getDocs(newsQuery);
+      const newsQuery = newsCollectionRef.orderBy('date', 'desc').limit(3);
+      const snapshot = await newsQuery.get();
   
       if (snapshot.empty) {
         return [];
