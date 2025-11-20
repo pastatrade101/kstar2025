@@ -16,6 +16,12 @@ import { cn } from '@/lib/utils';
 import Image from 'next/image';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { ThemeToggle } from '@/components/theme-toggle';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion';
 
 const ListItem = React.forwardRef<
   React.ElementRef<'a'>,
@@ -68,14 +74,14 @@ export default function HomeClient({
       href: '/kstar-malezi-foundation',
       description:
         'A non-profit fostering youth development through education and mentorship programs.',
-        image: PlaceHolderImages.find((p) => p.id === 'mega-menu-malezi'),
+      image: PlaceHolderImages.find((p) => p.id === 'mega-menu-malezi'),
     },
     {
       title: 'ClickData Tanzania',
       href: '/clickdata-tanzania',
       description:
         'Harnessing the power of data to provide innovative analytics and business solutions.',
-        image: PlaceHolderImages.find((p) => p.id === 'mega-menu-clickdata'),
+      image: PlaceHolderImages.find((p) => p.id === 'mega-menu-clickdata'),
     },
   ];
 
@@ -104,6 +110,10 @@ export default function HomeClient({
     }
   };
 
+  const handleMobileLinkClick = (href: string) => {
+    setIsMenuOpen(false);
+  };
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <header
@@ -116,8 +126,12 @@ export default function HomeClient({
                 <span className="text-white font-semibold text-xl">K</span>
               </div>
               <div>
-                  <div className="font-semibold text-foreground">Kstar International</div>
-                  <div className="text-xs text-muted-foreground">Excellence in Every Field</div>
+                <div className="font-semibold text-foreground">
+                  Kstar International
+                </div>
+                <div className="text-xs text-muted-foreground">
+                  Excellence in Every Field
+                </div>
               </div>
             </Link>
 
@@ -125,40 +139,38 @@ export default function HomeClient({
               <NavigationMenuList>
                 <NavigationMenuItem>
                   <Button variant="ghost" asChild>
-                    <Link href="#home" onClick={scrollToSection('home')}>
-                      Home
-                    </Link>
+                    <Link href="/">Home</Link>
                   </Button>
                 </NavigationMenuItem>
-                
+
                 <NavigationMenuItem>
                   <NavigationMenuTrigger>Kstar (T) Group</NavigationMenuTrigger>
                   <NavigationMenuContent>
                     <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
                       {kstarGroupComponents.map((component) => (
                         <li key={component.title} className="row-span-3">
-                           <NavigationMenuLink asChild>
-                             <a
-                               className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
-                               href={component.href}
-                             >
-                              <Image 
-                                src={component.image.imageUrl} 
-                                alt={component.title} 
-                                width={400} 
+                          <NavigationMenuLink asChild>
+                            <a
+                              className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
+                              href={component.href}
+                            >
+                              <Image
+                                src={component.image.imageUrl}
+                                alt={component.title}
+                                width={400}
                                 height={200}
-                                className='w-full h-24 object-cover rounded-md mb-4'
+                                className="w-full h-24 object-cover rounded-md mb-4"
                                 data-ai-hint={component.image.imageHint}
                               />
-                               <div className="mb-2 mt-4 text-lg font-medium">
-                                 {component.title}
-                               </div>
-                               <p className="text-sm leading-tight text-muted-foreground">
-                                 {component.description}
-                               </p>
-                             </a>
-                           </NavigationMenuLink>
-                         </li>
+                              <div className="mb-2 mt-4 text-lg font-medium">
+                                {component.title}
+                              </div>
+                              <p className="text-sm leading-tight text-muted-foreground">
+                                {component.description}
+                              </p>
+                            </a>
+                          </NavigationMenuLink>
+                        </li>
                       ))}
                     </ul>
                   </NavigationMenuContent>
@@ -166,33 +178,38 @@ export default function HomeClient({
 
                 <NavigationMenuItem>
                   <Button variant="ghost" asChild>
-                    <Link href="#about" onClick={scrollToSection('about')}>
+                    <Link href="/#about" onClick={scrollToSection('about')}>
                       About
                     </Link>
                   </Button>
                 </NavigationMenuItem>
                 <NavigationMenuItem>
                   <Button variant="ghost" asChild>
-                    <Link href="#services" onClick={scrollToSection('services')}>
+                    <Link
+                      href="/#services"
+                      onClick={scrollToSection('services')}
+                    >
                       Departments
                     </Link>
                   </Button>
                 </NavigationMenuItem>
-                 <NavigationMenuItem>
+                <NavigationMenuItem>
                   <Button variant="ghost" asChild>
-                    <Link href="#contact" onClick={scrollToSection('contact')}>
+                    <Link href="/#contact" onClick={scrollToSection('contact')}>
                       Contact
                     </Link>
                   </Button>
                 </NavigationMenuItem>
-
               </NavigationMenuList>
             </NavigationMenu>
 
             <div className="flex items-center gap-4">
-               <ThemeToggle />
-              <Button asChild className="hidden md:flex bg-gradient-to-r from-primary to-purple-700 hover:from-purple-700 hover:to-purple-800 shadow-lg shadow-primary/30">
-                <Link href="#contact" onClick={scrollToSection('contact')}>
+              <ThemeToggle />
+              <Button
+                asChild
+                className="hidden md:flex bg-gradient-to-r from-primary to-purple-700 hover:from-purple-700 hover:to-purple-800 shadow-lg shadow-primary/30"
+              >
+                <Link href="/#contact" onClick={scrollToSection('contact')}>
                   Get In Touch
                 </Link>
               </Button>
@@ -211,20 +228,59 @@ export default function HomeClient({
         {isMenuOpen && (
           <div className="md:hidden bg-background border-t">
             <nav className="py-4 space-y-1 px-4">
-              {navLinks.map((link) => (
-                <Button
-                  key={link.id}
-                  variant="ghost"
-                  className="w-full justify-start"
-                  asChild
-                >
-                  <Link href={`#${link.id}`} onClick={scrollToSection(link.id)}>
-                    {link.label}
-                  </Link>
-                </Button>
-              ))}
-              <Button asChild className="w-full mt-2 bg-gradient-to-r from-primary to-purple-700">
-                <Link href="#contact" onClick={scrollToSection('contact')}>
+              <Button variant="ghost" className="w-full justify-start" asChild>
+                <Link href="/" onClick={() => handleMobileLinkClick('/')}>
+                  Home
+                </Link>
+              </Button>
+
+              <Accordion type="single" collapsible className="w-full">
+                <AccordionItem value="kstar-group" className="border-b-0">
+                  <AccordionTrigger className="py-2 hover:no-underline font-medium text-sm hover:bg-accent hover:text-accent-foreground rounded-md px-3">
+                    Kstar (T) Group
+                  </AccordionTrigger>
+                  <AccordionContent className="pb-0 pl-4">
+                    {kstarGroupComponents.map((component) => (
+                      <Button
+                        key={component.href}
+                        variant="ghost"
+                        className="w-full justify-start"
+                        asChild
+                      >
+                        <Link
+                          href={component.href}
+                          onClick={() => handleMobileLinkClick(component.href)}
+                        >
+                          {component.title}
+                        </Link>
+                      </Button>
+                    ))}
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
+
+              {navLinks
+                .filter((l) => l.id !== 'home')
+                .map((link) => (
+                  <Button
+                    key={link.id}
+                    variant="ghost"
+                    className="w-full justify-start"
+                    asChild
+                  >
+                    <Link
+                      href={`/#${link.id}`}
+                      onClick={scrollToSection(link.id)}
+                    >
+                      {link.label}
+                    </Link>
+                  </Button>
+                ))}
+              <Button
+                asChild
+                className="w-full mt-2 bg-gradient-to-r from-primary to-purple-700"
+              >
+                <Link href="/#contact" onClick={scrollToSection('contact')}>
                   Get In Touch
                 </Link>
               </Button>
