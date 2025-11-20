@@ -55,9 +55,9 @@ export default function Home() {
         {/* Hero Section */}
         <section
           id="home"
-          className="relative pt-24 md:pt-32"
+          className="relative pt-32 md:pt-40"
         >
-         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-2 lg:gap-12 lg:items-center min-h-[calc(100vh-80px)]">
+         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-2 lg:gap-12 lg:items-center">
             <div className="py-12 lg:py-20 text-center lg:text-left">
                 <Badge
                 variant="outline"
