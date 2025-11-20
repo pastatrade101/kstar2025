@@ -18,7 +18,7 @@ import { initiateEmailSignIn } from '@/firebase/non-blocking-login';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { Loader2 } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 const formSchema = z.object({
   email: z.string().email({
@@ -54,7 +54,7 @@ export default function AdminLoginPage() {
 
   if (isUserLoading || user) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center bg-slate-100 dark:bg-slate-900">
         <Loader2 className="h-16 w-16 animate-spin" />
       </div>
     );
@@ -62,10 +62,18 @@ export default function AdminLoginPage() {
   
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-muted/40">
-      <Card className="w-full max-w-sm">
+    <div className="flex min-h-screen items-center justify-center bg-slate-100 dark:bg-slate-900 p-4">
+      <Card className="w-full max-w-sm border-slate-200 dark:border-slate-800 dark:bg-slate-900">
         <CardHeader>
-          <CardTitle className='font-headline text-2xl'>Admin Login</CardTitle>
+          <div className="flex items-center gap-3 mb-2">
+            <div className="size-10 rounded-lg bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center">
+              <span className="text-white font-bold text-xl">A</span>
+            </div>
+            <CardTitle className='text-2xl text-slate-900 dark:text-white'>Admin Panel</CardTitle>
+          </div>
+          <CardDescription>
+            Please sign in to access the dashboard.
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
@@ -77,7 +85,7 @@ export default function AdminLoginPage() {
                   <FormItem>
                     <FormLabel>Email</FormLabel>
                     <FormControl>
-                      <Input placeholder="admin@example.com" {...field} />
+                      <Input placeholder="admin@example.com" {...field} className='bg-slate-50 dark:bg-slate-800'/>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -90,13 +98,13 @@ export default function AdminLoginPage() {
                   <FormItem>
                     <FormLabel>Password</FormLabel>
                     <FormControl>
-                      <Input type="password" placeholder="••••••••" {...field} />
+                      <Input type="password" placeholder="••••••••" {...field} className='bg-slate-50 dark:bg-slate-800'/>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              <Button type="submit" className="w-full">
+              <Button type="submit" className="w-full bg-slate-900 hover:bg-slate-800 dark:bg-blue-600 dark:hover:bg-blue-700 dark:text-white">
                 Sign In
               </Button>
             </form>
