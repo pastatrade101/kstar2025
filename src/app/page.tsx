@@ -1,6 +1,7 @@
 
 
 
+
 import {
   ArrowRight,
   Target,
@@ -67,9 +68,6 @@ export default function Home() {
               <div className="grid lg:grid-cols-2 gap-12 items-center">
                 {/* Left Content */}
                 <div>
-                  <div className="inline-block px-4 py-2 rounded-full bg-primary/10 text-primary mb-6">
-                    <span className="text-sm font-medium">Kstar (T) Group</span>
-                  </div>
                   
                   <h1 className="text-5xl sm:text-6xl font-bold text-foreground mb-6 leading-tight">
                     Kstar (T) Group
@@ -273,7 +271,7 @@ export default function Home() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-background/80 text-foreground">
+      <footer className="bg-secondary/50 text-foreground">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="grid md:grid-cols-4 gap-10 mb-12">
             <div>

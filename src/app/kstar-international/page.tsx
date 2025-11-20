@@ -88,12 +88,6 @@ export default function KstarInternationalPage() {
         >
          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-2 lg:gap-12 lg:items-center">
             <div className="py-12 lg:py-20 text-center lg:text-left">
-                <Badge
-                variant="outline"
-                className="mb-6 bg-secondary text-secondary-foreground"
-                >
-                Kstar (T) Group
-                </Badge>
 
                 <h1 className="text-4xl md:text-5xl font-extrabold mb-6 tracking-tight">
                     <span className="bg-gradient-to-r from-k-star-red to-k-star-blue bg-clip-text text-transparent">Kstar (T) Group</span>
@@ -257,7 +251,7 @@ export default function KstarInternationalPage() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-background/80 text-foreground">
+      <footer className="bg-secondary/50 text-foreground">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="grid md:grid-cols-4 gap-10 mb-12">
             <div>
