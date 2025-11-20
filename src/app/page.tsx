@@ -49,6 +49,12 @@ export default function Home() {
     { title: "Department of Music", icon: Star, image: PlaceHolderImages.find(p => p.id === 'dept-music'), description: "Nurturing musical talent and providing a platform for artists to create and perform." },
   ];
 
+  const kstarGroupLinks = [
+    { href: "/kstar-international", label: "Kstar International" },
+    { href: "/kstar-malezi-foundation", label: "Kstar Malezi Foundation" },
+    { href: "/clickdata-tanzania", label: "ClickData Tanzania" },
+  ];
+
   return (
     <HomeClient>
       <main>
@@ -74,7 +80,7 @@ export default function Home() {
                     Our mission is to connect passion with purpose through creativity, sports, and innovation.
                 </p>
 
-                <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+                <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mb-10">
                     <Button asChild size="lg" className="group">
                         <Link href="#about">
                         Learn More
@@ -86,6 +92,17 @@ export default function Home() {
                         Contact Us
                         </Link>
                     </Button>
+                </div>
+                
+                <div className="flex flex-wrap gap-4 justify-center lg:justify-start">
+                  {kstarGroupLinks.map((link) => (
+                    <Button key={link.href} variant="outline" asChild className="group">
+                      <Link href={link.href}>
+                        {link.label}
+                        <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                      </Link>
+                    </Button>
+                  ))}
                 </div>
             </div>
 
