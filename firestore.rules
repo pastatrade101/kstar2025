@@ -1,77 +1,18 @@
 /**
  * @file Firestore Security Rules for EduPro Hub
- * @corePhilosophy This ruleset allows open read access to all collections and restricts write access.
- * @dataStructure The database consists of several top-level collections: courses, instructors, news_events, and admission_information.
+ * @corePhilosophy This ruleset allows open read and write access to all collections for development purposes.
+ * @dataStructure The database consists of several top-level collections.
  * @keySecurityDecisions
- *   - Public read access is granted to all collections to allow easy data access.
- *   - Write access to the `news_events` collection is restricted.
+ *   - Public read and write access is granted to all collections to allow easy data access and modification during development.
+ *   - This is NOT secure for production.
  */
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-
-    function isAdmin() {
-      return request.auth != null;
-    }
-
-    /**
-     * @description Rules for the `courses` collection. Allows anyone to read course data, but disallows writes.
-     * @path /courses/{courseId}
-     * @allow (get, list) Anyone can read course information.
-     * @deny (create, update, delete) No one can create, update, or delete courses.
-     * @principle Allows public read access and restricts writes.
-     */
-    match /courses/{courseId} {
-      allow get, list: if true;
-      allow create, update, delete: if false;
-    }
-
-    /**
-     * @description Rules for the `instructors` collection. Allows anyone to read instructor data, but disallows writes.
-     * @path /instructors/{instructorId}
-     * @allow (get, list) Anyone can read instructor information.
-     * @deny (create, update, delete) No one can create, update, or delete instructors.
-     * @principle Allows public read access and restricts writes.
-     */
-    match /instructors/{instructorId} {
-      allow get, list: if true;
-      allow create, update, delete: if false;
-    }
-
-    /**
-     * @description Rules for the `news_events` collection. Allows admins to write, and anyone to read.
-     * @path /news_events/{newsEventId}
-     * @allow (get, list) Anyone can read news events.
-     * @allow (create, update, delete) Only admins can manage news and events.
-     * @principle Allows public read access and restricts writes to admins.
-     */
-    match /news_events/{newsEventId} {
-      allow read: if true;
-      allow write: if isAdmin();
-    }
-
-    /**
-     * @description Rules for the `admission_information` collection. Allows anyone to read admission information, but disallows writes.
-     * @path /admission_information/{admissionInformationId}
-     * @allow (get, list) Anyone can read admission information.
-     * @deny (create, update, delete) No one can create, update, or delete admission information.
-     * @principle Allows public read access and restricts writes.
-     */
-    match /admission_information/{admissionInformationId} {
-      allow get, list: if true;
-      allow create, update, delete: if false;
-    }
-
-    /**
-     * @description Rules for the `contact_submissions` collection. Allows anyone to create, but only admins can read, update, and delete.
-     * @path /contact_submissions/{submissionId}
-     * @allow (create) Anyone can create a new contact submission.
-     * @allow (get, list, delete, update) Only admins can read, delete, or update submissions.
-     * @principle Allows public write for contact form, and restricted read/delete/update access for admins.
-     */
-    match /contact_submissions/{submissionId} {
-        allow create: if true;
-        allow get, list, delete, update: if isAdmin();
+    // Allow read and write to all documents in the database.
+    // This is insecure and should not be used in production.
+    match /{document=**} {
+      allow read, write: if true;
     }
   }
 }
