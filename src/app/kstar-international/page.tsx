@@ -262,9 +262,13 @@ export default function KstarInternationalPage() {
           <div className="grid md:grid-cols-4 gap-10 mb-12">
             <div>
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 bg-primary text-primary-foreground rounded-xl flex items-center justify-center font-bold">
-                  K
-                </div>
+                <Image 
+                  src="https://firebasestorage.googleapis.com/v0/b/studio-4061903538-cceaf.firebasestorage.app/o/ICON.png?alt=media&token=bb2b9ed0-6c57-4b29-895d-1ffba179efd7" 
+                  alt="Kstar Logo" 
+                  width={40} 
+                  height={40}
+                  className="rounded-xl"
+                />
                 <span className="font-bold text-lg">
                   Kstar International
                 </span>

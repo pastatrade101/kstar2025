@@ -122,9 +122,13 @@ export default function HomeClient({
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-20">
             <Link href="/" className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-purple-800 flex items-center justify-center shadow-lg shadow-primary/30">
-                <span className="text-white font-semibold text-xl">K</span>
-              </div>
+              <Image 
+                src="https://firebasestorage.googleapis.com/v0/b/studio-4061903538-cceaf.firebasestorage.app/o/ICON.png?alt=media&token=bb2b9ed0-6c57-4b29-895d-1ffba179efd7" 
+                alt="Kstar Logo" 
+                width={40} 
+                height={40}
+                className="rounded-xl"
+              />
               <div>
                 <div className="font-semibold text-foreground">
                   Kstar International
