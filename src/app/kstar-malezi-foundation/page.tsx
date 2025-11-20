@@ -77,7 +77,7 @@ import {
                   </Badge>
   
                   <h1 className="text-4xl md:text-5xl font-extrabold mb-6 tracking-tight">
-                    Kstar Malezi Foundation
+                    <span className="bg-gradient-to-r from-k-star-red to-k-star-blue bg-clip-text text-transparent">Kstar Malezi Foundation</span>
                   </h1>
   
                   <p className="text-lg md:text-xl text-muted-foreground mb-10 max-w-3xl mx-auto lg:mx-0">
@@ -236,7 +236,7 @@ import {
         </main>
   
         {/* Footer */}
-        <footer className="bg-secondary/50 text-foreground">
+        <footer className="bg-background/80 text-foreground">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
             <div className="grid md:grid-cols-4 gap-10 mb-12">
               <div>

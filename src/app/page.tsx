@@ -72,7 +72,7 @@ export default function Home() {
                   
                   <h1 className="text-5xl sm:text-6xl font-bold text-foreground mb-6 leading-tight">
                     Turning Passion into{' '}
-                    <span className="bg-gradient-to-r from-primary to-blue-500 bg-clip-text text-transparent">
+                    <span className="bg-gradient-to-r from-k-star-red to-k-star-blue bg-clip-text text-transparent">
                       Performance
                     </span>{' '}
                     Through Insight
@@ -83,7 +83,7 @@ export default function Home() {
                   </p>
 
                   <div className="flex flex-wrap gap-4 mb-12">
-                    <Button size="lg" className="bg-gradient-to-r from-primary to-purple-700 hover:from-purple-700 hover:to-purple-800 shadow-xl shadow-primary/20 group">
+                    <Button size="lg" className="bg-gradient-to-r from-primary to-accent hover:from-accent hover:to-primary shadow-xl shadow-primary/20 group">
                       Learn More
                       <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
                     </Button>

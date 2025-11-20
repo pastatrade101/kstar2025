@@ -211,7 +211,7 @@ export default function HomeClient({
               <ThemeToggle />
               <Button
                 asChild
-                className="hidden md:flex bg-gradient-to-r from-primary to-purple-700 hover:from-purple-700 hover:to-purple-800 shadow-lg shadow-primary/30"
+                className="hidden md:flex bg-gradient-to-r from-primary to-accent hover:from-accent hover:to-primary shadow-lg shadow-primary/30"
               >
                 <Link href="/#contact" onClick={scrollToSection('contact')}>
                   Get In Touch
@@ -282,7 +282,7 @@ export default function HomeClient({
                 ))}
               <Button
                 asChild
-                className="w-full mt-2 bg-gradient-to-r from-primary to-purple-700"
+                className="w-full mt-2 bg-gradient-to-r from-primary to-accent"
               >
                 <Link href="/#contact" onClick={scrollToSection('contact')}>
                   Get In Touch

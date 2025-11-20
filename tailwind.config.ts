@@ -48,6 +48,12 @@ export default {
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
         ring: 'hsl(var(--ring))',
+        'k-star-red': '#C8102E',
+        'k-star-blue': '#1A3D8F',
+        'light-blue': '#2D5FB8',
+        'deep-red': '#9A0E23',
+        'neutral-light': '#FFFFFF',
+        'neutral-dark': '#444444',
         chart: {
           '1': 'hsl(var(--chart-1))',
           '2': 'hsl(var(--chart-2))',
