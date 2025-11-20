@@ -10,6 +10,9 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { format } from 'date-fns';
 import { ArrowRight, Loader2 } from 'lucide-react';
+import { useState, useMemo } from 'react';
+import { cn } from '@/lib/utils';
+
 
 type NewsEvent = {
     id: string;
@@ -22,9 +25,19 @@ type NewsEvent = {
   
 export default function RecentNews() {
     const firestore = useFirestore();
+    const [activeTab, setActiveTab] = useState<'All' | 'News' | 'Event'>('All');
+
     const newsCollectionRef = useMemoFirebase(() => (firestore ? collection(firestore, 'news_events') : null), [firestore]);
-    const newsQuery = useMemoFirebase(() => (newsCollectionRef ? query(newsCollectionRef, orderBy('date', 'desc'), limit(6)) : null), [newsCollectionRef]);
+    const newsQuery = useMemoFirebase(() => (newsCollectionRef ? query(newsCollectionRef, orderBy('date', 'desc'), limit(12)) : null), [newsCollectionRef]);
     const { data: recentNews, isLoading } = useCollection<NewsEvent>(newsQuery);
+
+    const filteredNews = useMemo(() => {
+        if (!recentNews) return [];
+        const baseFilter = activeTab === 'All'
+          ? recentNews
+          : recentNews.filter(item => item.type === activeTab);
+        return baseFilter.slice(0, 6);
+    }, [recentNews, activeTab]);
 
     if (isLoading) {
         return (
@@ -49,12 +62,28 @@ export default function RecentNews() {
                 <div className="text-center max-w-3xl mx-auto">
                     <Badge>News & Events</Badge>
                     <h2 className="text-3xl md:text-4xl font-bold mt-4 mb-6">Stay Updated</h2>
-                    <p className="text-lg text-muted-foreground">
+                    <p className="text-lg text-muted-foreground mb-8">
                         Check out the latest news and happenings from Kstar International.
                     </p>
+                    <div className="flex justify-center gap-2">
+                        {(['All', 'News', 'Event'] as const).map((tab) => (
+                             <button
+                                key={tab}
+                                onClick={() => setActiveTab(tab)}
+                                className={cn(
+                                    "inline-flex items-center rounded-full border px-3 py-1 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+                                    activeTab === tab 
+                                        ? "bg-primary text-primary-foreground" 
+                                        : "bg-background/50 hover:bg-background text-foreground"
+                                )}
+                            >
+                                {tab}
+                            </button>
+                        ))}
+                    </div>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-16">
-                    {recentNews.map((item) => (
+                    {filteredNews.map((item) => (
                         <Card key={item.id} className="flex flex-col overflow-hidden group">
                             <Link href="/news-events" className="block aspect-video overflow-hidden">
                                 <Image
@@ -85,6 +114,11 @@ export default function RecentNews() {
                         </Card>
                     ))}
                 </div>
+                {filteredNews.length === 0 && (
+                    <div className="text-center mt-16 text-muted-foreground">
+                        No {activeTab.toLowerCase()} posts found.
+                    </div>
+                )}
                 <div className="text-center mt-16">
                     <Button asChild size="lg">
                         <Link href="/news-events">View All News & Events</Link>
