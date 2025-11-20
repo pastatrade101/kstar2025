@@ -106,15 +106,18 @@ export default function HomeClient({
   return (
     <div className="min-h-screen bg-background text-foreground">
       <header
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-background/80 backdrop-blur-xl border-b`}
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-white/80 backdrop-blur-lg border-b border-slate-200`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-20">
-            <Link href="/" className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-primary text-primary-foreground rounded-lg flex items-center justify-center font-bold">
-                K
+            <Link href="/" className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-purple-800 flex items-center justify-center shadow-lg shadow-primary/30">
+                <span className="text-white font-semibold text-xl">K</span>
               </div>
-              <span className="font-bold text-lg">Kstar International</span>
+              <div>
+                  <div className="font-semibold text-slate-900">Kstar International</div>
+                  <div className="text-xs text-slate-500">Excellence in Every Field</div>
+              </div>
             </Link>
 
             <NavigationMenu className="hidden md:flex">
@@ -186,7 +189,7 @@ export default function HomeClient({
             </NavigationMenu>
 
             <div className="flex items-center gap-4">
-              <Button asChild className="hidden md:flex">
+              <Button asChild className="hidden md:flex bg-gradient-to-r from-primary to-purple-700 hover:from-purple-700 hover:to-purple-800 shadow-lg shadow-primary/30">
                 <Link href="#contact" onClick={scrollToSection('contact')}>
                   Get In Touch
                 </Link>
@@ -204,7 +207,7 @@ export default function HomeClient({
         </div>
 
         {isMenuOpen && (
-          <div className="md:hidden bg-background border-t border-border">
+          <div className="md:hidden bg-white border-t border-slate-200">
             <nav className="py-4 space-y-1 px-4">
               {navLinks.map((link) => (
                 <Button
@@ -218,7 +221,7 @@ export default function HomeClient({
                   </Link>
                 </Button>
               ))}
-              <Button asChild className="w-full mt-2">
+              <Button asChild className="w-full mt-2 bg-gradient-to-r from-primary to-purple-700">
                 <Link href="#contact" onClick={scrollToSection('contact')}>
                   Get In Touch
                 </Link>

@@ -55,69 +55,90 @@ export default function Home() {
     { href: "/clickdata-tanzania", label: "ClickData Tanzania" },
   ];
 
+  const heroImage = PlaceHolderImages.find(p => p.id === 'hero-main');
+
   return (
     <HomeClient>
       <main>
         {/* Hero Section */}
-        <section
-          id="home"
-          className="relative pt-32 md:pt-40"
-        >
-         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-2 lg:gap-12 lg:items-center">
-            <div className="py-12 lg:py-20 text-center lg:text-left">
-                <Badge
-                variant="outline"
-                className="mb-6 bg-secondary text-secondary-foreground"
-                >
-                Kstar (T) Group
-                </Badge>
+        <section id="home" className="pt-32 pb-20 px-4 sm:px-6 lg:px-8">
+            <div className="max-w-7xl mx-auto">
+              <div className="grid lg:grid-cols-2 gap-12 items-center">
+                {/* Left Content */}
+                <div>
+                  <div className="inline-block px-4 py-2 rounded-full bg-primary/10 text-primary mb-6">
+                    <span className="text-sm font-medium">Kstar (T) Group</span>
+                  </div>
+                  
+                  <h1 className="text-5xl sm:text-6xl font-bold text-slate-900 mb-6 leading-tight">
+                    Turning Passion into{' '}
+                    <span className="bg-gradient-to-r from-primary to-blue-500 bg-clip-text text-transparent">
+                      Performance
+                    </span>{' '}
+                    Through Insight
+                  </h1>
 
-                <h1 className="text-4xl md:text-5xl font-extrabold mb-6 tracking-tight">
-                    Turning Passion into Performance Through Insight
-                </h1>
-
-                <p className="text-lg md:text-xl text-muted-foreground mb-10 max-w-3xl mx-auto lg:mx-0">
+                  <p className="text-xl text-slate-600 mb-8 leading-relaxed">
                     Our mission is to connect passion with purpose through creativity, sports, and innovation.
-                </p>
+                  </p>
 
-                <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mb-10">
-                    <Button asChild size="lg" className="group">
-                        <Link href="#about">
-                        Learn More
-                        <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-                        </Link>
+                  <div className="flex flex-wrap gap-4 mb-12">
+                    <Button size="lg" className="bg-gradient-to-r from-primary to-purple-700 hover:from-purple-700 hover:to-purple-800 shadow-xl shadow-primary/20 group">
+                      Learn More
+                      <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
                     </Button>
-                    <Button asChild size="lg" variant="secondary">
-                        <Link href="#contact">
-                        Contact Us
-                        </Link>
+                    <Button size="lg" variant="outline" className="border-2 border-slate-300 hover:border-primary/80 hover:text-primary">
+                      Contact Us
                     </Button>
-                </div>
-                
-                <div className="flex flex-wrap gap-4 justify-center lg:justify-start">
-                  {kstarGroupLinks.map((link) => (
-                    <Button key={link.href} variant="outline" asChild className="group">
-                      <Link href={link.href}>
-                        {link.label}
-                        <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                  </div>
+
+                  {/* Quick Links */}
+                  <div className="flex flex-wrap gap-6">
+                    {kstarGroupLinks.map((org, index) => (
+                      <Link
+                        key={index}
+                        href={org.href}
+                        className="group flex items-center gap-2 text-slate-600 hover:text-primary transition-colors"
+                      >
+                        <span className="text-sm font-medium">{org.label}</span>
+                        <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                       </Link>
-                    </Button>
-                  ))}
+                    ))}
+                  </div>
                 </div>
-            </div>
 
-             <div className="hidden lg:block relative h-[500px]">
-                <Image
-                    src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1920&q=80"
-                    alt="Creative individuals working together"
-                    fill
-                    className="object-cover rounded-2xl shadow-xl"
-                    priority
-                    data-ai-hint="creative team collaboration"
-                />
+                {/* Right Content - Image */}
+                <div className="relative">
+                  <div className="relative rounded-2xl overflow-hidden shadow-2xl">
+                    <Image 
+                      src={heroImage?.imageUrl ?? ''}
+                      alt={heroImage?.description ?? 'Professional workspace'}
+                      width={1080}
+                      height={1200}
+                      className="w-full h-full md:h-[600px] object-cover"
+                      data-ai-hint={heroImage?.imageHint}
+                      priority
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-primary/30 to-transparent" />
+                  </div>
+                  
+                  <div
+                    className="absolute -bottom-8 -left-8 bg-white/80 backdrop-blur-md rounded-2xl shadow-2xl p-6"
+                  >
+                    <div className="text-4xl font-bold text-primary mb-1">3</div>
+                    <div className="text-sm text-slate-600">Organizations</div>
+                  </div>
+                  
+                  <div
+                    className="absolute -top-8 -right-8 bg-white/80 backdrop-blur-md rounded-2xl shadow-2xl p-6"
+                  >
+                    <div className="text-4xl font-bold bg-gradient-to-r from-primary to-blue-500 bg-clip-text text-transparent mb-1">100%</div>
+                    <div className="text-sm text-slate-600">Committed</div>
+                  </div>
+                </div>
+              </div>
             </div>
-          </div>
-        </section>
+          </section>
 
         {/* About Us Section */}
         <section id="about" className="py-20 md:py-32 bg-secondary/50">

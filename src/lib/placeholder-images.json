@@ -106,13 +106,13 @@
     },
     {
       "id": "service-5",
-      "imageUrl": "https://images.unsplash.com/photo-1531545514256-b1400bc00f31?w=800&q=80",
-      "imageHint": "event management concert"
+      "imageUrl": "https://images.unsplash.com/photo-1519751138087-5bf79df62d5b?w=800&q=80",
+      "imageHint": "colorful abstract background"
     },
     {
       "id": "service-6",
-      "imageUrl": "https://images.unsplash.com/photo-1519751138087-5bf79df62d5b?w=800&q=80",
-      "imageHint": "colorful abstract background"
+      "imageUrl": "https://images.unsplash.com/photo-1531545514256-b1400bc00f31?w=800&q=80",
+      "imageHint": "event management concert"
     },
     {
       "id": "dept-creativity",
@@ -143,6 +143,12 @@
       "id": "mega-menu-clickdata",
       "imageUrl": "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&q=80",
       "imageHint": "data analytics charts"
+    },
+    {
+      "id": "hero-main",
+      "imageUrl": "https://images.unsplash.com/photo-1718220216044-006f43e3a9b1?w=1080&q=80",
+      "description": "A professional and modern office workspace.",
+      "imageHint": "professional workspace"
     }
   ]
 }
