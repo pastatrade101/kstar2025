@@ -1,73 +1,73 @@
 'use client';
-import { Clock, Newspaper, Mail, Users } from 'lucide-react';
+import { Clock, Newspaper, Mail } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 import { Badge } from '../ui/badge';
 import { ScrollArea } from '../ui/scroll-area';
+import { useFirestore, useCollection } from '@/firebase';
+import { useMemoFirebase } from '@/firebase/provider';
+import { collection, query, orderBy, limit } from 'firebase/firestore';
+import { useMemo } from 'react';
+import { formatDistanceToNow } from 'date-fns';
+import { Loader2 } from 'lucide-react';
 
-const activities = [
-  {
-    id: 1,
-    type: 'news',
-    title: 'New article published',
-    description: 'Summer Festival Announcement',
-    time: '2 hours ago',
-    icon: Newspaper,
-    iconColor: 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-400',
-    status: 'completed',
-  },
-  {
-    id: 2,
-    type: 'submission',
-    title: 'Contact form submitted',
-    description: 'From: john.doe@example.com',
-    time: '4 hours ago',
-    icon: Mail,
-    iconColor: 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400',
-    status: 'new',
-  },
-  {
-    id: 3,
-    type: 'user',
-    title: 'New user registered',
-    description: 'Sarah Johnson joined',
-    time: '6 hours ago',
-    icon: Users,
-    iconColor: 'bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-400',
-    status: 'completed',
-  },
-  {
-    id: 4,
-    type: 'news',
-    title: 'Event updated',
-    description: 'Community Meetup - Date Changed',
-    time: '1 day ago',
-    icon: Newspaper,
-    iconColor: 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-400',
-    status: 'completed',
-  },
-  {
-    id: 5,
-    type: 'submission',
-    title: 'Contact form submitted',
-    description: 'From: mike.wilson@example.com',
-    time: '1 day ago',
-    icon: Mail,
-    iconColor: 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400',
-    status: 'completed',
-  },
-  {
-    id: 6,
-    type: 'news',
-    title: 'Article deleted',
-    description: 'Old announcement removed',
-    time: '2 days ago',
-    icon: Newspaper,
-    iconColor: 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-400',
-    status: 'completed',
-  },
-];
+type NewsEvent = {
+  id: string;
+  title: string;
+  content: string;
+  date: string;
+  type: 'News' | 'Event';
+};
+
+type ContactSubmission = {
+  id: string;
+  name: string;
+  email: string;
+  subject: string;
+  submittedAt: {
+    seconds: number;
+    nanoseconds: number;
+  } | null;
+};
 
 export function RecentActivity() {
+  const firestore = useFirestore();
+
+  const newsCollectionRef = useMemoFirebase(() => (firestore ? collection(firestore, 'news_events') : null), [firestore]);
+  const newsQuery = useMemoFirebase(() => (newsCollectionRef ? query(newsCollectionRef, orderBy('date', 'desc'), limit(5)) : null), [newsCollectionRef]);
+  const { data: recentNews, isLoading: isLoadingNews } = useCollection<NewsEvent>(newsQuery);
+
+  const contactsCollectionRef = useMemoFirebase(() => (firestore ? collection(firestore, 'contact_submissions') : null), [firestore]);
+  const contactsQuery = useMemoFirebase(() => (contactsCollectionRef ? query(contactsCollectionRef, orderBy('submittedAt', 'desc'), limit(5)) : null), [contactsCollectionRef]);
+  const { data: recentContacts, isLoading: isLoadingContacts } = useCollection<ContactSubmission>(contactsQuery);
+
+  const combinedActivities = useMemo(() => {
+    const newsActivities = (recentNews || []).map(item => ({
+      id: item.id,
+      type: 'news' as const,
+      title: item.type === 'News' ? 'New article published' : 'New event published',
+      description: item.title,
+      timestamp: new Date(item.date),
+      icon: Newspaper,
+      iconColor: 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-400',
+    }));
+
+    const contactActivities = (recentContacts || []).map(item => ({
+      id: item.id,
+      type: 'submission' as const,
+      title: 'Contact form submitted',
+      description: `From: ${item.name}`,
+      timestamp: item.submittedAt ? new Date(item.submittedAt.seconds * 1000) : new Date(),
+      icon: Mail,
+      iconColor: 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400',
+    }));
+
+    return [...newsActivities, ...contactActivities]
+      .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())
+      .slice(0, 10);
+  }, [recentNews, recentContacts]);
+  
+  const isLoading = isLoadingNews || isLoadingContacts;
+
   return (
     <Card className="border-slate-200 dark:bg-slate-900 dark:border-slate-800">
       <CardHeader>
@@ -78,13 +78,23 @@ export function RecentActivity() {
       </CardHeader>
       <CardContent>
         <ScrollArea className="h-[450px] pr-4 -mr-4">
+          {isLoading && (
+              <div className="flex justify-center items-center h-full">
+                  <Loader2 className="mx-auto h-8 w-8 animate-spin" />
+              </div>
+          )}
+          {!isLoading && combinedActivities.length === 0 && (
+            <div className="text-center text-muted-foreground pt-16">
+              No recent activity.
+            </div>
+          )}
           <div className="space-y-4">
-            {activities.map((activity, index) => {
+            {combinedActivities.map((activity, index) => {
               const Icon = activity.icon;
               return (
                 <div key={activity.id} className="relative">
                   {/* Timeline line */}
-                  {index !== activities.length - 1 && (
+                  {index !== combinedActivities.length - 1 && (
                     <div className="absolute left-5 top-12 bottom-0 w-px bg-slate-200 dark:bg-slate-800" />
                   )}
                   
@@ -98,11 +108,11 @@ export function RecentActivity() {
                           <p className="text-slate-900 dark:text-slate-200 text-sm font-medium">
                             {activity.title}
                           </p>
-                          <p className="text-slate-600 dark:text-slate-400 text-sm mt-0.5">
+                          <p className="text-slate-600 dark:text-slate-400 text-sm mt-0.5 truncate">
                             {activity.description}
                           </p>
                         </div>
-                        {activity.status === 'new' && (
+                        {activity.type === 'submission' && (
                           <Badge variant="default" className="bg-green-500 shrink-0">
                             New
                           </Badge>
@@ -110,7 +120,7 @@ export function RecentActivity() {
                       </div>
                       <div className="flex items-center gap-1 mt-2 text-slate-500 dark:text-slate-400 text-xs">
                         <Clock className="size-3" />
-                        <span>{activity.time}</span>
+                        <span>{formatDistanceToNow(activity.timestamp, { addSuffix: true })}</span>
                       </div>
                     </div>
                   </div>
