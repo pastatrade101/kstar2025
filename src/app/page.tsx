@@ -55,49 +55,49 @@ export default function Home() {
         {/* Hero Section */}
         <section
           id="home"
-          className="relative pt-32 pb-20 flex items-center justify-center overflow-hidden min-h-[80vh]"
+          className="relative pt-24 md:pt-32"
         >
-          <div className="absolute inset-0 z-0">
-             <Image
-              src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1920&q=80"
-              alt="Creative individuals working together"
-              fill
-              className="object-cover"
-              priority
-              data-ai-hint="creative team collaboration"
-            />
-            <div className="absolute inset-0 bg-black/60"></div>
-          </div>
+         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-2 lg:gap-12 lg:items-center min-h-[calc(100vh-80px)]">
+            <div className="py-12 lg:py-20 text-center lg:text-left">
+                <Badge
+                variant="outline"
+                className="mb-6 bg-secondary text-secondary-foreground"
+                >
+                Kstar International, Kstar Malezi Foundation & ClickData Tanzania
+                </Badge>
 
+                <h1 className="text-4xl md:text-5xl font-extrabold mb-6 tracking-tight">
+                    Turning Passion into Performance Through Insight
+                </h1>
 
-          <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-white">
-            <Badge
-              variant="outline"
-              className="mb-6 bg-white/10 text-white border-white/20 font-medium"
-            >
-              Kstar International, Kstar Malezi Foundation & ClickData Tanzania
-            </Badge>
+                <p className="text-lg md:text-xl text-muted-foreground mb-10 max-w-3xl mx-auto lg:mx-0">
+                    Our mission is to connect passion with purpose through creativity, sports, and innovation.
+                </p>
 
-            <h1 className="text-4xl md:text-6xl font-extrabold mb-6 tracking-tight">
-              Turning Passion into Performance Through Insight
-            </h1>
+                <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+                    <Button asChild size="lg" className="group">
+                        <Link href="#about">
+                        Learn More
+                        <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                        </Link>
+                    </Button>
+                    <Button asChild size="lg" variant="secondary">
+                        <Link href="#contact">
+                        Contact Us
+                        </Link>
+                    </Button>
+                </div>
+            </div>
 
-            <p className="text-lg md:text-xl text-slate-200 mb-10 max-w-3xl mx-auto">
-              Our mission is to connect passion with purpose through creativity, sports, and innovation.
-            </p>
-
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button asChild size="lg" className="group">
-                <Link href="#about">
-                  Learn More
-                  <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-                </Link>
-              </Button>
-              <Button asChild size="lg" variant="secondary">
-                <Link href="#contact">
-                  Contact Us
-                </Link>
-              </Button>
+             <div className="hidden lg:block relative h-[500px]">
+                <Image
+                    src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1920&q=80"
+                    alt="Creative individuals working together"
+                    fill
+                    className="object-cover rounded-2xl shadow-xl"
+                    priority
+                    data-ai-hint="creative team collaboration"
+                />
             </div>
           </div>
         </section>
