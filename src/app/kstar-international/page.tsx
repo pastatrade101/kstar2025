@@ -256,7 +256,7 @@ export default function KstarInternationalPage() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-foreground text-background">
+      <footer className="bg-slate-100 text-foreground">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="grid md:grid-cols-4 gap-10 mb-12">
             <div>
@@ -274,7 +274,7 @@ export default function KstarInternationalPage() {
             </div>
 
             <div>
-              <h3 className="font-semibold mb-4 text-white">
+              <h3 className="font-semibold mb-4 text-foreground">
                 Quick Links
               </h3>
               <ul className="space-y-2.5">
@@ -298,7 +298,7 @@ export default function KstarInternationalPage() {
             </div>
 
             <div>
-              <h3 className="font-semibold mb-4 text-white">Contact Us</h3>
+              <h3 className="font-semibold mb-4 text-foreground">Contact Us</h3>
               <ul className="space-y-3 text-sm">
                 <li className="flex items-start gap-3">
                   <MapPin className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
@@ -318,7 +318,7 @@ export default function KstarInternationalPage() {
             </div>
 
             <div>
-              <h3 className="font-semibold mb-4 text-white">
+              <h3 className="font-semibold mb-4 text-foreground">
                 Follow Us
               </h3>
               <p className="text-muted-foreground mb-4 text-sm">
@@ -340,7 +340,7 @@ export default function KstarInternationalPage() {
             </div>
           </div>
 
-          <div className="pt-8 border-t border-border/50">
+          <div className="pt-8 border-t border-border">
             <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm">
               <p className="text-muted-foreground">
                 © {currentYear} Kstar International Limited. All rights reserved.
