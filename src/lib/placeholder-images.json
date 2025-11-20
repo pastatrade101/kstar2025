@@ -107,7 +107,7 @@
     {
       "id": "service-5",
       "imageUrl": "https://images.unsplash.com/photo-1531545514256-b1400bc00f31?w=800&q=80",
-      "imageHint": "talent development workshop"
+      "imageHint": "event management concert"
     },
     {
       "id": "service-6",
@@ -128,6 +128,21 @@
       "id": "dept-music",
       "imageUrl": "https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=800&q=80",
       "imageHint": "music studio headphones"
+    },
+    {
+      "id": "mega-menu-kstar",
+      "imageUrl": "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=400&q=80",
+      "imageHint": "business people meeting"
+    },
+    {
+      "id": "mega-menu-malezi",
+      "imageUrl": "https://images.unsplash.com/photo-1518152006812-edab29b069ac?w=400&q=80",
+      "imageHint": "charity foundation children"
+    },
+    {
+      "id": "mega-menu-clickdata",
+      "imageUrl": "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&q=80",
+      "imageHint": "data analytics charts"
     }
   ]
 }
