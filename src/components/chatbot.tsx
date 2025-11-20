@@ -72,7 +72,7 @@ export default function Chatbot() {
           <SheetHeader>
             <SheetTitle className="font-headline flex items-center gap-2">
               <Bot />
-              EduPro Assistant
+              Kstar (T) Group AI Assistance
             </SheetTitle>
           </SheetHeader>
           <ScrollArea className="flex-1 my-4 -mx-6 px-6">
