@@ -14,7 +14,7 @@ export default function HomeClient({ children }: { children: React.ReactNode }) 
   const navLinks = [
     { id: 'home', label: 'Home' },
     { id: 'about', label: 'About' },
-    { id: 'services', label: 'Services' },
+    { id: 'services', label: 'Departments' },
     { id: 'values', label: 'Values' },
     { id: 'contact', label: 'Contact' },
   ];

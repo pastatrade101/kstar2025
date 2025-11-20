@@ -5,14 +5,7 @@ import {
   Target,
   Eye,
   CheckCircle,
-  HeartHandshake,
   Lightbulb,
-  ThumbsUp,
-  Scale,
-  Users,
-  Sparkles,
-  Globe,
-  TrendingUp,
   Award,
   Mail,
   MapPin,
@@ -21,7 +14,12 @@ import {
   Twitter,
   Instagram,
   Linkedin,
-  Youtube
+  Youtube,
+  Star,
+  Zap,
+  Users,
+  BarChart,
+  Repeat
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -37,21 +35,18 @@ export default function Home() {
   const currentYear = new Date().getFullYear();
 
   const coreValues = [
-    { icon: Users, title: "Team Work", description: "We increase the ability to solve problems and obtain solutions in a more efficiently and effectively way." },
-    { icon: HeartHandshake, title: "Trust", description: "Without trust there is no a firm foundation, realising this major value, Kstar is aiming at being reliable to the beneficiaries." },
-    { icon: ThumbsUp, title: "Mutual Respect", description: "We respect the values, ideas and beliefs of others whilst not imposing our own on others." },
-    { icon: Scale, title: "Integrity", description: "The company tells the truth, hence is accountable and reliable, and treats workers, stakeholders, and customers with respect and zeal." },
-    { icon: Lightbulb, title: "Constructive Self-Criticism", description: "We are always looking for ways to improve and grow." },
-    { icon: CheckCircle, title: "Honesty", description: "We believe in being truthful in all our endeavors." }
+    { icon: Lightbulb, title: "Innovation", description: "We embrace creativity and new ideas to solve challenges." },
+    { icon: Award, title: "Excellence", description: "We strive for the highest standards in performance and results." },
+    { icon: Zap, title: "Empowerment", description: "We inspire and support people to reach their full potential." },
+    { icon: Users, title: "Collaboration", description: "We believe teamwork and sharing knowledge leads to greater success." },
+    { icon: BarChart, title: "Data-Driven Decisions", description: "We use insights and analytics to make informed choices." },
+    { icon: Repeat, title: "Resilience", description: "We overcome obstacles and keep moving forward toward our goals." }
   ];
 
-  const services = [
-    { title: "Discovering & Promoting Creativity", icon: Sparkles, image: PlaceHolderImages.find(p => p.id === 'service-1'), description: "With the help of Kstar there would be a developmental model for promoting creative individuals as well as with their productivity in order to expand their concepts, talents, giftedness so as to include co-cognitive traits and to promote social capital." },
-    { title: "Conducting Constructive Dialogues", icon: Users, image: PlaceHolderImages.find(p => p.id === 'service-2'), description: "This aims at general experience that suggests the best dialogues to unleash different views on the ongoing crosscutting issues within the nation as well as globally so as to gain different views and understanding." },
-    { title: "Connecting People Globally", icon: Globe, image: PlaceHolderImages.find(p => p.id === 'service-3'), description: "The mutual aim is to connect people and the ideas from different parts of the world through global innovation plattforms for the current as well as the next generation and the forth coming ones." },
-    { title: "Business Idea Competitions", icon: Lightbulb, image: PlaceHolderImages.find(p => p.id === 'service-4'), description: "These business ideas tend to attract investments, bring people with the same objectives and interests together, grow existing businesses." },
-    { title: "Talent Development", icon: TrendingUp, image: PlaceHolderImages.find(p => p.id === 'service-5'), description: "Focusing on how average performance can become over achievers, this is done to the both created and borned talents because any talent can be developed and honed." },
-    { title: "Event Production & Management", icon: Award, image: PlaceHolderImages.find(p => p.id === 'service-6'), description: "Any entertainment event should have a clear and a well understood master plan so as to be achieved smoothly. The most important is to brand the event to be conducted as well as the venue where it will be taking place." },
+  const departments = [
+    { title: "Department of Creativity", icon: Lightbulb, image: PlaceHolderImages.find(p => p.id === 'dept-creativity'), description: "Fostering new ideas and artistic expression to solve challenges and inspire change." },
+    { title: "Department of Sports", icon: Award, image: PlaceHolderImages.find(p => p.id === 'dept-sports'), description: "Developing athletic talent and promoting physical excellence through dedicated programs." },
+    { title: "Department of Music", icon: Star, image: PlaceHolderImages.find(p => p.id === 'dept-music'), description: "Nurturing musical talent and providing a platform for artists to create and perform." },
   ];
 
   return (
@@ -80,15 +75,15 @@ export default function Home() {
               variant="outline"
               className="mb-6 bg-white/10 text-white border-white/20 font-medium"
             >
-              Welcome to Kstar International
+              Kstar International, Kstar Malezi Foundation & ClickData Tanzania
             </Badge>
 
             <h1 className="text-4xl md:text-6xl font-extrabold mb-6 tracking-tight">
-              Turn Your Desires Into Reality
+              Turning Passion into Performance Through Insight
             </h1>
 
             <p className="text-lg md:text-xl text-slate-200 mb-10 max-w-3xl mx-auto">
-              Kstar International Limited is established to serve the creative individual to fullfil their Purpose, Passion and Plans. The company is the bridge and place of hope for all creative induviduals.
+              Our mission is to connect passion with purpose through creativity, sports, and innovation.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -116,7 +111,7 @@ export default function Home() {
                 Our Story, Mission, and Vision
               </h2>
                <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-                Founded on 29th June, 2020 by Founder and CEO Mwacha, Joseph Alphonce and the Company Director Robert A. Mwacha. Our motto is "Turn your desires into reality" or "Badili matamanio yako kuwa kweli".
+                Founded in 2025, we are driven by a passion for creativity, sports and data. Our mission is to help people fulfill their dreams by turning passion into performance through insight.
               </p>
             </div>
             <div className="grid md:grid-cols-2 gap-12 items-center">
@@ -129,7 +124,7 @@ export default function Home() {
                     <CardTitle>Our Vision</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p>To make a better life for the creative individuals.</p>
+                    <p>Helping People Turn Their Dreams into Reality.</p>
                   </CardContent>
                 </Card>
                 <Card className="bg-background border-border/50">
@@ -140,50 +135,57 @@ export default function Home() {
                     <CardTitle>Our Mission</CardTitle>
                   </CardHeader>
                   <CardContent>
-                   <p>To support people with creative approach and transformative ideas to contribute solutions and make impact to the community.</p>
+                   <p>To Connect Passion with Purpose Through Creativity, Sports, And Innovation.</p>
                   </CardContent>
                 </Card>
               </div>
                <div>
-                 <Image src="https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=800&q=80" alt="Our Team" width={800} height={600} className="rounded-2xl shadow-xl" data-ai-hint="professional team meeting"/>
+                <div className='rounded-2xl shadow-xl overflow-hidden'>
+                  <Image src="https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=800&q=80" alt="Our Team" width={800} height={600} className="w-full h-full object-cover" data-ai-hint="professional team meeting"/>
+                </div>
               </div>
             </div>
+             <div className="mt-16 text-center max-w-3xl mx-auto">
+                <p className="text-lg text-muted-foreground">
+                    Though young, we are committed to innovation, excellence and empowerment, providing tools, knowledge and inspiration that help individuals and teams reach their full potential.
+                </p>
+             </div>
           </div>
         </section>
 
-        {/* Services Section */}
+        {/* Departments Section */}
         <section id="services" className="py-20 md:py-32 bg-background">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center max-w-3xl mx-auto">
-              <Badge>Our Services</Badge>
-              <h2 className="text-3xl md:text-4xl font-bold mt-4 mb-6">What We Do</h2>
+              <Badge>Our Departments</Badge>
+              <h2 className="text-3xl md:text-4xl font-bold mt-4 mb-6">Where Passion Meets Purpose</h2>
               <p className="text-lg text-muted-foreground">
-                We offer a range of services designed to discover, promote, and support creative individuals and their ideas.
+                We empower talent through specialized departments focused on creativity, sports, and innovation.
               </p>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-16">
-              {services.map((service) => (
-                <Card key={service.title} className="bg-card/50 border-border/50 overflow-hidden group hover:shadow-xl transition-shadow duration-300">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16">
+              {departments.map((dept) => (
+                <Card key={dept.title} className="bg-card/50 border-border/50 overflow-hidden group hover:shadow-xl transition-shadow duration-300">
                   <div className="aspect-video overflow-hidden">
                     <Image
-                      src={service.image?.imageUrl ?? ''}
-                      alt={service.title}
+                      src={dept.image?.imageUrl ?? ''}
+                      alt={dept.title}
                       width={600}
                       height={400}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                      data-ai-hint={service.image?.imageHint}
+                      data-ai-hint={dept.image?.imageHint}
                     />
                   </div>
                   <CardHeader>
                     <CardTitle className="flex items-start gap-3">
                       <div className="flex-shrink-0 w-8 h-8 mt-1 bg-primary/10 text-primary rounded-md flex items-center justify-center">
-                        <service.icon className="w-5 h-5" />
+                        <dept.icon className="w-5 h-5" />
                       </div>
-                      <span className="flex-1">{service.title}</span>
+                      <span className="flex-1">{dept.title}</span>
                     </CardTitle>
                   </CardHeader>
                    <CardContent>
-                    <p className="text-muted-foreground text-sm">{service.description}</p>
+                    <p className="text-muted-foreground text-sm">{dept.description}</p>
                   </CardContent>
                 </Card>
               ))}
@@ -212,29 +214,6 @@ export default function Home() {
           </div>
         </section>
         
-        {/* Vimba na Kstar Section */}
-        <section id="vimba-na-kstar" className="py-20 md:py-32">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid md:grid-cols-2 gap-12 items-center">
-              <div className="relative aspect-video">
-                  <Image src="https://images.unsplash.com/photo-1556740738-b6a63e27c4df?w=800&q=80" alt="Entrepreneurs working" fill className="object-cover rounded-2xl shadow-2xl" data-ai-hint="young entrepreneurs business"/>
-              </div>
-              <div>
-                <Badge>Signature Program</Badge>
-                <h2 className="text-3xl md:text-4xl font-bold mt-4 mb-6">
-                  Vimba Na Kstar (VK)
-                </h2>
-                <p className="text-lg text-muted-foreground mb-6">
-                  A Business Idea Challenge in Tanzania supporting youth aged 18-45. We provide financial support to initiated businesses, enabling young entrepreneurs to turn their desires into reality and stimulate urban-rural economies.
-                </p>
-                <Button asChild size="lg" variant="outline">
-                    <Link href="#">Learn More about VK <ArrowRight className="ml-2 h-4 w-4" /></Link>
-                </Button>
-              </div>
-            </div>
-          </div>
-        </section>
-
         <RecentNews />
 
         {/* Contact Section */}
@@ -284,7 +263,7 @@ export default function Home() {
                 {[
                   { href: '#home', label: 'Home' },
                   { href: '#about', label: 'About Us' },
-                  { href: '#services', label: 'Services' },
+                  { href: '#services', label: 'Departments' },
                   { href: '#values', label: 'Core Values' },
                   { href: '#contact', label: 'Contact' },
                 ].map(link => (
@@ -335,11 +314,9 @@ export default function Home() {
                   { icon: Linkedin, href: '#' },
                   { icon: Youtube, href: '#' },
                 ].map((social, i) => (
-                  <Button asChild key={i} variant="outline" size="icon" className="bg-white/10 text-white hover:bg-white/20">
-                    <a href={social.href}>
+                  <a href={social.href} key={i} className="text-muted-foreground hover:text-primary transition-colors">
                       <social.icon className="h-5 w-5" />
-                    </a>
-                  </Button>
+                  </a>
                 ))}
               </div>
             </div>
