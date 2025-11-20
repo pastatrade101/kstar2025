@@ -46,8 +46,8 @@ service cloud.firestore {
      * @principle Allows public read access and restricts writes to admins.
      */
     match /news_events/{newsEventId} {
-      allow get, list: if true;
-      allow create, update, delete: if isAdmin();
+      allow read: if true;
+      allow write: if isAdmin();
     }
 
     /**
