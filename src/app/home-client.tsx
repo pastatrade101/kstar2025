@@ -15,6 +15,7 @@ import {
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
+import { ThemeToggle } from '@/components/theme-toggle';
 
 const ListItem = React.forwardRef<
   React.ElementRef<'a'>,
@@ -106,7 +107,7 @@ export default function HomeClient({
   return (
     <div className="min-h-screen bg-background text-foreground">
       <header
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-white/80 backdrop-blur-lg border-b border-slate-200`}
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-background/80 backdrop-blur-lg border-b`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-20">
@@ -115,8 +116,8 @@ export default function HomeClient({
                 <span className="text-white font-semibold text-xl">K</span>
               </div>
               <div>
-                  <div className="font-semibold text-slate-900">Kstar International</div>
-                  <div className="text-xs text-slate-500">Excellence in Every Field</div>
+                  <div className="font-semibold text-foreground">Kstar International</div>
+                  <div className="text-xs text-muted-foreground">Excellence in Every Field</div>
               </div>
             </Link>
 
@@ -189,6 +190,7 @@ export default function HomeClient({
             </NavigationMenu>
 
             <div className="flex items-center gap-4">
+               <ThemeToggle />
               <Button asChild className="hidden md:flex bg-gradient-to-r from-primary to-purple-700 hover:from-purple-700 hover:to-purple-800 shadow-lg shadow-primary/30">
                 <Link href="#contact" onClick={scrollToSection('contact')}>
                   Get In Touch
@@ -207,7 +209,7 @@ export default function HomeClient({
         </div>
 
         {isMenuOpen && (
-          <div className="md:hidden bg-white border-t border-slate-200">
+          <div className="md:hidden bg-background border-t">
             <nav className="py-4 space-y-1 px-4">
               {navLinks.map((link) => (
                 <Button

@@ -70,7 +70,7 @@ export default function Home() {
                     <span className="text-sm font-medium">Kstar (T) Group</span>
                   </div>
                   
-                  <h1 className="text-5xl sm:text-6xl font-bold text-slate-900 mb-6 leading-tight">
+                  <h1 className="text-5xl sm:text-6xl font-bold text-foreground mb-6 leading-tight">
                     Turning Passion into{' '}
                     <span className="bg-gradient-to-r from-primary to-blue-500 bg-clip-text text-transparent">
                       Performance
@@ -78,7 +78,7 @@ export default function Home() {
                     Through Insight
                   </h1>
 
-                  <p className="text-xl text-slate-600 mb-8 leading-relaxed">
+                  <p className="text-xl text-muted-foreground mb-8 leading-relaxed">
                     Our mission is to connect passion with purpose through creativity, sports, and innovation.
                   </p>
 
@@ -87,7 +87,7 @@ export default function Home() {
                       Learn More
                       <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
                     </Button>
-                    <Button size="lg" variant="outline" className="border-2 border-slate-300 hover:border-primary/80 hover:text-primary">
+                    <Button size="lg" variant="outline" className="border-2 border-border hover:border-primary/80 hover:text-primary">
                       Contact Us
                     </Button>
                   </div>
@@ -98,7 +98,7 @@ export default function Home() {
                       <Link
                         key={index}
                         href={org.href}
-                        className="group flex items-center gap-2 text-slate-600 hover:text-primary transition-colors"
+                        className="group flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors"
                       >
                         <span className="text-sm font-medium">{org.label}</span>
                         <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -123,17 +123,17 @@ export default function Home() {
                   </div>
                   
                   <div
-                    className="absolute -bottom-8 -left-8 bg-white/80 backdrop-blur-md rounded-2xl shadow-2xl p-6"
+                    className="absolute -bottom-8 -left-8 bg-card/80 backdrop-blur-md rounded-2xl shadow-2xl p-6"
                   >
                     <div className="text-4xl font-bold text-primary mb-1">3</div>
-                    <div className="text-sm text-slate-600">Organizations</div>
+                    <div className="text-sm text-muted-foreground">Organizations</div>
                   </div>
                   
                   <div
-                    className="absolute -top-8 -right-8 bg-white/80 backdrop-blur-md rounded-2xl shadow-2xl p-6"
+                    className="absolute -top-8 -right-8 bg-card/80 backdrop-blur-md rounded-2xl shadow-2xl p-6"
                   >
                     <div className="text-4xl font-bold bg-gradient-to-r from-primary to-blue-500 bg-clip-text text-transparent mb-1">100%</div>
-                    <div className="text-sm text-slate-600">Committed</div>
+                    <div className="text-sm text-muted-foreground">Committed</div>
                   </div>
                 </div>
               </div>
@@ -276,7 +276,7 @@ export default function Home() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-slate-100 text-foreground">
+      <footer className="bg-secondary/50 text-foreground">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="grid md:grid-cols-4 gap-10 mb-12">
             <div>
