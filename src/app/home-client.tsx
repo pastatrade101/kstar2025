@@ -71,7 +71,7 @@ export default function HomeClient({
     },
     {
       title: 'ClickData Tanzania',
-      href: '#',
+      href: '/clickdata-tanzania',
       description:
         'Harnessing the power of data to provide innovative analytics and business solutions.',
         image: PlaceHolderImages.find((p) => p.id === 'mega-menu-clickdata'),
