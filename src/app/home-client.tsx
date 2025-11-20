@@ -57,7 +57,7 @@ export default function HomeClient({
   }[] = [
     {
       title: 'Kstar International',
-      href: '#',
+      href: '/kstar-international',
       description:
         'Empowering talent in creativity and sports through insight-driven performance.',
       image: PlaceHolderImages.find((p) => p.id === 'mega-menu-kstar'),
