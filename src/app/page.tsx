@@ -1,5 +1,6 @@
 
 
+
 import {
   ArrowRight,
   Target,
@@ -71,11 +72,7 @@ export default function Home() {
                   </div>
                   
                   <h1 className="text-5xl sm:text-6xl font-bold text-foreground mb-6 leading-tight">
-                    Turning Passion into{' '}
-                    <span className="bg-gradient-to-r from-k-star-red to-k-star-blue bg-clip-text text-transparent">
-                      Performance
-                    </span>{' '}
-                    Through Insight
+                    Kstar (T) Group
                   </h1>
 
                   <p className="text-xl text-muted-foreground mb-8 leading-relaxed">
@@ -276,7 +273,7 @@ export default function Home() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-secondary/50 text-foreground">
+      <footer className="bg-background/80 text-foreground">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="grid md:grid-cols-4 gap-10 mb-12">
             <div>
@@ -289,11 +286,11 @@ export default function Home() {
                 className="rounded-xl"
               />
                 <span className="font-bold text-lg">
-                  Kstar International
+                  Kstar (T) Group
                 </span>
               </div>
               <p className="text-muted-foreground text-sm leading-relaxed">
-                Thank you for visiting Kstar International. We feel proud to serve you.
+                Thank you for visiting Kstar (T) Group. We feel proud to serve you.
               </p>
             </div>
 

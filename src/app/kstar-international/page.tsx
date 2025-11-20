@@ -96,7 +96,7 @@ export default function KstarInternationalPage() {
                 </Badge>
 
                 <h1 className="text-4xl md:text-5xl font-extrabold mb-6 tracking-tight">
-                    <span className="bg-gradient-to-r from-k-star-red to-k-star-blue bg-clip-text text-transparent">Turning Passion into Performance Through Insight</span>
+                    <span className="bg-gradient-to-r from-k-star-red to-k-star-blue bg-clip-text text-transparent">Kstar (T) Group</span>
                 </h1>
 
                 <p className="text-lg md:text-xl text-muted-foreground mb-10 max-w-3xl mx-auto lg:mx-0">
@@ -270,11 +270,11 @@ export default function KstarInternationalPage() {
                   className="rounded-xl"
                 />
                 <span className="font-bold text-lg">
-                  Kstar International
+                  Kstar (T) Group
                 </span>
               </div>
               <p className="text-muted-foreground text-sm leading-relaxed">
-                Thank you for visiting Kstar International. We feel proud to serve you.
+                Thank you for visiting Kstar (T) Group. We feel proud to serve you.
               </p>
             </div>
 
