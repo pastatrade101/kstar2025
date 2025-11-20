@@ -77,7 +77,7 @@ import {
                   <CardTitle className="font-headline text-2xl">{item.title}</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-foreground/80">{item.content}</p>
+                  <p className="text-foreground/80 whitespace-pre-wrap">{item.content}</p>
                 </CardContent>
               </div>
             </Card>
