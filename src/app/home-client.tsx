@@ -64,7 +64,7 @@ export default function HomeClient({
     },
     {
       title: 'Kstar Malezi Foundation',
-      href: '#',
+      href: '/kstar-malezi-foundation',
       description:
         'A non-profit fostering youth development through education and mentorship programs.',
         image: PlaceHolderImages.find((p) => p.id === 'mega-menu-malezi'),
