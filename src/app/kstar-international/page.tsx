@@ -91,7 +91,7 @@ export default function KstarInternationalPage() {
                 variant="outline"
                 className="mb-6 bg-secondary text-secondary-foreground"
                 >
-                Kstar International, Kstar Malezi Foundation & ClickData Tanzania
+                Kstar (T) Group
                 </Badge>
 
                 <h1 className="text-4xl md:text-5xl font-extrabold mb-6 tracking-tight">
