@@ -198,7 +198,7 @@ import {
         </main>
   
         {/* Footer */}
-        <footer className="bg-slate-100 text-foreground">
+        <footer className="bg-secondary/50 text-foreground">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
             <div className="grid md:grid-cols-4 gap-10 mb-12">
               <div>
@@ -288,13 +288,13 @@ import {
                 </p>
                 <div className="flex gap-6">
                   <Link
-                    href="#"
+                    href="/privacy-policy"
                     className="text-muted-foreground hover:text-primary transition-colors"
                   >
                     Privacy Policy
                   </Link>
                   <Link
-                    href="#"
+                    href="/terms-of-use"
                     className="text-muted-foreground hover:text-primary transition-colors"
                   >
                     Terms of Use
