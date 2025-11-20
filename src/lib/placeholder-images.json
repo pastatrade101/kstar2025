@@ -146,9 +146,9 @@
     },
     {
       "id": "hero-main",
-      "imageUrl": "https://images.unsplash.com/photo-1718220216044-006f43e3a9b1?w=1080&q=80",
-      "description": "A professional and modern office workspace.",
-      "imageHint": "professional workspace"
+      "imageUrl": "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1080&q=80",
+      "description": "A diverse group of professionals collaborating on a creative project.",
+      "imageHint": "creative team collaboration"
     }
   ]
 }
