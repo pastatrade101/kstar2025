@@ -38,6 +38,12 @@ service cloud.firestore {
       allow create: if true;
       allow read, update, delete: if request.auth != null;
     }
+
+    // Volunteer registrations can be created by anyone, but only read/deleted by admins
+    match /volunteer_registrations/{registrationId} {
+      allow create: if true;
+      allow read, update, delete: if request.auth != null;
+    }
     
     // Fallback for any other path - deny by default
     match /{document=**} {

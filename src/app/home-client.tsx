@@ -1,7 +1,8 @@
+
 'use client';
 
 import React, { useState } from 'react';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, HeartHandshake } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import {
@@ -179,21 +180,10 @@ export default function HomeClient({
                     </ul>
                   </NavigationMenuContent>
                 </NavigationMenuItem>
-
                 <NavigationMenuItem>
                   <Button variant="ghost" asChild>
-                    <Link href="/#about" onClick={scrollToSection('about')}>
-                      About
-                    </Link>
-                  </Button>
-                </NavigationMenuItem>
-                <NavigationMenuItem>
-                  <Button variant="ghost" asChild>
-                    <Link
-                      href="/#services"
-                      onClick={scrollToSection('services')}
-                    >
-                      Departments
+                    <Link href="/get-involved">
+                      Get Involved
                     </Link>
                   </Button>
                 </NavigationMenuItem>
@@ -213,8 +203,8 @@ export default function HomeClient({
                 asChild
                 className="hidden md:flex bg-gradient-to-r from-primary to-accent hover:from-accent hover:to-primary shadow-lg shadow-primary/30"
               >
-                <Link href="/#contact" onClick={scrollToSection('contact')}>
-                  Get In Touch
+                <Link href="/get-involved">
+                  Join Us
                 </Link>
               </Button>
 
@@ -263,29 +253,22 @@ export default function HomeClient({
                 </AccordionItem>
               </Accordion>
 
-              {navLinks
-                .filter((l) => l.id !== 'home')
-                .map((link) => (
-                  <Button
-                    key={link.id}
-                    variant="ghost"
-                    className="w-full justify-start"
-                    asChild
-                  >
-                    <Link
-                      href={`/#${link.id}`}
-                      onClick={scrollToSection(link.id)}
-                    >
-                      {link.label}
-                    </Link>
-                  </Button>
-                ))}
+              <Button variant="ghost" className="w-full justify-start" asChild>
+                <Link href="/get-involved" onClick={() => handleMobileLinkClick('/get-involved')}>
+                  Get Involved
+                </Link>
+              </Button>
+              <Button variant="ghost" className="w-full justify-start" asChild>
+                <Link href="/#contact" onClick={scrollToSection('contact')}>
+                  Contact
+                </Link>
+              </Button>
               <Button
                 asChild
                 className="w-full mt-2 bg-gradient-to-r from-primary to-accent"
               >
-                <Link href="/#contact" onClick={scrollToSection('contact')}>
-                  Get In Touch
+                <Link href="/get-involved">
+                  Join Us
                 </Link>
               </Button>
             </nav>

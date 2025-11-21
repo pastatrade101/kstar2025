@@ -184,6 +184,51 @@
         "message",
         "submittedAt"
       ]
+    },
+    "VolunteerRegistration": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "VolunteerRegistration",
+      "type": "object",
+      "description": "Represents a volunteer, partner, or supporter registration.",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The full name of the registrant."
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "description": "The email address of the registrant."
+        },
+        "phone": {
+          "type": "string",
+          "description": "The phone number of the registrant."
+        },
+        "type": {
+          "type": "string",
+          "enum": ["Volunteer", "Partner", "Supporter"],
+          "description": "The type of registration."
+        },
+        "skills": {
+          "type": "string",
+          "description": "A summary of the registrant's skills."
+        },
+        "availability": {
+          "type": "string",
+          "description": "The registrant's general availability."
+        },
+        "registeredAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The timestamp when the registration was submitted."
+        }
+      },
+      "required": [
+        "name",
+        "email",
+        "type",
+        "registeredAt"
+      ]
     }
   },
   "auth": {
@@ -269,6 +314,22 @@
             {
               "name": "submissionId",
               "description": "Unique identifier for the contact submission."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/volunteer_registrations/{registrationId}",
+        "definition": {
+          "entityName": "VolunteerRegistration",
+          "schema": {
+            "$ref": "#/backend/entities/VolunteerRegistration"
+          },
+          "description": "Stores volunteer, partner, and supporter registrations. Publicly writable, but readable and manageable by admins.",
+          "params": [
+            {
+              "name": "registrationId",
+              "description": "Unique identifier for the registration."
             }
           ]
         }

@@ -1,5 +1,6 @@
+
 'use client';
-import { Newspaper, Mail, ArrowRight, Plus, Eye } from 'lucide-react';
+import { Newspaper, Mail, ArrowRight, Plus, Eye, HeartHandshake } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';
 import Link from 'next/link';
@@ -24,6 +25,16 @@ const actions = [
     secondaryAction: 'Export Data',
     iconColor: 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400',
     stats: { total: 156, unread: 12, responded: 144 },
+  },
+  {
+    title: 'Manage Volunteers',
+    description: 'View and manage volunteer and partner registrations',
+    href: '/admin/volunteers',
+    icon: HeartHandshake,
+    primaryAction: 'View Registrations',
+    secondaryAction: 'Export List',
+    iconColor: 'bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-400',
+    stats: { total: 42, volunteers: 25, partners: 17 },
   },
 ];
 

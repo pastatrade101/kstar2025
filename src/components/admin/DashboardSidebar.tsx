@@ -1,5 +1,6 @@
+
 'use client';
-import { X, LayoutDashboard, Newspaper, Mail, Users, Settings, BarChart3, Calendar, FileText } from 'lucide-react';
+import { X, LayoutDashboard, Newspaper, Mail, Users, Settings, BarChart3, Calendar, FileText, HeartHandshake } from 'lucide-react';
 import { Button } from '../ui/button';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
@@ -14,6 +15,7 @@ const navigation = [
   { name: 'Dashboard', href: '/admin/dashboard', icon: LayoutDashboard },
   { name: 'News & Events', href: '/admin/news', icon: Newspaper },
   { name: 'Contact Submissions', href: '/admin/contacts', icon: Mail },
+  { name: 'Volunteers', href: '/admin/volunteers', icon: HeartHandshake },
   { name: 'Users', href: '#', icon: Users },
   { name: 'Analytics', href: '#', icon: BarChart3 },
   { name: 'Calendar', href: '#', icon: Calendar },
