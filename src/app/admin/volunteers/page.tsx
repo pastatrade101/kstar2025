@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useFirestore, useCollection, deleteDocumentNonBlocking } from '@/firebase';
