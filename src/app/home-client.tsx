@@ -131,7 +131,7 @@ export default function HomeClient({
               />
               <div>
                 <div className="font-semibold text-foreground">
-                  Kstar International
+                  Kstar (T) Group
                 </div>
                 <div className="text-xs text-muted-foreground">
                   Excellence in Every Field
