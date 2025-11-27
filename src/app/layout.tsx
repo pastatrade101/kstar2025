@@ -6,8 +6,8 @@ import { FirebaseClientProvider } from '@/firebase';
 import { ThemeProvider } from '@/components/theme-provider';
 
 export const metadata: Metadata = {
-  title: 'EduPro Hub',
-  description: 'The professional website for EduPro Hub institution.',
+  title: 'kstar (T) Group',
+  description: 'The professional website for kstar (T) Group institution.',
 };
 
 export default function RootLayout({
