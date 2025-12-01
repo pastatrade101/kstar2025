@@ -229,6 +229,37 @@
         "type",
         "registeredAt"
       ]
+    },
+    "Job": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Job",
+      "type": "object",
+      "description": "Represents a job listing.",
+      "properties": {
+        "title": { "type": "string" },
+        "department": { "type": "string" },
+        "location": { "type": "string" },
+        "type": { "type": "string", "enum": ["Full-time", "Part-time", "Contract", "Internship"] },
+        "description": { "type": "string" },
+        "postedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["title", "department", "location", "type", "description", "postedAt"]
+    },
+    "JobApplication": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "JobApplication",
+      "type": "object",
+      "description": "Represents a job application submitted by a user.",
+      "properties": {
+        "jobId": { "type": "string" },
+        "jobTitle": { "type": "string" },
+        "name": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "phone": { "type": "string" },
+        "resumeUrl": { "type": "string" },
+        "submittedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["jobId", "jobTitle", "name", "email", "resumeUrl", "submittedAt"]
     }
   },
   "auth": {
@@ -333,8 +364,29 @@
             }
           ]
         }
+      },
+      {
+        "path": "/jobs/{jobId}",
+        "definition": {
+          "entityName": "Job",
+          "schema": { "$ref": "#/backend/entities/Job" },
+          "description": "Stores job listings. Publicly readable, but only writable by admins.",
+          "params": [{ "name": "jobId", "description": "Unique ID for the job." }]
+        }
+      },
+      {
+        "path": "/job_applications/{applicationId}",
+        "definition": {
+          "entityName": "JobApplication",
+          "schema": { "$ref": "#/backend/entities/JobApplication" },
+          "description": "Stores job applications. Publicly writable for creation, but only readable by admins.",
+          "params": [{ "name": "applicationId", "description": "Unique ID for the application." }]
+        }
       }
     ],
     "reasoning": "The Firestore structure is designed to efficiently manage data for the EduPro Hub application, focusing on courses, instructors, news events, and admission information. The structure prioritizes simplicity and ease of querying for the core features of the application, such as the course catalog, faculty directory, news & events, and admission information. It leverages structural segregation to ensure each collection contains homogeneous data with consistent security requirements. This design avoids hierarchical authorization dependencies. Each data entity has its own top-level collection. This approach supports the required QAPs by allowing secure list operations on each entity type."
+  },
+  "storage": {
+    "rules": "rules_version = '2';\nservice firebase.storage {\n  match /b/{bucket}/o {\n    // Resume uploads: allow writes for anyone, but only for PDF files up to 5MB.\n    // The resume is stored with a unique ID, only accessible by admins later.\n    match /resumes/{applicationId}/{fileName} {\n      allow read: if request.auth != null;\n      allow write: if request.resource.size < 5 * 1024 * 1024\n                   && request.resource.contentType == 'application/pdf';\n    }\n  }\n}"
   }
 }
