@@ -5,6 +5,7 @@ import { Button } from '../ui/button';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface DashboardSidebarProps {
   isOpen: boolean;
@@ -27,11 +28,18 @@ const navigation = [
 
 export function DashboardSidebar({ isOpen, onClose }: DashboardSidebarProps) {
     const pathname = usePathname();
+    const isMobile = useIsMobile();
+    
+    const handleLinkClick = () => {
+      if(isMobile) {
+        onClose();
+      }
+    }
 
   return (
     <>
       {/* Mobile backdrop */}
-      {isOpen && (
+      {isOpen && isMobile && (
         <div
           className="fixed inset-0 z-40 bg-slate-900/50 lg:hidden"
           onClick={onClose}
@@ -41,7 +49,7 @@ export function DashboardSidebar({ isOpen, onClose }: DashboardSidebarProps) {
       {/* Sidebar */}
       <aside
         className={cn(
-          'fixed inset-y-0 left-0 z-50 w-64 transform bg-slate-900 transition-transform duration-300 lg:translate-x-0',
+          'fixed inset-y-0 left-0 z-50 w-64 transform bg-slate-900 transition-transform duration-300',
           isOpen ? 'translate-x-0' : '-translate-x-full'
         )}
       >
@@ -73,7 +81,7 @@ export function DashboardSidebar({ isOpen, onClose }: DashboardSidebarProps) {
                 <Link
                   key={item.name}
                   href={item.href}
-                  onClick={onClose}
+                  onClick={handleLinkClick}
                   className={cn(
                     'flex items-center gap-3 rounded-lg px-3 py-2.5 transition-colors',
                     isCurrent

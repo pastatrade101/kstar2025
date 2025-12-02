@@ -38,7 +38,7 @@ export function DashboardHeader({ onMenuClick }: DashboardHeaderProps) {
         <Button
           variant="ghost"
           size="icon"
-          className="lg:hidden shrink-0"
+          className="shrink-0"
           onClick={onMenuClick}
         >
           <Menu className="size-5" />
