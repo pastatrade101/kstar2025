@@ -1,6 +1,6 @@
 
 'use client';
-import { X, LayoutDashboard, Newspaper, Mail, Users, Settings, BarChart3, Calendar, FileText, HeartHandshake, Briefcase } from 'lucide-react';
+import { X, LayoutDashboard, Newspaper, Mail, Users, Settings, BarChart3, Calendar, FileText, HeartHandshake, Briefcase, PlusSquare } from 'lucide-react';
 import { Button } from '../ui/button';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
@@ -13,8 +13,9 @@ interface DashboardSidebarProps {
 
 const navigation = [
   { name: 'Dashboard', href: '/admin/dashboard', icon: LayoutDashboard },
-  { name: 'News & Events', href: '/admin/news', icon: Newspaper },
+  { name: 'Manage Jobs', href: '/admin/jobs', icon: PlusSquare },
   { name: 'Job Applications', href: '/admin/applications', icon: Briefcase },
+  { name: 'News & Events', href: '/admin/news', icon: Newspaper },
   { name: 'Contact Submissions', href: '/admin/contacts', icon: Mail },
   { name: 'Volunteers', href: '/admin/volunteers', icon: HeartHandshake },
   { name: 'Users', href: '#', icon: Users },
@@ -104,4 +105,3 @@ export function DashboardSidebar({ isOpen, onClose }: DashboardSidebarProps) {
     </>
   );
 }
-
