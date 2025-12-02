@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Menu, X } from 'lucide-react';
+import { LogOut, Menu, X, LayoutDashboard } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import {
@@ -22,6 +22,17 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion';
+import { useAuth, useUser } from '@/firebase';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+
 
 const ListItem = React.forwardRef<
   React.ElementRef<'a'>,
@@ -51,6 +62,19 @@ ListItem.displayName = 'ListItem';
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { user } = useUser();
+  const auth = useAuth();
+
+  const handleSignOut = () => {
+    if (auth) {
+      auth.signOut();
+    }
+  };
+
+  const getInitials = (email?: string | null) => {
+    if (!email) return 'A';
+    return email.substring(0, 2).toUpperCase();
+  }
 
   const kstarGroupComponents: {
     title: string;
@@ -192,14 +216,38 @@ export default function Header() {
 
           <div className="flex items-center gap-4">
             <ThemeToggle />
-            <Button
-              asChild
-              className="hidden md:flex bg-gradient-to-r from-primary to-accent hover:from-accent hover:to-primary shadow-lg shadow-primary/30"
-            >
-              <Link href="/get-involved">
-                Join Us
-              </Link>
-            </Button>
+            
+            {user ? (
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="gap-2 p-1 h-auto rounded-full">
+                        <Avatar className="size-8">
+                        <AvatarFallback className="bg-primary text-primary-foreground">{getInitials(user.displayName || user.email)}</AvatarFallback>
+                        </Avatar>
+                    </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-56">
+                    <DropdownMenuLabel>{user.displayName || user.email}</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                        <Link href="/admin/dashboard">
+                            <LayoutDashboard className="mr-2 h-4 w-4" />
+                            <span>Dashboard</span>
+                        </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem className="text-red-500 focus:text-red-500" onClick={handleSignOut}>
+                        <LogOut className="mr-2 h-4 w-4" />
+                        <span>Sign Out</span>
+                    </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
+            ) : (
+                <Button asChild>
+                    <Link href="/admin">Sign In</Link>
+                </Button>
+            )}
+
 
             <button
               className="md:hidden"
@@ -266,8 +314,8 @@ export default function Header() {
               asChild
               className="w-full mt-2 bg-gradient-to-r from-primary to-accent"
             >
-              <Link href="/get-involved">
-                Join Us
+              <Link href="/admin">
+                Sign In
               </Link>
             </Button>
           </nav>
