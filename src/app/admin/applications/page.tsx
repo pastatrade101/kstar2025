@@ -27,6 +27,7 @@ import {
   } from '@/components/ui/alert-dialog';
 import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 
 type ApplicationStatus = 'Pending' | 'Received' | 'Whitelisted' | 'Not Selected';
 
@@ -177,10 +178,26 @@ export default function JobApplicationsPage() {
                                     </DropdownMenuContent>
                                 </DropdownMenu>
                             </TableCell>
-                            <TableCell className="max-w-sm">
-                                <p className='whitespace-pre-wrap text-sm text-muted-foreground line-clamp-4'>
-                                    {item.coverLetter || '-'}
-                                </p>
+                            <TableCell>
+                                <Dialog>
+                                    <DialogTrigger asChild>
+                                        <Button variant="outline" size="sm">
+                                            <FileText className="mr-2 h-4 w-4" />
+                                            View Letter
+                                        </Button>
+                                    </DialogTrigger>
+                                    <DialogContent className="sm:max-w-[625px]">
+                                        <DialogHeader>
+                                        <DialogTitle>Cover Letter from {item.userName}</DialogTitle>
+                                        <DialogDescription>
+                                            Application for {item.jobTitle}
+                                        </DialogDescription>
+                                        </DialogHeader>
+                                        <div className="prose dark:prose-invert prose-sm max-h-[60vh] overflow-y-auto whitespace-pre-wrap p-1">
+                                            <p>{item.coverLetter}</p>
+                                        </div>
+                                    </DialogContent>
+                                </Dialog>
                             </TableCell>
                             <TableCell className="text-right">
                                 <AlertDialog>
