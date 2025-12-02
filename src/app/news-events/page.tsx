@@ -32,7 +32,7 @@ import {
     const { data: newsAndEvents, isLoading } = useCollection<NewsEvent>(newsQuery);
   
     return (
-      <div className="flex flex-col gap-8 p-4 md:p-8">
+      <div className="flex flex-col gap-8 p-4 md:p-8 pt-24 md:pt-32">
         <header>
           <h1 className="font-headline text-4xl font-bold tracking-tight">
             News & Events

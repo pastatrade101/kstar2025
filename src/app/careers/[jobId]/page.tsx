@@ -40,11 +40,6 @@ function ApplicationForm({ job }: { job: Job }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [uploadProgress, setUploadProgress] = useState<number | null>(null);
 
-  const applicationsCollectionRef = useMemoFirebase(
-    () => (firestore ? collection(firestore, 'job_applications') : null),
-    [firestore]
-  );
-  
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       const file = e.target.files[0];
@@ -62,7 +57,7 @@ function ApplicationForm({ job }: { job: Job }) {
 
   const onApplicationSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!job || !user || !applicationsCollectionRef) {
+    if (!job || !user || !firestore) {
       toast({ variant: 'destructive', title: 'Error', description: 'Could not submit application. Please try again.' });
       return;
     }
@@ -70,14 +65,15 @@ function ApplicationForm({ job }: { job: Job }) {
     setIsSubmitting(true);
     setUploadProgress(0);
 
-    const newApplicationRef = doc(applicationsCollectionRef);
+    // Step 1: Create a new document reference in Firestore to get a unique ID.
+    const newApplicationRef = doc(collection(firestore, 'job_applications'));
     const newApplicationId = newApplicationRef.id;
 
     try {
       let resumeUrl = '';
 
       if (resumeFile) {
-        // Step 1: Upload the file if it exists
+        // Step 2: Use the unique ID for the storage path and upload the file.
         const storage = getStorage();
         const storageRef = ref(storage, `resumes/${newApplicationId}/${resumeFile.name}`);
         const uploadTask = uploadBytesResumable(storageRef, resumeFile);
@@ -90,17 +86,18 @@ function ApplicationForm({ job }: { job: Job }) {
             },
             (error) => {
               console.error("Upload error:", error);
-              reject(error);
+              reject(error); // Reject the promise on error
             },
             async () => {
+              // On success, get the download URL.
               resumeUrl = await getDownloadURL(uploadTask.snapshot.ref);
-              resolve();
+              resolve(); // Resolve the promise on completion
             }
           );
         });
       }
-
-      // Step 2: Save the application data to Firestore
+      
+      // Step 3: Save the application data (including the URL) to Firestore.
       const applicationData = {
         jobId: job.id,
         jobTitle: job.title,
@@ -108,7 +105,7 @@ function ApplicationForm({ job }: { job: Job }) {
         userName: user.displayName || user.email,
         userEmail: user.email,
         phone: applicantPhone,
-        resumeUrl: resumeUrl, // This will be an empty string if no file was uploaded
+        resumeUrl: resumeUrl,
         submittedAt: serverTimestamp(),
       };
 
@@ -175,7 +172,7 @@ function ApplicationForm({ job }: { job: Job }) {
             </div>
             )}
 
-            <Button type="submit" className="w-full" disabled={isSubmitting}>
+            <Button type="submit" className="w-full" disabled={isSubmitting || !user}>
             {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Send className="mr-2 h-4 w-4" />}
             {isSubmitting ? 'Submitting...' : 'Submit Application'}
             </Button>

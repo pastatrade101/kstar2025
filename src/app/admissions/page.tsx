@@ -1,3 +1,4 @@
+'use client';
 import {
   Accordion,
   AccordionContent,
@@ -63,7 +64,7 @@ const admissionData = {
 
 export default function AdmissionsPage() {
   return (
-    <div className="flex flex-col gap-8 p-4 md:p-8 max-w-4xl mx-auto">
+    <div className="flex flex-col gap-8 p-4 md:p-8 max-w-4xl mx-auto pt-24 md:pt-32">
       <header className="text-center">
         <h1 className="font-headline text-4xl font-bold tracking-tight">
           Admissions
