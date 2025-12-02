@@ -1,65 +1,82 @@
 /**
  * @file Firestore Security Rules for EduPro Hub
  * @corePhilosophy This ruleset allows public read access for most content,
- *   while restricting write operations to authenticated administrators.
+ *   while restricting write operations to authenticated administrators with an 'admin' role.
  * @dataStructure The database consists of several top-level collections.
  * @keySecurityDecisions
  *   - Public collections (courses, instructors, etc.) are readable by anyone.
- *   - Write access to content collections (news_events) is restricted to authenticated users.
- *   - Contact submissions are publicly writable but only readable by authenticated users.
+ *   - Write access to content collections is restricted to admins.
+ *   - Contact submissions are publicly writable but only readable by admins.
+ *   - Users can create their own user profile document, but cannot assign themselves as admin.
  */
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Publicly readable content
+    // Helper function to check for admin role
+    function isAdmin() {
+      return request.auth != null && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    // User profiles
+    match /users/{userId} {
+      allow read: if true;
+      // Allow users to create their own profile, but not give themselves the admin role.
+      allow create: if request.auth != null && request.auth.uid == userId
+                    && request.resource.data.role == 'user';
+      // Allow users to update their own profile (but not their role), or if an admin is making the change.
+      allow update: if (request.auth != null && request.auth.uid == userId && request.resource.data.role == resource.data.role) || isAdmin();
+    }
+
+    // Publicly readable content, admin-only writes
     match /courses/{courseId} {
       allow read: if true;
-      allow write: if request.auth != null; // Admins can write
+      allow write: if isAdmin();
     }
 
     match /instructors/{instructorId} {
       allow read: if true;
-      allow write: if request.auth != null; // Admins can write
+      allow write: if isAdmin();
     }
 
     match /news_events/{newsEventId} {
       allow read: if true;
-      allow write: if request.auth != null; // Admins can write
+      allow write: if isAdmin();
     }
     
     match /jobs/{jobId} {
       allow read: if true;
-      allow write: if request.auth != null; // Admins can create/update jobs
+      allow write: if isAdmin();
     }
 
     match /admission_information/{infoId} {
       allow read: if true;
-      allow write: if request.auth != null; // Admins can write
+      allow write: if isAdmin();
     }
 
-    // Contact submissions can be created by anyone, but only read/deleted by admins
+    // Contact submissions can be created by anyone, but only read/managed by admins
     match /contact_submissions/{submissionId} {
       allow create: if true;
-      allow read, update, delete: if request.auth != null;
+      allow read, update, delete: if isAdmin();
     }
 
-    // Volunteer registrations can be created by anyone, but only read/deleted by admins
+    // Volunteer registrations can be created by anyone, but only read/managed by admins
     match /volunteer_registrations/{registrationId} {
       allow create: if true;
-      allow read, update, delete: if request.auth != null;
+      allow read, update, delete: if isAdmin();
     }
 
+    // Job Applications
     match /job_applications/{applicationId} {
-      // Allow creation only if the user is authenticated and the userId matches their own UID.
+      // Allow creation only if the user is authenticated and the userId in the doc matches their own UID.
       allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
       // Admins can read, update, or delete any individual application.
-      allow get, update, delete: if request.auth != null; 
+      allow get, update, delete: if isAdmin(); 
     }
 
     match /job_applications/{allApplications=**} {
       // Admins can list all applications.
-      allow list: if request.auth != null;
+      allow list: if isAdmin();
     }
     
     // Fallback for any other path - deny by default
@@ -68,5 +85,3 @@ service cloud.firestore {
     }
   }
 }
-
-    

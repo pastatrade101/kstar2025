@@ -1,10 +1,16 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { useUser } from '@/firebase';
+import { useUser, useFirestore, useDoc } from '@/firebase';
 import { useRouter, usePathname } from 'next/navigation';
 import { DashboardSidebar } from '@/components/admin/DashboardSidebar';
 import { DashboardHeader } from '@/components/admin/DashboardHeader';
 import { Loader2 } from 'lucide-react';
+import { doc } from 'firebase/firestore';
+import { useMemoFirebase } from '@/firebase/provider';
+
+type UserProfile = {
+  role: 'admin' | 'user';
+};
 
 export default function AdminLayout({
   children,
@@ -15,31 +21,48 @@ export default function AdminLayout({
   const { user, isUserLoading } = useUser();
   const router = useRouter();
   const pathname = usePathname();
+  const firestore = useFirestore();
+
+  const userProfileRef = useMemoFirebase(
+    () => (firestore && user ? doc(firestore, 'users', user.uid) : null),
+    [firestore, user]
+  );
+  const { data: userProfile, isLoading: isProfileLoading } = useDoc<UserProfile>(userProfileRef);
 
   useEffect(() => {
-    // If still checking for user, don't do anything yet.
-    if (isUserLoading) {
+    const isLoading = isUserLoading || isProfileLoading;
+    
+    // Wait until we have user and profile info
+    if (isLoading) {
       return;
     }
     
-    // If loading is finished and there's no user, redirect to the new login page,
-    // but only if we are not already on a public-facing page that might lead here.
+    // If no user is logged in, redirect to the main login page
     if (!user && pathname.startsWith('/admin')) {
       router.push('/login');
+      return;
     }
-  }, [user, isUserLoading, router, pathname]);
 
-  // If we are on a protected route and still loading or have no user, show a spinner.
-  if (pathname.startsWith('/admin') && (isUserLoading || !user)) {
+    // If user is logged in but is not an admin, redirect them away from admin pages
+    if (user && userProfile?.role !== 'admin' && pathname.startsWith('/admin')) {
+      router.push('/');
+    }
+
+  }, [user, userProfile, isUserLoading, isProfileLoading, router, pathname]);
+
+  const isLoading = isUserLoading || (user && isProfileLoading);
+  // While loading, or if no user, or if user is not an admin (and on an admin page), show spinner.
+  if (pathname.startsWith('/admin') && (isLoading || !user || userProfile?.role !== 'admin')) {
     return (
       <div className="flex h-screen items-center justify-center bg-slate-100 dark:bg-slate-900">
         <Loader2 className="h-12 w-12 animate-spin" />
       </div>
     );
   }
-  
-  // If we're on the dedicated admin login page, and somehow a user is already logged in, redirect them.
-  if (pathname === '/admin' && user) {
+
+  // This handles the specific case for `/admin` login page.
+  // If the user is somehow already logged in and an admin, redirect them to the dashboard.
+  if (pathname === '/admin' && user && userProfile?.role === 'admin') {
     router.push('/admin/dashboard');
     return (
       <div className="flex h-screen items-center justify-center bg-slate-100 dark:bg-slate-900">
@@ -47,12 +70,11 @@ export default function AdminLayout({
       </div>
     );
   }
-
-  // This handles showing the admin login form if the path is /admin
+  
+  // Render the admin login form if the path is exactly /admin and user is not an admin
   if (pathname === '/admin') {
     return <>{children}</>;
   }
-
 
   return (
     <div className="min-h-screen bg-slate-100 dark:bg-slate-950 text-slate-800 dark:text-slate-200">

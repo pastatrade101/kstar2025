@@ -1,5 +1,23 @@
 {
   "entities": {
+    "UserProfile": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "User Profile",
+      "type": "object",
+      "description": "Represents a user's profile information.",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "displayName": { "type": "string" },
+        "role": {
+          "type": "string",
+          "enum": ["admin", "user"],
+          "description": "The user's role in the system."
+        },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "email", "role", "createdAt"]
+    },
     "Course": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "Course",
@@ -270,6 +288,15 @@
   },
   "firestore": {
     "structure": [
+      {
+        "path": "/users/{userId}",
+        "definition": {
+          "entityName": "UserProfile",
+          "schema": { "$ref": "#/backend/entities/UserProfile" },
+          "description": "Stores public user profile information. Users can read all profiles but only write to their own. Admins can write to any profile.",
+          "params": [{ "name": "userId", "description": "The unique ID of the user." }]
+        }
+      },
       {
         "path": "/courses/{courseId}",
         "definition": {
