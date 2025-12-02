@@ -104,7 +104,7 @@ export function AuthGate() {
         <CardContent>
             {isLoginView ? (
                 <Form {...loginForm}>
-                    <form onSubmit={loginForm.handleSubmit(onLoginSubmit)} className="space-y-4">
+                    <form key="login-form" onSubmit={loginForm.handleSubmit(onLoginSubmit)} className="space-y-4">
                         <FormField
                             control={loginForm.control}
                             name="email"
@@ -135,7 +135,7 @@ export function AuthGate() {
                 </Form>
             ) : (
                 <Form {...registerForm}>
-                    <form onSubmit={registerForm.handleSubmit(onRegisterSubmit)} className="space-y-4">
+                    <form key="register-form" onSubmit={registerForm.handleSubmit(onRegisterSubmit)} className="space-y-4">
                         <div className="grid grid-cols-2 gap-4">
                             <FormField
                                 control={registerForm.control}
@@ -190,7 +190,7 @@ export function AuthGate() {
                 </Form>
             )}
              <Button variant="link" size="sm" className="w-full mt-4" onClick={() => setIsLoginView(!isLoginView)}>
-                {isLoginView ? "Don't have an account? Sign up" : "Already have an account? Sign in"}
+                {isLoginVew ? "Don't have an account? Sign up" : "Already have an account? Sign in"}
             </Button>
         </CardContent>
     </Card>
