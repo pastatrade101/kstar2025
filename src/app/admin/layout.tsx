@@ -32,23 +32,19 @@ export default function AdminLayout({
   useEffect(() => {
     const isLoading = isUserLoading || isProfileLoading;
     
-    // Wait until we have user and profile info
     if (isLoading) {
       return;
     }
     
-    // If no user is logged in AND they are trying to access a protected admin page
     if (!user && pathname !== '/admin') {
-      router.push('/admin'); // Redirect to the admin login page specifically
+      router.push('/admin');
       return;
     }
 
-    // If a user is logged in but is not an admin, redirect them away from any admin page
-    if (user && userProfile?.role !== 'admin' && pathname.startsWith('/admin')) {
+    if (user && userProfile?.role !== 'admin') {
       router.push('/');
     }
 
-    // If an admin user is logged in and on the /admin page, redirect to dashboard
     if (user && userProfile?.role === 'admin' && pathname === '/admin') {
         router.push('/admin/dashboard');
     }
@@ -57,8 +53,11 @@ export default function AdminLayout({
 
   const isLoading = isUserLoading || (user && isProfileLoading);
   
-  // If we're on a protected admin page, and we're still loading or the user isn't an admin, show a spinner.
-  if (pathname !== '/admin' && (isLoading || !user || userProfile?.role !== 'admin')) {
+  if (pathname === '/admin') {
+    return <>{children}</>;
+  }
+  
+  if (isLoading || !user || userProfile?.role !== 'admin') {
     return (
       <div className="flex h-screen items-center justify-center bg-slate-100 dark:bg-slate-900">
         <Loader2 className="h-12 w-12 animate-spin" />
@@ -66,6 +65,15 @@ export default function AdminLayout({
     );
   }
   
-  // Render the children (which will be the admin login page for `/admin`, or the dashboard etc. for other routes)
-  return <>{children}</>;
+  return (
+    <div className="flex h-screen overflow-hidden bg-slate-100 dark:bg-slate-900/40">
+        <DashboardSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+        <div className="relative flex flex-1 flex-col overflow-y-auto overflow-x-hidden">
+            <DashboardHeader onMenuClick={() => setSidebarOpen(true)} />
+            <main className="flex-1 p-4 sm:p-6 lg:p-8">
+                {children}
+            </main>
+        </div>
+    </div>
+  );
 }
