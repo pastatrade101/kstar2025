@@ -1,13 +1,19 @@
 'use client';
 
-import { useFirestore, useCollection, deleteDocumentNonBlocking } from '@/firebase';
+import { useFirestore, useCollection, deleteDocumentNonBlocking, updateDocumentNonBlocking } from '@/firebase';
 import { collection, query, orderBy, doc } from 'firebase/firestore';
 import { useMemoFirebase } from '@/firebase/provider';
-import { Loader2, Trash2, Users, Download, Briefcase, ExternalLink, FileText } from 'lucide-react';
+import { Loader2, Trash2, Users, Download, Briefcase, ExternalLink, FileText, ChevronDown } from 'lucide-react';
 import { format } from 'date-fns';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+  } from '@/components/ui/dropdown-menu';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -20,6 +26,9 @@ import {
     AlertDialogTrigger,
   } from '@/components/ui/alert-dialog';
 import Link from 'next/link';
+import { Badge } from '@/components/ui/badge';
+
+type ApplicationStatus = 'Submitted' | 'In Review' | 'Interviewing' | 'Offered' | 'Rejected';
 
 type JobApplication = {
   id: string;
@@ -33,7 +42,16 @@ type JobApplication = {
     seconds: number;
     nanoseconds: number;
   } | null;
+  status: ApplicationStatus;
 };
+
+const statusColors: Record<ApplicationStatus, string> = {
+    Submitted: 'bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300',
+    'In Review': 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300',
+    Interviewing: 'bg-purple-100 text-purple-800 dark:bg-purple-900/50 dark:text-purple-300',
+    Offered: 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300',
+    Rejected: 'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300',
+  };
 
 export default function JobApplicationsPage() {
   const firestore = useFirestore();
@@ -56,6 +74,13 @@ export default function JobApplicationsPage() {
     const itemRef = doc(firestore, 'job_applications', id);
     deleteDocumentNonBlocking(itemRef);
   };
+  
+  const handleStatusChange = (id: string, status: ApplicationStatus) => {
+    if (!firestore) return;
+    const itemRef = doc(firestore, 'job_applications', id);
+    updateDocumentNonBlocking(itemRef, { status });
+  };
+
 
   return (
     <Card className='dark:bg-slate-900 dark:border-slate-800'>
@@ -73,7 +98,8 @@ export default function JobApplicationsPage() {
                         <TableHead>Applicant Name</TableHead>
                         <TableHead>Contact</TableHead>
                         <TableHead>Applied For</TableHead>
-                        <TableHead>Submitted On</TableHead>
+                        <TableHead>Submitted</TableHead>
+                        <TableHead>Status</TableHead>
                         <TableHead>Cover Letter</TableHead>
                         <TableHead className="text-right">Actions</TableHead>
                     </TableRow>
@@ -81,21 +107,21 @@ export default function JobApplicationsPage() {
                 <TableBody>
                     {isLoadingApplications && (
                         <TableRow>
-                            <TableCell colSpan={6} className="text-center h-48">
+                            <TableCell colSpan={7} className="text-center h-48">
                                 <Loader2 className="mx-auto h-8 w-8 animate-spin" />
                             </TableCell>
                         </TableRow>
                     )}
                     {error && (
                         <TableRow>
-                            <TableCell colSpan={6} className="text-center text-red-500">
+                            <TableCell colSpan={7} className="text-center text-red-500">
                                 Error loading applications: {error.message}
                             </TableCell>
                         </TableRow>
                     )}
                     {!isLoadingApplications && applications && applications.length === 0 && (
                         <TableRow>
-                            <TableCell colSpan={6} className="text-center text-muted-foreground h-48">
+                            <TableCell colSpan={7} className="text-center text-muted-foreground h-48">
                                 No applications found.
                             </TableCell>
                         </TableRow>
@@ -115,6 +141,26 @@ export default function JobApplicationsPage() {
                             </TableCell>
                             <TableCell>
                                 {item.submittedAt ? format(new Date(item.submittedAt.seconds * 1000), 'PPP') : 'N/A'}
+                            </TableCell>
+                            <TableCell>
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                    <Button variant="ghost" className={`text-xs h-7 px-2 font-semibold ${statusColors[item.status]}`}>
+                                        {item.status}
+                                        <ChevronDown className="h-3 w-3 ml-1" />
+                                    </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent>
+                                    {Object.keys(statusColors).map((status) => (
+                                        <DropdownMenuItem
+                                        key={status}
+                                        onSelect={() => handleStatusChange(item.id, status as ApplicationStatus)}
+                                        >
+                                        <Badge className={`mr-2 ${statusColors[status as ApplicationStatus]}`}>{status}</Badge>
+                                        </DropdownMenuItem>
+                                    ))}
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
                             </TableCell>
                             <TableCell className="max-w-sm">
                                 <p className='whitespace-pre-wrap text-sm text-muted-foreground line-clamp-4'>

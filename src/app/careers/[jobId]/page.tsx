@@ -1,11 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import { useFirestore, useDoc, useUser } from '@/firebase';
-import { doc, collection, serverTimestamp, setDoc } from 'firebase/firestore';
+import { useFirestore, useDoc, useUser, useCollection, addDocumentNonBlocking } from '@/firebase';
+import { doc, collection, serverTimestamp, query, where, limit } from 'firebase/firestore';
 import { useMemoFirebase } from '@/firebase/provider';
 import { useParams, useRouter } from 'next/navigation';
-import { Loader2, MapPin, Briefcase, ArrowLeft, Send } from 'lucide-react';
+import { Loader2, MapPin, Briefcase, ArrowLeft, Send, CheckCircle2 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -15,6 +15,7 @@ import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { AuthGate } from '@/components/auth-gate';
 import { Textarea } from '@/components/ui/textarea';
+import { format } from 'date-fns';
 
 type Job = {
   id: string;
@@ -29,10 +30,21 @@ type Job = {
   } | null;
 };
 
-function ApplicationForm({ job }: { job: Job }) {
+type JobApplication = {
+    id: string;
+    submittedAt: {
+      seconds: number;
+      nanoseconds: number;
+    } | null;
+    status: 'Submitted' | 'In Review' | 'Interviewing' | 'Offered' | 'Rejected';
+};
+
+function ApplicationForm({ job, onApplicationSuccess }: { job: Job, onApplicationSuccess: () => void }) {
   const { user } = useUser();
   const { toast } = useToast();
   const firestore = useFirestore();
+  const applicationsCollectionRef = useMemoFirebase(() => collection(firestore, 'job_applications'), [firestore]);
+
 
   const [applicantPhone, setApplicantPhone] = useState('');
   const [coverLetter, setCoverLetter] = useState('');
@@ -47,8 +59,6 @@ function ApplicationForm({ job }: { job: Job }) {
 
     setIsSubmitting(true);
 
-    const newApplicationRef = doc(collection(firestore, 'job_applications'));
-
     try {
       const applicationData = {
         jobId: job.id,
@@ -59,18 +69,20 @@ function ApplicationForm({ job }: { job: Job }) {
         phone: applicantPhone,
         coverLetter: coverLetter,
         submittedAt: serverTimestamp(),
+        status: 'Submitted',
       };
 
-      await setDoc(newApplicationRef, applicationData);
+      await addDocumentNonBlocking(applicationsCollectionRef, applicationData);
 
       toast({
         title: 'Application Submitted!',
         description: 'Thank you for applying. We will review your application and be in touch.',
       });
 
-      // Reset form
+      // Reset form and notify parent
       setApplicantPhone('');
       setCoverLetter('');
+      onApplicationSuccess();
 
     } catch (error) {
       console.error("Application submission error:", error);
@@ -113,6 +125,31 @@ function ApplicationForm({ job }: { job: Job }) {
   )
 }
 
+function ApplicationStatus({ application }: { application: JobApplication }) {
+    return (
+      <Card className="bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800">
+        <CardHeader className="text-center">
+          <CheckCircle2 className="mx-auto h-12 w-12 text-green-600 dark:text-green-500 mb-4" />
+          <CardTitle className="text-green-800 dark:text-green-300">Application Submitted</CardTitle>
+          <CardDescription className="text-green-700 dark:text-green-400">
+            You have already applied for this position.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="text-center space-y-2">
+            <p className="text-sm text-muted-foreground">
+              Submitted on: {application.submittedAt ? format(new Date(application.submittedAt.seconds * 1000), 'PPP') : 'N/A'}
+            </p>
+            <div className="flex items-center justify-center gap-2">
+              <p className="text-sm text-muted-foreground">Status:</p>
+              <Badge variant="secondary">{application.status}</Badge>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
 export default function JobDetailsPage() {
   const router = useRouter();
   const params = useParams();
@@ -122,9 +159,23 @@ export default function JobDetailsPage() {
   const firestore = useFirestore();
   const jobDocRef = useMemoFirebase(() => (firestore && jobId ? doc(firestore, 'jobs', jobId) : null), [firestore, jobId]);
   const { data: job, isLoading, error } = useDoc<Job>(jobDocRef);
+  
+  const applicationsCollectionRef = useMemoFirebase(() => (firestore ? collection(firestore, 'job_applications') : null), [firestore]);
+  
+  const userApplicationQuery = useMemoFirebase(() => {
+    if (!applicationsCollectionRef || !user || !jobId) return null;
+    return query(
+      applicationsCollectionRef,
+      where('userId', '==', user.uid),
+      where('jobId', '==', jobId),
+      limit(1)
+    );
+  }, [applicationsCollectionRef, user, jobId]);
 
-
-  if (isLoading || isUserLoading) {
+  const { data: userApplication, isLoading: isLoadingApplication, refetch: refetchApplication } = useCollection<JobApplication>(userApplicationQuery);
+  const hasApplied = userApplication && userApplication.length > 0;
+  
+  if (isLoading || isUserLoading || isLoadingApplication) {
     return (
       <div className="flex justify-center items-center h-[60vh]">
         <Loader2 className="h-12 w-12 animate-spin text-primary" />
@@ -175,7 +226,9 @@ export default function JobDetailsPage() {
           </div>
 
           <div className="lg:col-span-1">
-             { user ? <ApplicationForm job={job} /> : <AuthGate /> }
+             { !user && <AuthGate /> }
+             { user && hasApplied && userApplication && <ApplicationStatus application={userApplication[0]} /> }
+             { user && !hasApplied && <ApplicationForm job={job} onApplicationSuccess={refetchApplication}/> }
           </div>
         </div>
       </div>

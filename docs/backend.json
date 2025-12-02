@@ -276,9 +276,14 @@
         "userEmail": { "type": "string", "format": "email" },
         "phone": { "type": "string" },
         "coverLetter": { "type": "string" },
-        "submittedAt": { "type": "string", "format": "date-time" }
+        "submittedAt": { "type": "string", "format": "date-time" },
+        "status": {
+          "type": "string",
+          "enum": ["Submitted", "In Review", "Interviewing", "Offered", "Rejected"],
+          "description": "The current status of the job application."
+        }
       },
-      "required": ["jobId", "jobTitle", "userId", "userName", "userEmail", "submittedAt"]
+      "required": ["jobId", "jobTitle", "userId", "userName", "userEmail", "submittedAt", "status"]
     }
   },
   "auth": {
@@ -407,7 +412,7 @@
         "definition": {
           "entityName": "JobApplication",
           "schema": { "$ref": "#/backend/entities/JobApplication" },
-          "description": "Stores job applications. Writable by the authenticated user who owns the application, but only readable by admins.",
+          "description": "Stores job applications. Writable by the authenticated user who owns the application. Readable by the owner and admins.",
           "params": [{ "name": "applicationId", "description": "Unique ID for the application." }]
         }
       }

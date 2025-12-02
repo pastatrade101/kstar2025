@@ -70,13 +70,15 @@ service cloud.firestore {
     match /job_applications/{applicationId} {
       // Allow creation only if the user is authenticated and the userId in the doc matches their own UID.
       allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
-      // Admins can read, update, or delete any individual application.
-      allow get, update, delete: if isAdmin(); 
+      // Allow user to read their own application.
+      allow get: if request.auth != null && (request.auth.uid == resource.data.userId || isAdmin());
+      // Admins can update or delete any individual application.
+      allow update, delete: if isAdmin();
     }
 
     match /job_applications/{allApplications=**} {
-      // Admins can list all applications.
-      allow list: if isAdmin();
+      // Admins can list all applications. Users can list their own.
+      allow list: if isAdmin() || (request.auth != null && request.query.where.userId == request.auth.uid);
     }
     
     // Fallback for any other path - deny by default
