@@ -13,7 +13,8 @@ import { Separator } from '@/components/ui/separator';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import { Progress } from '@/components/ui/progress';
 
 
 type Job = {
@@ -44,6 +45,7 @@ export default function JobDetailsPage() {
   const [applicantPhone, setApplicantPhone] = useState('');
   const [resumeFile, setResumeFile] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState<number | null>(null);
 
   const applicationsCollectionRef = useMemoFirebase(
     () => collection(firestore, 'job_applications'),
@@ -73,51 +75,68 @@ export default function JobDetailsPage() {
     }
 
     setIsSubmitting(true);
+    setUploadProgress(0);
 
-    try {
-      // 1. Upload resume to Firebase Storage
-      const storage = getStorage();
-      const storageRef = ref(storage, `resumes/${applicationsCollectionRef.id}/${Date.now()}_${resumeFile.name}`);
-      await uploadBytes(storageRef, resumeFile);
-      const resumeUrl = await getDownloadURL(storageRef);
+    const storage = getStorage();
+    const storageRef = ref(storage, `resumes/${applicationsCollectionRef.id}/${Date.now()}_${resumeFile.name}`);
+    const uploadTask = uploadBytesResumable(storageRef, resumeFile);
 
-      // 2. Save application to Firestore
-      addDocumentNonBlocking(applicationsCollectionRef, {
-        jobId: job.id,
-        jobTitle: job.title,
-        name: applicantName,
-        email: applicantEmail,
-        phone: applicantPhone,
-        resumeUrl,
-        submittedAt: serverTimestamp(),
-      });
+    uploadTask.on('state_changed', 
+      (snapshot) => {
+        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        setUploadProgress(progress);
+      }, 
+      (error) => {
+        console.error("Upload error:", error);
+        toast({
+          variant: 'destructive',
+          title: 'Upload Failed',
+          description: error.message || 'An unexpected error occurred during upload. Please try again.',
+        });
+        setIsSubmitting(false);
+        setUploadProgress(null);
+      }, 
+      () => {
+        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+          // Save application to Firestore
+          addDocumentNonBlocking(applicationsCollectionRef, {
+            jobId: job.id,
+            jobTitle: job.title,
+            name: applicantName,
+            email: applicantEmail,
+            phone: applicantPhone,
+            resumeUrl: downloadURL,
+            submittedAt: serverTimestamp(),
+          });
 
-      toast({
-        title: 'Application Submitted!',
-        description: 'Thank you for applying. We will review your application and be in touch.',
-      });
+          toast({
+            title: 'Application Submitted!',
+            description: 'Thank you for applying. We will review your application and be in touch.',
+          });
 
-      // Reset form
-      setApplicantName('');
-      setApplicantEmail('');
-      setApplicantPhone('');
-      setResumeFile(null);
-      // We also need to reset the file input element itself
-      const fileInput = document.getElementById('resume') as HTMLInputElement;
-      if (fileInput) {
-        fileInput.value = '';
+          // Reset form
+          setApplicantName('');
+          setApplicantEmail('');
+          setApplicantPhone('');
+          setResumeFile(null);
+          const fileInput = document.getElementById('resume') as HTMLInputElement;
+          if (fileInput) {
+            fileInput.value = '';
+          }
+
+        }).catch((err) => {
+            console.error("Application submission error:", err);
+            toast({
+              variant: 'destructive',
+              title: 'Submission Failed',
+              description: err.message || 'An unexpected error occurred. Please try again.',
+            });
+        }).finally(() => {
+            setIsSubmitting(false);
+            setUploadProgress(null);
+        });
       }
-      
-    } catch (err: any) {
-      console.error("Application submission error:", err);
-      toast({
-        variant: 'destructive',
-        title: 'Submission Failed',
-        description: err.message || 'An unexpected error occurred. Please try again.',
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
+    );
   };
 
   if (isLoading) {
@@ -194,16 +213,25 @@ export default function JobDetailsPage() {
                       <div className="relative">
                       <Input id="resume" type="file" accept=".pdf" onChange={handleFileChange} required className="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20" disabled={isSubmitting}/>
                     </div>
-                    {resumeFile && (
+                    {resumeFile && !isSubmitting && (
                       <div className="flex items-center gap-2 text-sm text-muted-foreground mt-2">
                         <FileText className="h-4 w-4" />
                         <span>{resumeFile.name}</span>
                       </div>
                     )}
                   </div>
+                  
+                  {isSubmitting && uploadProgress !== null && (
+                    <div className="space-y-2">
+                      <Label>Uploading Resume...</Label>
+                      <Progress value={uploadProgress} className="w-full" />
+                      <p className="text-sm text-muted-foreground text-center">{Math.round(uploadProgress)}%</p>
+                    </div>
+                  )}
+
                   <Button type="submit" className="w-full" disabled={isSubmitting}>
                     {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Send className="mr-2 h-4 w-4" />}
-                    Submit Application
+                    {isSubmitting ? 'Submitting...' : 'Submit Application'}
                   </Button>
                 </form>
               </CardContent>
