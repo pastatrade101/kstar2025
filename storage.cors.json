@@ -1,6 +1,11 @@
 [
   {
-    "origin": ["*"],
+    "origin": [
+      "https://kstar.co.tz",
+      "https://studio-4061903538-cceaf.web.app",
+      "https://studio-4061903538-cceaf.firebaseapp.com",
+      "http://localhost:9002"
+    ],
     "method": [
       "GET",
       "POST",
