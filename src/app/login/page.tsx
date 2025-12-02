@@ -11,11 +11,9 @@ export default function LoginPage() {
   const router = useRouter();
 
   useEffect(() => {
-    // If user is logged in, redirect them to their intended destination.
-    // For now, we'll default to the admin dashboard, as that's the primary role.
-    // A future improvement could be to redirect to a user-specific profile page.
+    // If user is logged in, redirect them to the home page.
     if (!isUserLoading && user) {
-      router.push('/admin/dashboard');
+      router.push('/');
     }
   }, [user, isUserLoading, router]);
 

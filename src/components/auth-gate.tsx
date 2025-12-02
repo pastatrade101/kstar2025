@@ -53,12 +53,10 @@ export function AuthGate() {
     setIsLoading(true);
     initiateEmailSignIn(auth, values.email, values.password)
       .then(() => {
-        // onAuthStateChanged in the provider will handle redirect
-        // We can optionally show a success toast here
         toast({
           title: "Signed In Successfully!",
         });
-        router.refresh(); // This helps ensure the page re-evaluates user state
+        router.push('/');
       })
       .catch((error) => {
         toast({
@@ -81,7 +79,7 @@ export function AuthGate() {
             title: "Account Created!",
             description: "You have been successfully signed up and logged in.",
         });
-        router.refresh(); // This helps ensure the page re-evaluates user state
+        router.push('/');
     } catch (error: any) {
         toast({
             variant: "destructive",
@@ -104,7 +102,7 @@ export function AuthGate() {
         <CardContent>
             {isLoginView ? (
                 <Form {...loginForm}>
-                    <form key="login-form" onSubmit={loginForm.handleSubmit(onLoginSubmit)} className="space-y-4">
+                    <form key="login" onSubmit={loginForm.handleSubmit(onLoginSubmit)} className="space-y-4">
                         <FormField
                             control={loginForm.control}
                             name="email"
@@ -135,7 +133,7 @@ export function AuthGate() {
                 </Form>
             ) : (
                 <Form {...registerForm}>
-                    <form key="register-form" onSubmit={registerForm.handleSubmit(onRegisterSubmit)} className="space-y-4">
+                    <form key="register" onSubmit={registerForm.handleSubmit(onRegisterSubmit)} className="space-y-4">
                         <div className="grid grid-cols-2 gap-4">
                             <FormField
                                 control={registerForm.control}
@@ -191,7 +189,7 @@ export function AuthGate() {
             )}
              <Button variant="link" size="sm" className="w-full mt-4" onClick={() => setIsLoginView(!isLoginView)}>
                 {isLoginView ? "Don't have an account? Sign up" : "Already have an account? Sign in"}
-            </Button>
+             </Button>
         </CardContent>
     </Card>
   );
