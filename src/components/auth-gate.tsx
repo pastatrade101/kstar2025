@@ -190,7 +190,7 @@ export function AuthGate() {
                 </Form>
             )}
              <Button variant="link" size="sm" className="w-full mt-4" onClick={() => setIsLoginView(!isLoginView)}>
-                {isLoginVew ? "Don't have an account? Sign up" : "Already have an account? Sign in"}
+                {isLoginView ? "Don't have an account? Sign up" : "Already have an account? Sign in"}
             </Button>
         </CardContent>
     </Card>
