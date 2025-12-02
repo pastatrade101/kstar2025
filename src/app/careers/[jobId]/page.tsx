@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useFirestore, useDoc, addDocumentNonBlocking } from '@/firebase';
-import { doc, collection, serverTimestamp } from 'firebase/firestore';
+import { doc, collection, serverTimestamp, setDoc } from 'firebase/firestore';
 import { useMemoFirebase } from '@/firebase/provider';
 import { useParams, useRouter } from 'next/navigation';
 import { Loader2, MapPin, Briefcase, Clock, ArrowLeft, Upload, FileText, Send } from 'lucide-react';
@@ -48,7 +48,7 @@ export default function JobDetailsPage() {
   const [uploadProgress, setUploadProgress] = useState<number | null>(null);
 
   const applicationsCollectionRef = useMemoFirebase(
-    () => collection(firestore, 'job_applications'),
+    () => (firestore ? collection(firestore, 'job_applications') : null),
     [firestore]
   );
   
@@ -69,7 +69,7 @@ export default function JobDetailsPage() {
 
   const onApplicationSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!job || !resumeFile || !applicantName || !applicantEmail) {
+    if (!job || !resumeFile || !applicantName || !applicantEmail || !applicationsCollectionRef) {
       toast({ variant: 'destructive', title: 'Missing Information', description: 'Please fill out all required fields and upload your resume.' });
       return;
     }
@@ -78,7 +78,11 @@ export default function JobDetailsPage() {
     setUploadProgress(0);
 
     const storage = getStorage();
-    const storageRef = ref(storage, `resumes/${applicationsCollectionRef.id}/${Date.now()}_${resumeFile.name}`);
+    // Create a new document reference with a unique ID first
+    const newApplicationRef = doc(applicationsCollectionRef);
+    const newApplicationId = newApplicationRef.id;
+
+    const storageRef = ref(storage, `resumes/${newApplicationId}/${resumeFile.name}`);
     const uploadTask = uploadBytesResumable(storageRef, resumeFile);
 
     uploadTask.on('state_changed', 
@@ -98,8 +102,8 @@ export default function JobDetailsPage() {
       }, 
       () => {
         getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-          // Save application to Firestore
-          addDocumentNonBlocking(applicationsCollectionRef, {
+          // Save application to Firestore using the pre-generated document reference
+          setDoc(newApplicationRef, {
             jobId: job.id,
             jobTitle: job.title,
             name: applicantName,
