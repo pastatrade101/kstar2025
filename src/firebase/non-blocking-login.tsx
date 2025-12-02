@@ -20,8 +20,11 @@ export function initiateAnonymousSignIn(authInstance: Auth): Promise<void> {
  * @param email The user's email.
  * @param password The user's password.
  */
-export async function signUpWithEmailAndPassword(authInstance: Auth, email: string, password: string): Promise<void> {
-  await createUserWithEmailAndPassword(authInstance, email, password);
+export async function signUpWithEmailAndPassword(authInstance: Auth, email: string, password: string, displayName?: string): Promise<void> {
+  const userCredential = await createUserWithEmailAndPassword(authInstance, email, password);
+  if (userCredential.user && displayName) {
+    await updateProfile(userCredential.user, { displayName });
+  }
 }
 
 

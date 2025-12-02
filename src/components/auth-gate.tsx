@@ -26,6 +26,8 @@ const loginSchema = z.object({
 });
 
 const registerSchema = z.object({
+  firstName: z.string().min(1, 'First name is required'),
+  lastName: z.string().min(1, 'Last name is required'),
   email: z.string().email(),
   password: z.string().min(6, 'Password must be at least 6 characters'),
 });
@@ -44,7 +46,7 @@ export function AuthGate() {
 
   const registerForm = useForm<z.infer<typeof registerSchema>>({
     resolver: zodResolver(registerSchema),
-    defaultValues: { email: '', password: '' },
+    defaultValues: { firstName: '', lastName: '', email: '', password: '' },
   });
 
   function onLoginSubmit(values: z.infer<typeof loginSchema>) {
@@ -73,7 +75,8 @@ export function AuthGate() {
   async function onRegisterSubmit(values: z.infer<typeof registerSchema>) {
     setIsLoading(true);
     try {
-        await signUpWithEmailAndPassword(auth, values.email, values.password);
+        const displayName = `${values.firstName} ${values.lastName}`;
+        await signUpWithEmailAndPassword(auth, values.email, values.password, displayName);
         toast({
             title: "Account Created!",
             description: "You have been successfully signed up and logged in.",
@@ -133,6 +136,30 @@ export function AuthGate() {
             ) : (
                 <Form {...registerForm}>
                     <form onSubmit={registerForm.handleSubmit(onRegisterSubmit)} className="space-y-4">
+                        <div className="grid grid-cols-2 gap-4">
+                            <FormField
+                                control={registerForm.control}
+                                name="firstName"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>First Name</FormLabel>
+                                        <FormControl><Input placeholder="John" {...field} /></FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                             <FormField
+                                control={registerForm.control}
+                                name="lastName"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Last Name</FormLabel>
+                                        <FormControl><Input placeholder="Doe" {...field} /></FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        </div>
                         <FormField
                             control={registerForm.control}
                             name="email"
