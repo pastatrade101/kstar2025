@@ -165,8 +165,8 @@ export default function JobDetailsPage() {
     if (!firestore || !user || !jobId) return null;
     return query(
       collection(firestore, 'job_applications'),
-      where('jobId', '==', jobId),
       where('userId', '==', user.uid),
+      where('jobId', '==', jobId),
       limit(1)
     );
   }, [firestore, user, jobId]);
