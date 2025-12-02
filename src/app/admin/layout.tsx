@@ -22,15 +22,15 @@ export default function AdminLayout({
       return;
     }
     
-    // If loading is finished and there's no user, redirect to the login page,
-    // but only if we are not already on the login page.
-    if (!user && pathname !== '/admin') {
-      router.push('/admin');
+    // If loading is finished and there's no user, redirect to the new login page,
+    // but only if we are not already on a public-facing page that might lead here.
+    if (!user && pathname.startsWith('/admin')) {
+      router.push('/login');
     }
   }, [user, isUserLoading, router, pathname]);
 
   // If we are on a protected route and still loading or have no user, show a spinner.
-  if (pathname !== '/admin' && (isUserLoading || !user)) {
+  if (pathname.startsWith('/admin') && (isUserLoading || !user)) {
     return (
       <div className="flex h-screen items-center justify-center bg-slate-100 dark:bg-slate-900">
         <Loader2 className="h-12 w-12 animate-spin" />
@@ -38,7 +38,17 @@ export default function AdminLayout({
     );
   }
   
-  // If we're on the login page, just render the children (the login form).
+  // If we're on the dedicated admin login page, and somehow a user is already logged in, redirect them.
+  if (pathname === '/admin' && user) {
+    router.push('/admin/dashboard');
+    return (
+      <div className="flex h-screen items-center justify-center bg-slate-100 dark:bg-slate-900">
+        <Loader2 className="h-12 w-12 animate-spin" />
+      </div>
+    );
+  }
+
+  // This handles showing the admin login form if the path is /admin
   if (pathname === '/admin') {
     return <>{children}</>;
   }

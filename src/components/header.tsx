@@ -244,7 +244,7 @@ export default function Header() {
                 </DropdownMenu>
             ) : (
                 <Button asChild>
-                    <Link href="/admin">Sign In</Link>
+                    <Link href="/login">Sign In</Link>
                 </Button>
             )}
 
@@ -314,7 +314,7 @@ export default function Header() {
               asChild
               className="w-full mt-2 bg-gradient-to-r from-primary to-accent"
             >
-              <Link href="/admin">
+              <Link href="/login">
                 Sign In
               </Link>
             </Button>

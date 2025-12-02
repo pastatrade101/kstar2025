@@ -18,6 +18,7 @@ import { initiateEmailSignIn, signUpWithEmailAndPassword } from '@/firebase/non-
 import { Loader2, UserPlus, LogIn } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
+import { useRouter } from 'next/navigation';
 
 const loginSchema = z.object({
   email: z.string().email(),
@@ -35,6 +36,7 @@ export function AuthGate() {
   const auth = useAuth();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
   const loginForm = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
@@ -49,6 +51,14 @@ export function AuthGate() {
   function onLoginSubmit(values: z.infer<typeof loginSchema>) {
     setIsLoading(true);
     initiateEmailSignIn(auth, values.email, values.password)
+      .then(() => {
+        // onAuthStateChanged in the provider will handle redirect
+        // We can optionally show a success toast here
+        toast({
+          title: "Signed In Successfully!",
+        });
+        router.refresh(); // This helps ensure the page re-evaluates user state
+      })
       .catch((error) => {
         toast({
             variant: "destructive",
@@ -57,7 +67,6 @@ export function AuthGate() {
         });
       })
       .finally(() => {
-        // The onAuthStateChanged listener handles success, but we need to stop loading on failure.
         setIsLoading(false);
       });
   }
@@ -70,6 +79,7 @@ export function AuthGate() {
             title: "Account Created!",
             description: "You have been successfully signed up and logged in.",
         });
+        router.refresh(); // This helps ensure the page re-evaluates user state
     } catch (error: any) {
         toast({
             variant: "destructive",
@@ -84,9 +94,9 @@ export function AuthGate() {
   return (
     <Card>
         <CardHeader>
-            <CardTitle>{isLoginView ? 'Sign In to Apply' : 'Create an Account'}</CardTitle>
+            <CardTitle>{isLoginView ? 'Sign In' : 'Create an Account'}</CardTitle>
             <CardDescription>
-                {isLoginView ? 'Welcome back! Please log in.' : 'A free account is required to apply.'}
+                {isLoginView ? "Welcome back! Please enter your details." : "An account is required to proceed. It's free!"}
             </CardDescription>
         </CardHeader>
         <CardContent>

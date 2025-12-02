@@ -69,10 +69,10 @@ export default function AdminLoginPage() {
             <div className="size-10 rounded-lg bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center">
               <span className="text-white font-bold text-xl">A</span>
             </div>
-            <CardTitle className='text-2xl text-slate-900 dark:text-white'>Admin Panel</CardTitle>
+            <CardTitle className='text-2xl text-slate-900 dark:text-white'>Admin Panel Login</CardTitle>
           </div>
           <CardDescription>
-            Please sign in to access the dashboard.
+            This login is for administrators only.
           </CardDescription>
         </CardHeader>
         <CardContent>
