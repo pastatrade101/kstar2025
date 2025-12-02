@@ -14,11 +14,10 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { useAuth } from '@/firebase';
-import { initiateEmailSignIn, initiateEmailSignUp } from '@/firebase/non-blocking-login';
+import { initiateEmailSignIn, signUpWithEmailAndPassword } from '@/firebase/non-blocking-login';
 import { Loader2, UserPlus, LogIn } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { updateProfile } from 'firebase/auth';
 
 const loginSchema = z.object({
   email: z.string().email(),
@@ -49,38 +48,37 @@ export function AuthGate() {
 
   function onLoginSubmit(values: z.infer<typeof loginSchema>) {
     setIsLoading(true);
-    initiateEmailSignIn(auth, values.email, values.password);
-    // The onAuthStateChanged listener will handle success/failure redirects and state changes.
-    // We can add a timeout to reset loading state in case of silent failures.
-    setTimeout(() => setIsLoading(false), 5000); 
+    initiateEmailSignIn(auth, values.email, values.password)
+      .catch((error) => {
+        toast({
+            variant: "destructive",
+            title: "Sign In Failed",
+            description: error.message || "An unknown error occurred.",
+        });
+      })
+      .finally(() => {
+        // The onAuthStateChanged listener handles success, but we need to stop loading on failure.
+        setIsLoading(false);
+      });
   }
 
-  function onRegisterSubmit(values: z.infer<typeof registerSchema>) {
+  async function onRegisterSubmit(values: z.infer<typeof registerSchema>) {
     setIsLoading(true);
-    initiateEmailSignUp(auth, values.email, values.password);
-    
-    // After sign-up is initiated, we listen for the new user to be created,
-    // and then update their profile with the name.
-    const unsubscribe = auth.onAuthStateChanged(user => {
-      if (user) {
-        updateProfile(user, { displayName: values.name })
-          .then(() => {
-            toast({ title: "Account Created!", description: "You are now logged in."});
-            setIsLoading(false);
-          })
-          .catch((error) => {
-            toast({ variant: 'destructive', title: "Profile Update Failed", description: error.message });
-            setIsLoading(false);
-          });
-        unsubscribe(); // Unsubscribe after we've handled the user creation
-      }
-    });
-
-    // Timeout to prevent loading forever
-    setTimeout(() => {
+    try {
+        await signUpWithEmailAndPassword(auth, values.email, values.password, values.name);
+        toast({
+            title: "Account Created!",
+            description: "You have been successfully signed up and logged in.",
+        });
+    } catch (error: any) {
+        toast({
+            variant: "destructive",
+            title: "Sign Up Failed",
+            description: error.message || "An unknown error occurred.",
+        });
+    } finally {
         setIsLoading(false);
-        unsubscribe();
-    }, 10000);
+    }
   }
 
   return (
@@ -173,5 +171,3 @@ export function AuthGate() {
     </Card>
   );
 }
-
-    
