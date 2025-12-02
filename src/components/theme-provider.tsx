@@ -1,13 +1,15 @@
 'use client';
 
-import * as React from 'react';
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
 type Theme = 'dark' | 'light' | 'system';
 
 interface ThemeProviderProps {
   children: ReactNode;
+  attribute?: string;
   defaultTheme?: Theme;
+  enableSystem?: boolean;
+  disableTransitionOnChange?: boolean;
   storageKey?: string;
 }
 
