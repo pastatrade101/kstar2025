@@ -160,17 +160,15 @@ export default function JobDetailsPage() {
   const jobDocRef = useMemoFirebase(() => (firestore && jobId ? doc(firestore, 'jobs', jobId) : null), [firestore, jobId]);
   const { data: job, isLoading, error } = useDoc<Job>(jobDocRef);
   
-  const applicationsCollectionRef = useMemoFirebase(() => (firestore ? collection(firestore, 'job_applications') : null), [firestore]);
-  
   const userApplicationQuery = useMemoFirebase(() => {
-    if (!applicationsCollectionRef || !user || !jobId) return null;
+    if (!firestore || !user || !jobId) return null;
     return query(
-      applicationsCollectionRef,
+      collection(firestore, 'job_applications'),
       where('jobId', '==', jobId),
       where('userId', '==', user.uid),
       limit(1)
     );
-  }, [applicationsCollectionRef, user, jobId]);
+  }, [firestore, user, jobId]);
 
   const { data: userApplication, isLoading: isLoadingApplication, refetch: refetchApplication } = useCollection<JobApplication>(userApplicationQuery);
   const hasApplied = userApplication && userApplication.length > 0;
