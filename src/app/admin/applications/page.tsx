@@ -1,6 +1,6 @@
 'use client';
 
-import { useFirestore, useCollection, deleteDocumentNonBlocking, updateDocumentNonBlocking } from '@/firebase';
+import { useFirestore, useCollection, deleteDocumentNonBlocking, updateDocumentNonBlocking, useUser, useDoc } from '@/firebase';
 import { collection, query, orderBy, doc } from 'firebase/firestore';
 import { useMemoFirebase } from '@/firebase/provider';
 import { Loader2, Trash2, Users, Download, Briefcase, ExternalLink, FileText, ChevronDown } from 'lucide-react';
@@ -30,6 +30,10 @@ import { Badge } from '@/components/ui/badge';
 
 type ApplicationStatus = 'Pending' | 'Received' | 'Whitelisted' | 'Not Selected';
 
+type UserProfile = {
+    role: 'admin' | 'user';
+};
+
 type JobApplication = {
   id: string;
   jobId: string;
@@ -54,10 +58,21 @@ const statusColors: Record<ApplicationStatus, string> = {
 
 export default function JobApplicationsPage() {
   const firestore = useFirestore();
-  const applicationsCollectionRef = useMemoFirebase(
-    () => (firestore ? collection(firestore, 'job_applications') : null),
-    [firestore]
+  const { user } = useUser();
+  
+  const userProfileRef = useMemoFirebase(
+    () => (firestore && user ? doc(firestore, 'users', user.uid) : null),
+    [firestore, user]
   );
+  const { data: userProfile, isLoading: isProfileLoading } = useDoc<UserProfile>(userProfileRef);
+
+  const isAdmin = userProfile?.role === 'admin';
+
+  const applicationsCollectionRef = useMemoFirebase(
+    () => (firestore && isAdmin ? collection(firestore, 'job_applications') : null),
+    [firestore, isAdmin]
+  );
+
   const applicationsQuery = useMemoFirebase(
     () =>
       applicationsCollectionRef
@@ -80,6 +95,7 @@ export default function JobApplicationsPage() {
     updateDocumentNonBlocking(itemRef, { status });
   };
 
+  const isLoading = isProfileLoading || (isAdmin && isLoadingApplications);
 
   return (
     <Card className='dark:bg-slate-900 dark:border-slate-800'>
@@ -104,7 +120,7 @@ export default function JobApplicationsPage() {
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    {isLoadingApplications && (
+                    {isLoading && (
                         <TableRow>
                             <TableCell colSpan={7} className="text-center h-48">
                                 <Loader2 className="mx-auto h-8 w-8 animate-spin" />
@@ -118,7 +134,7 @@ export default function JobApplicationsPage() {
                             </TableCell>
                         </TableRow>
                     )}
-                    {!isLoadingApplications && applications && applications.length === 0 && (
+                    {!isLoading && (!applications || applications.length === 0) && (
                         <TableRow>
                             <TableCell colSpan={7} className="text-center text-muted-foreground h-48">
                                 No applications found.
