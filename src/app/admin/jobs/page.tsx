@@ -31,7 +31,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
-import { Loader2, PlusCircle, Trash2, Briefcase, MapPin, Clock } from 'lucide-react';
+import { Loader2, PlusCircle, Trash2, Briefcase, MapPin, Clock, Calendar as CalendarIcon, CalendarDays } from 'lucide-react';
 import { format, formatDistanceToNow } from 'date-fns';
 import { useFirestore, useCollection, addDocumentNonBlocking, deleteDocumentNonBlocking } from '@/firebase';
 import { collection, query, orderBy, doc, serverTimestamp } from 'firebase/firestore';
@@ -39,6 +39,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { useMemoFirebase } from '@/firebase/provider';
 import { Badge } from '@/components/ui/badge';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
 
 const formSchema = z.object({
@@ -47,6 +49,9 @@ const formSchema = z.object({
   location: z.string().min(1, { message: 'Location is required' }),
   type: z.enum(['Full-time', 'Part-time', 'Contract', 'Internship']),
   description: z.string().min(10, { message: 'Description must be at least 10 characters.' }),
+  applicationDeadline: z.date({
+    required_error: 'An application deadline is required.',
+  }),
 });
 
 type Job = z.infer<typeof formSchema> & {
@@ -79,6 +84,7 @@ export default function ManageJobsPage() {
     const dataToSave = {
       ...values,
       postedAt: serverTimestamp(),
+      applicationDeadline: format(values.applicationDeadline, 'yyyy-MM-dd'),
     };
     addDocumentNonBlocking(jobsCollectionRef, dataToSave);
     form.reset({
@@ -87,6 +93,7 @@ export default function ManageJobsPage() {
         location: 'Dar es Salaam, Tanzania',
         type: 'Full-time',
         description: '',
+        applicationDeadline: undefined,
     });
   }
 
@@ -171,6 +178,45 @@ export default function ManageJobsPage() {
                 />
                 <FormField
                   control={form.control}
+                  name="applicationDeadline"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-col">
+                      <FormLabel>Application Deadline</FormLabel>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              variant={'outline'}
+                              className={cn(
+                                'w-full pl-3 text-left font-normal',
+                                !field.value && 'text-muted-foreground'
+                              )}
+                            >
+                              {field.value ? (
+                                format(field.value, 'PPP')
+                              ) : (
+                                <span>Pick a date</span>
+                              )}
+                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={field.value}
+                            onSelect={field.onChange}
+                            disabled={(date) => date < new Date()}
+                            initialFocus
+                          />
+                        </PopoverContent>
+                      </Popover>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
                   name="description"
                   render={({ field }) => (
                     <FormItem>
@@ -207,7 +253,7 @@ export default function ManageJobsPage() {
                           <TableRow className='dark:border-slate-800'>
                               <TableHead>Position</TableHead>
                               <TableHead>Details</TableHead>
-                              <TableHead>Posted</TableHead>
+                              <TableHead>Dates</TableHead>
                               <TableHead className="text-right">Actions</TableHead>
                           </TableRow>
                       </TableHeader>
@@ -249,7 +295,14 @@ export default function ManageJobsPage() {
                                     </div>
                                   </TableCell>
                                   <TableCell className='align-top text-muted-foreground text-sm'>
-                                    {item.postedAt ? formatDistanceToNow(new Date(item.postedAt.seconds * 1000), { addSuffix: true }) : '...'}
+                                    <div className='flex items-center gap-2'>
+                                      <Clock className="h-4 w-4" />
+                                      <span>Posted: {item.postedAt ? formatDistanceToNow(new Date(item.postedAt.seconds * 1000), { addSuffix: true }) : '...'}</span>
+                                    </div>
+                                    <div className='flex items-center gap-2 mt-2 text-red-600 dark:text-red-400'>
+                                      <CalendarDays className="h-4 w-4" />
+                                      <span>Deadline: {item.applicationDeadline ? format(new Date(item.applicationDeadline as any), 'PPP') : 'N/A'}</span>
+                                    </div>
                                    </TableCell>
                                   <TableCell className="text-right align-top">
                                   <AlertDialog>

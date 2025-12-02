@@ -6,9 +6,9 @@ import { useMemoFirebase } from '@/firebase/provider';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, MapPin, Briefcase, Clock, ArrowRight } from 'lucide-react';
+import { Loader2, MapPin, Briefcase, Clock, ArrowRight, CalendarDays } from 'lucide-react';
 import Link from 'next/link';
-import { formatDistanceToNow } from 'date-fns';
+import { formatDistanceToNow, format } from 'date-fns';
 
 type Job = {
   id: string;
@@ -21,6 +21,7 @@ type Job = {
     seconds: number;
     nanoseconds: number;
   } | null;
+  applicationDeadline: string;
 };
 
 export default function CareersPage() {
@@ -79,6 +80,10 @@ export default function CareersPage() {
                       <span>
                         {job.postedAt ? `${formatDistanceToNow(new Date(job.postedAt.seconds * 1000))} ago` : 'Date not available'}
                       </span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm text-red-600 dark:text-red-400">
+                        <CalendarDays className="h-4 w-4" />
+                        <span>Deadline: {format(new Date(job.applicationDeadline), 'PPP')}</span>
                     </div>
                   </CardContent>
                   <CardFooter>

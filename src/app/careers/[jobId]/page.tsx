@@ -5,7 +5,7 @@ import { useFirestore, useDoc, useUser, useCollection, addDocumentNonBlocking } 
 import { doc, collection, serverTimestamp, query, where, limit } from 'firebase/firestore';
 import { useMemoFirebase } from '@/firebase/provider';
 import { useParams, useRouter } from 'next/navigation';
-import { Loader2, MapPin, Briefcase, ArrowLeft, Send, CheckCircle2 } from 'lucide-react';
+import { Loader2, MapPin, Briefcase, ArrowLeft, Send, CheckCircle2, CalendarDays } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -28,6 +28,7 @@ type Job = {
     seconds: number;
     nanoseconds: number;
   } | null;
+  applicationDeadline: string;
 };
 
 type JobApplication = {
@@ -215,6 +216,10 @@ export default function JobDetailsPage() {
               <div className="flex items-center gap-2">
                 <Briefcase className="h-4 w-4" />
                 <span>{job.type}</span>
+              </div>
+              <div className="flex items-center gap-2 text-red-600 dark:text-red-400">
+                <CalendarDays className="h-4 w-4" />
+                <span>Deadline: {format(new Date(job.applicationDeadline), 'PPP')}</span>
               </div>
             </div>
             <Separator />
