@@ -109,7 +109,7 @@ export function AuthGate() {
                             render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>Email</FormLabel>
-                                    <FormControl><Input placeholder="you@example.com" {...field} /></FormControl>
+                                    <FormControl><Input type="email" placeholder="you@example.com" {...field} /></FormControl>
                                     <FormMessage />
                                 </FormItem>
                             )}
@@ -140,7 +140,7 @@ export function AuthGate() {
                             render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>Full Name</FormLabel>
-                                    <FormControl><Input placeholder="John Doe" {...field} /></FormControl>
+                                    <FormControl><Input type="text" placeholder="John Doe" {...field} /></FormControl>
                                     <FormMessage />
                                 </FormItem>
                             )}
@@ -151,7 +151,7 @@ export function AuthGate() {
                             render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>Email</FormLabel>
-                                    <FormControl><Input placeholder="you@example.com" {...field} /></FormControl>
+                                    <FormControl><Input type="email" placeholder="you@example.com" {...field} /></FormControl>
                                     <FormMessage />
                                 </FormItem>
                             )}
