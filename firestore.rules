@@ -52,7 +52,11 @@ service cloud.firestore {
 
     match /job_applications/{applicationId} {
       allow create: if true; // Anyone can submit an application
-      allow read, update, delete: if request.auth != null; // Admins can manage applications
+      allow get, update, delete: if request.auth != null; // Admins can manage individual applications
+    }
+
+    match /job_applications {
+        allow list: if request.auth != null; // Admins can list all applications
     }
     
     // Fallback for any other path - deny by default
