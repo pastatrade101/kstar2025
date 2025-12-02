@@ -122,7 +122,7 @@ export function AuthGate() {
                             render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>Password</FormLabel>
-                                    <FormControl><Input type="password" {...field} /></FormControl>
+                                    <FormControl><Input type="password" placeholder="••••••••" {...field} /></FormControl>
                                     <FormMessage />
                                 </FormItem>
                             )}
@@ -143,7 +143,7 @@ export function AuthGate() {
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>First Name</FormLabel>
-                                        <FormControl><Input placeholder="John" {...field} /></FormControl>
+                                        <FormControl><Input type="text" placeholder="John" {...field} /></FormControl>
                                         <FormMessage />
                                     </FormItem>
                                 )}
@@ -154,7 +154,7 @@ export function AuthGate() {
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>Last Name</FormLabel>
-                                        <FormControl><Input placeholder="Doe" {...field} /></FormControl>
+                                        <FormControl><Input type="text" placeholder="Doe" {...field} /></FormControl>
                                         <FormMessage />
                                     </FormItem>
                                 )}
@@ -177,7 +177,7 @@ export function AuthGate() {
                             render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>Password</FormLabel>
-                                    <FormControl><Input type="password" {...field} /></FormControl>
+                                    <FormControl><Input type="password" placeholder="••••••••" {...field} /></FormControl>
                                     <FormMessage />
                                 </FormItem>
                             )}
