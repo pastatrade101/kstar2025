@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useFirestore, useDoc, setDocumentNonBlocking } from '@/firebase';
+import { useFirestore, useDoc } from '@/firebase';
 import { doc, collection, serverTimestamp, setDoc } from 'firebase/firestore';
 import { useMemoFirebase } from '@/firebase/provider';
 import { useParams, useRouter } from 'next/navigation';
@@ -268,5 +268,3 @@ export default function JobDetailsPage() {
     </div>
   );
 }
-
-    
