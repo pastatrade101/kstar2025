@@ -37,33 +37,28 @@ export default function AdminLayout({
       return;
     }
     
-    // If no user is logged in, redirect to the main login page
-    if (!user && pathname.startsWith('/admin')) {
-      router.push('/login');
+    // If no user is logged in AND they are trying to access a protected admin page
+    if (!user && pathname !== '/admin') {
+      router.push('/admin'); // Redirect to the admin login page specifically
       return;
     }
 
-    // If user is logged in but is not an admin, redirect them away from admin pages
+    // If a user is logged in but is not an admin, redirect them away from any admin page
     if (user && userProfile?.role !== 'admin' && pathname.startsWith('/admin')) {
       router.push('/');
+    }
+
+    // If an admin user is logged in and on the /admin page, redirect to dashboard
+    if (user && userProfile?.role === 'admin' && pathname === '/admin') {
+        router.push('/admin/dashboard');
     }
 
   }, [user, userProfile, isUserLoading, isProfileLoading, router, pathname]);
 
   const isLoading = isUserLoading || (user && isProfileLoading);
-  // While loading, or if no user, or if user is not an admin (and on an admin page), show spinner.
-  if (pathname.startsWith('/admin') && (isLoading || !user || userProfile?.role !== 'admin')) {
-    return (
-      <div className="flex h-screen items-center justify-center bg-slate-100 dark:bg-slate-900">
-        <Loader2 className="h-12 w-12 animate-spin" />
-      </div>
-    );
-  }
-
-  // This handles the specific case for `/admin` login page.
-  // If the user is somehow already logged in and an admin, redirect them to the dashboard.
-  if (pathname === '/admin' && user && userProfile?.role === 'admin') {
-    router.push('/admin/dashboard');
+  
+  // If we're on a protected admin page, and we're still loading or the user isn't an admin, show a spinner.
+  if (pathname !== '/admin' && (isLoading || !user || userProfile?.role !== 'admin')) {
     return (
       <div className="flex h-screen items-center justify-center bg-slate-100 dark:bg-slate-900">
         <Loader2 className="h-12 w-12 animate-spin" />
@@ -71,21 +66,6 @@ export default function AdminLayout({
     );
   }
   
-  // Render the admin login form if the path is exactly /admin and user is not an admin
-  if (pathname === '/admin') {
-    return <>{children}</>;
-  }
-
-  return (
-    <div className="min-h-screen bg-slate-100 dark:bg-slate-950 text-slate-800 dark:text-slate-200">
-      <DashboardSidebar
-        isOpen={sidebarOpen}
-        onClose={() => setSidebarOpen(false)}
-      />
-      <div className="lg:pl-64">
-        <DashboardHeader onMenuClick={() => setSidebarOpen(true)} />
-        <main className="p-4 sm:p-6 lg:p-8">{children}</main>
-      </div>
-    </div>
-  );
+  // Render the children (which will be the admin login page for `/admin`, or the dashboard etc. for other routes)
+  return <>{children}</>;
 }
