@@ -166,8 +166,8 @@ export default function JobDetailsPage() {
     if (!applicationsCollectionRef || !user || !jobId) return null;
     return query(
       applicationsCollectionRef,
-      where('userId', '==', user.uid),
       where('jobId', '==', jobId),
+      where('userId', '==', user.uid),
       limit(1)
     );
   }, [applicationsCollectionRef, user, jobId]);
