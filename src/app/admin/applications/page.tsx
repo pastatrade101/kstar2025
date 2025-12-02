@@ -28,7 +28,7 @@ import {
 import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 
-type ApplicationStatus = 'Submitted' | 'In Review' | 'Interviewing' | 'Offered' | 'Rejected';
+type ApplicationStatus = 'Pending' | 'Received' | 'Whitelisted' | 'Not Selected';
 
 type JobApplication = {
   id: string;
@@ -46,11 +46,10 @@ type JobApplication = {
 };
 
 const statusColors: Record<ApplicationStatus, string> = {
-    Submitted: 'bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300',
-    'In Review': 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300',
-    Interviewing: 'bg-purple-100 text-purple-800 dark:bg-purple-900/50 dark:text-purple-300',
-    Offered: 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300',
-    Rejected: 'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300',
+    Pending: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300',
+    Received: 'bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300',
+    Whitelisted: 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300',
+    'Not Selected': 'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300',
   };
 
 export default function JobApplicationsPage() {

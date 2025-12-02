@@ -36,7 +36,7 @@ type JobApplication = {
       seconds: number;
       nanoseconds: number;
     } | null;
-    status: 'Submitted' | 'In Review' | 'Interviewing' | 'Offered' | 'Rejected';
+    status: 'Pending' | 'Received' | 'Whitelisted' | 'Not Selected';
 };
 
 function ApplicationForm({ job, onApplicationSuccess }: { job: Job, onApplicationSuccess: () => void }) {
@@ -69,7 +69,7 @@ function ApplicationForm({ job, onApplicationSuccess }: { job: Job, onApplicatio
         phone: applicantPhone,
         coverLetter: coverLetter,
         submittedAt: serverTimestamp(),
-        status: 'Submitted',
+        status: 'Received',
       };
 
       await addDocumentNonBlocking(applicationsCollectionRef, applicationData);

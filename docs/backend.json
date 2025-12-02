@@ -279,7 +279,7 @@
         "submittedAt": { "type": "string", "format": "date-time" },
         "status": {
           "type": "string",
-          "enum": ["Submitted", "In Review", "Interviewing", "Offered", "Rejected"],
+          "enum": ["Pending", "Received", "Whitelisted", "Not Selected"],
           "description": "The current status of the job application."
         }
       },
