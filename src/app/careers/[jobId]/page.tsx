@@ -6,7 +6,6 @@ import { doc, collection, serverTimestamp } from 'firebase/firestore';
 import { useMemoFirebase } from '@/firebase/provider';
 import { useParams, useRouter } from 'next/navigation';
 import { Loader2, MapPin, Briefcase, Clock, ArrowLeft, Upload, FileText, Send } from 'lucide-react';
-import HomeClient from '@/components/home-client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -83,7 +82,7 @@ export default function JobDetailsPage() {
       const resumeUrl = await getDownloadURL(storageRef);
 
       // 2. Save application to Firestore
-      await addDocumentNonBlocking(applicationsCollectionRef, {
+      addDocumentNonBlocking(applicationsCollectionRef, {
         jobId: job.id,
         jobTitle: job.title,
         name: applicantName,
@@ -123,101 +122,95 @@ export default function JobDetailsPage() {
 
   if (isLoading) {
     return (
-      <HomeClient>
-        <div className="flex justify-center items-center h-[60vh]">
-          <Loader2 className="h-12 w-12 animate-spin text-primary" />
-        </div>
-      </HomeClient>
+      <div className="flex justify-center items-center h-[60vh]">
+        <Loader2 className="h-12 w-12 animate-spin text-primary" />
+      </div>
     );
   }
 
   if (error || !job) {
     return (
-      <HomeClient>
-        <div className="text-center py-20">
-          <h2 className="text-2xl font-bold">Job Not Found</h2>
-          <p className="text-muted-foreground mt-2">
-            The job listing you are looking for could not be found. It may have been removed.
-          </p>
-          <Button onClick={() => router.push('/careers')} className="mt-6">
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Careers
-          </Button>
-        </div>
-      </HomeClient>
+      <div className="text-center py-20">
+        <h2 className="text-2xl font-bold">Job Not Found</h2>
+        <p className="text-muted-foreground mt-2">
+          The job listing you are looking for could not be found. It may have been removed.
+        </p>
+        <Button onClick={() => router.push('/careers')} className="mt-6">
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Back to Careers
+        </Button>
+      </div>
     );
   }
 
   return (
-    <HomeClient>
-      <div className="bg-secondary/30">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-24">
-          <Button variant="ghost" onClick={() => router.back()} className="mb-8">
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to All Jobs
-          </Button>
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-            <div className="lg:col-span-2">
-              <Badge>{job.department}</Badge>
-              <h1 className="text-3xl md:text-4xl font-extrabold mt-2 mb-4">{job.title}</h1>
-              <div className="flex flex-wrap gap-x-6 gap-y-2 text-muted-foreground mb-6">
-                <div className="flex items-center gap-2">
-                  <MapPin className="h-4 w-4" />
-                  <span>{job.location}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Briefcase className="h-4 w-4" />
-                  <span>{job.type}</span>
-                </div>
+    <div className="bg-secondary/30 pt-20">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-24">
+        <Button variant="ghost" onClick={() => router.back()} className="mb-8">
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Back to All Jobs
+        </Button>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+          <div className="lg:col-span-2">
+            <Badge>{job.department}</Badge>
+            <h1 className="text-3xl md:text-4xl font-extrabold mt-2 mb-4">{job.title}</h1>
+            <div className="flex flex-wrap gap-x-6 gap-y-2 text-muted-foreground mb-6">
+              <div className="flex items-center gap-2">
+                <MapPin className="h-4 w-4" />
+                <span>{job.location}</span>
               </div>
-              <Separator />
-              <div className="prose dark:prose-invert max-w-none mt-8 whitespace-pre-wrap">
-                <p>{job.description}</p>
+              <div className="flex items-center gap-2">
+                <Briefcase className="h-4 w-4" />
+                <span>{job.type}</span>
               </div>
             </div>
+            <Separator />
+            <div className="prose dark:prose-invert max-w-none mt-8 whitespace-pre-wrap">
+              <p>{job.description}</p>
+            </div>
+          </div>
 
-            <div className="lg:col-span-1">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Apply for this Position</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <form onSubmit={onApplicationSubmit} className="space-y-6">
-                    <div className="space-y-2">
-                      <Label htmlFor="name">Full Name</Label>
-                      <Input id="name" placeholder="John Doe" required value={applicantName} onChange={e => setApplicantName(e.target.value)} disabled={isSubmitting} />
+          <div className="lg:col-span-1">
+            <Card>
+              <CardHeader>
+                <CardTitle>Apply for this Position</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <form onSubmit={onApplicationSubmit} className="space-y-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="name">Full Name</Label>
+                    <Input id="name" placeholder="John Doe" required value={applicantName} onChange={e => setApplicantName(e.target.value)} disabled={isSubmitting} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="email">Email</Label>
+                    <Input id="email" type="email" placeholder="john.doe@example.com" required value={applicantEmail} onChange={e => setApplicantEmail(e.target.value)} disabled={isSubmitting} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="phone">Phone Number (Optional)</Label>
+                    <Input id="phone" placeholder="+1 234 567 890" value={applicantPhone} onChange={e => setApplicantPhone(e.target.value)} disabled={isSubmitting} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="resume">Resume (PDF, max 5MB)</Label>
+                      <div className="relative">
+                      <Input id="resume" type="file" accept=".pdf" onChange={handleFileChange} required className="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20" disabled={isSubmitting}/>
                     </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="email">Email</Label>
-                      <Input id="email" type="email" placeholder="john.doe@example.com" required value={applicantEmail} onChange={e => setApplicantEmail(e.target.value)} disabled={isSubmitting} />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="phone">Phone Number (Optional)</Label>
-                      <Input id="phone" placeholder="+1 234 567 890" value={applicantPhone} onChange={e => setApplicantPhone(e.target.value)} disabled={isSubmitting} />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="resume">Resume (PDF, max 5MB)</Label>
-                       <div className="relative">
-                        <Input id="resume" type="file" accept=".pdf" onChange={handleFileChange} required className="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20" disabled={isSubmitting}/>
+                    {resumeFile && (
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground mt-2">
+                        <FileText className="h-4 w-4" />
+                        <span>{resumeFile.name}</span>
                       </div>
-                      {resumeFile && (
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground mt-2">
-                          <FileText className="h-4 w-4" />
-                          <span>{resumeFile.name}</span>
-                        </div>
-                      )}
-                    </div>
-                    <Button type="submit" className="w-full" disabled={isSubmitting}>
-                      {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Send className="mr-2 h-4 w-4" />}
-                      Submit Application
-                    </Button>
-                  </form>
-                </CardContent>
-              </Card>
-            </div>
+                    )}
+                  </div>
+                  <Button type="submit" className="w-full" disabled={isSubmitting}>
+                    {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Send className="mr-2 h-4 w-4" />}
+                    Submit Application
+                  </Button>
+                </form>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>
-    </HomeClient>
+    </div>
   );
 }

@@ -4,6 +4,8 @@ import { Toaster } from '@/components/ui/toaster';
 import Chatbot from '@/components/chatbot';
 import { FirebaseClientProvider } from '@/firebase';
 import { ThemeProvider } from '@/components/theme-provider';
+import Header from '@/components/header';
+import Footer from '@/components/footer';
 
 export const metadata: Metadata = {
   title: 'kstar (T) Group',
@@ -31,9 +33,11 @@ export default function RootLayout({
             disableTransitionOnChange
         >
           <FirebaseClientProvider>
+            <Header />
             <div className="min-h-screen">
               {children}
             </div>
+            <Footer />
             <Chatbot />
             <Toaster />
           </FirebaseClientProvider>
