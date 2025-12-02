@@ -1,7 +1,7 @@
 'use client';
 
 import { useFirestore, useCollection, deleteDocumentNonBlocking, updateDocumentNonBlocking, useUser, useDoc } from '@/firebase';
-import { collection, query, orderBy, doc } from 'firebase/firestore';
+import { collection, query, orderBy, doc, where } from 'firebase/firestore';
 import { useMemoFirebase } from '@/firebase/provider';
 import { Loader2, Trash2, Users, Download, Briefcase, ExternalLink, FileText, ChevronDown } from 'lucide-react';
 import { format } from 'date-fns';

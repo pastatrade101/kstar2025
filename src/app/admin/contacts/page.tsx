@@ -23,7 +23,6 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import {
   Dialog,
@@ -163,7 +162,7 @@ export default function ContactsPage() {
   
   return (
     <>
-      <div className="flex flex-col h-full bg-white dark:bg-slate-900 rounded-lg shadow-sm">
+      <div className="flex flex-col h-full bg-white dark:bg-slate-900 rounded-lg shadow-sm border dark:border-slate-800">
         {/* Message List */}
         <div className="border-b dark:border-slate-800 p-4">
             <h1 className="text-xl font-bold flex items-center justify-between mb-4">

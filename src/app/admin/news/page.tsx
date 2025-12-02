@@ -43,6 +43,7 @@ import { collection, query, orderBy, doc } from 'firebase/firestore';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useMemoFirebase } from '@/firebase/provider';
 import Image from 'next/image';
+import { Badge } from '@/components/ui/badge';
 
 const formSchema = z.object({
   title: z.string().min(1, { message: 'Title is required' }),
@@ -54,12 +55,14 @@ const formSchema = z.object({
   imageUrl: z.string().url({ message: 'Please enter a valid image URL.' }),
 });
 
+type NewsItem = z.infer<typeof formSchema> & { id: string };
+
 export default function ManageNewsPage() {
   const firestore = useFirestore();
   const newsCollectionRef = useMemoFirebase(() => collection(firestore, 'news_events'), [firestore]);
   const newsQuery = useMemoFirebase(() => query(newsCollectionRef, orderBy('date', 'desc')), [newsCollectionRef]);
 
-  const { data: newsItems, isLoading: isLoadingNews, error } = useCollection<z.infer<typeof formSchema>>(newsQuery);
+  const { data: newsItems, isLoading: isLoadingNews, error } = useCollection<NewsItem>(newsQuery);
   
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -234,21 +237,21 @@ export default function ManageNewsPage() {
                       <TableBody>
                           {isLoadingNews && (
                               <TableRow>
-                                  <TableCell colSpan={5} className="text-center">
+                                  <TableCell colSpan={5} className="h-48 text-center">
                                       <Loader2 className="mx-auto h-8 w-8 animate-spin" />
                                   </TableCell>
                               </TableRow>
                           )}
                           {error && (
                               <TableRow>
-                                  <TableCell colSpan={5} className="text-center text-red-500">
+                                  <TableCell colSpan={5} className="h-48 text-center text-red-500">
                                       Error loading posts: {error.message}
                                   </TableCell>
                               </TableRow>
                           )}
                           {!isLoadingNews && newsItems && newsItems.length === 0 && (
                               <TableRow>
-                                  <TableCell colSpan={5} className="text-center text-muted-foreground">
+                                  <TableCell colSpan={5} className="h-48 text-center text-muted-foreground">
                                       No posts found.
                                   </TableCell>
                               </TableRow>
@@ -256,12 +259,14 @@ export default function ManageNewsPage() {
                           {newsItems?.map((item) => (
                               <TableRow key={item.id} className='dark:border-slate-800'>
                                   <TableCell>
-                                      <Image src={item.imageUrl} alt={item.title} width={80} height={60} className="rounded-md object-cover" />
+                                      <Image src={item.imageUrl} alt={item.title} width={80} height={60} className="rounded-md object-cover aspect-[4/3]" />
                                   </TableCell>
-                                  <TableCell className="font-medium">{item.title}</TableCell>
-                                  <TableCell>{item.type}</TableCell>
-                                  <TableCell>{format(new Date(item.date), 'PPP')}</TableCell>
-                                  <TableCell className="text-right">
+                                  <TableCell className="font-medium align-top">{item.title}</TableCell>
+                                  <TableCell className="align-top">
+                                    <Badge variant={item.type === 'Event' ? 'default' : 'secondary'}>{item.type}</Badge>
+                                  </TableCell>
+                                  <TableCell className="align-top text-muted-foreground">{format(new Date(item.date), 'PPP')}</TableCell>
+                                  <TableCell className="text-right align-top">
                                       <Button variant="ghost" size="icon" onClick={() => handleDelete(item.id)}>
                                           <Trash2 className="h-4 w-4 text-red-500" />
                                           <span className="sr-only">Delete</span>
