@@ -132,7 +132,7 @@ export default function HomeClient({
               />
               <div>
                 <div className="font-semibold text-foreground">
-                  Kstar (T) Group
+                  kstar (T) Group
                 </div>
                 <div className="text-xs text-muted-foreground">
                   Excellence in Every Field
@@ -179,6 +179,13 @@ export default function HomeClient({
                       ))}
                     </ul>
                   </NavigationMenuContent>
+                </NavigationMenuItem>
+                <NavigationMenuItem>
+                  <Button variant="ghost" asChild>
+                    <Link href="/careers">
+                      Careers
+                    </Link>
+                  </Button>
                 </NavigationMenuItem>
                 <NavigationMenuItem>
                   <Button variant="ghost" asChild>
@@ -252,6 +259,12 @@ export default function HomeClient({
                   </AccordionContent>
                 </AccordionItem>
               </Accordion>
+              
+              <Button variant="ghost" className="w-full justify-start" asChild>
+                <Link href="/careers" onClick={() => handleMobileLinkClick('/careers')}>
+                  Careers
+                </Link>
+              </Button>
 
               <Button variant="ghost" className="w-full justify-start" asChild>
                 <Link href="/get-involved" onClick={() => handleMobileLinkClick('/get-involved')}>
