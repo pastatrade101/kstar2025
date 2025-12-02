@@ -73,7 +73,7 @@ service cloud.firestore {
       // Allow user to read their own application, or if admin.
       allow get: if request.auth != null && (request.auth.uid == resource.data.userId || isAdmin());
        // Admins can list all applications. Users can list their own by filtering on their userId.
-      allow list: if isAdmin() || (request.auth != null && request.query.where[0][1] == 'userId' && request.query.where[0][2] == request.auth.uid);
+      allow list: if isAdmin() || (request.auth != null && request.query.get("where").get(0).get(2) == request.auth.uid);
       // Admins can update or delete any individual application.
       allow update, delete: if isAdmin();
     }
