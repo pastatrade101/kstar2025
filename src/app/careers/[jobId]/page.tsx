@@ -62,95 +62,81 @@ function ApplicationForm({ job }: { job: Job }) {
 
   const onApplicationSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!job || !resumeFile || !user || !applicationsCollectionRef) {
-      toast({ variant: 'destructive', title: 'Missing Information', description: 'Please upload your resume to submit.' });
+    if (!job || !user || !applicationsCollectionRef) {
+      toast({ variant: 'destructive', title: 'Error', description: 'Could not submit application. Please try again.' });
       return;
     }
 
     setIsSubmitting(true);
     setUploadProgress(0);
 
+    const newApplicationRef = doc(applicationsCollectionRef);
+    const newApplicationId = newApplicationRef.id;
+
     try {
+      let resumeUrl = '';
+
+      if (resumeFile) {
+        // Step 1: Upload the file if it exists
         const storage = getStorage();
-        const newApplicationRef = doc(applicationsCollectionRef);
-        const newApplicationId = newApplicationRef.id;
-    
         const storageRef = ref(storage, `resumes/${newApplicationId}/${resumeFile.name}`);
         const uploadTask = uploadBytesResumable(storageRef, resumeFile);
-    
-        uploadTask.on('state_changed', 
-          (snapshot) => {
-            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-            setUploadProgress(progress);
-          }, 
-          (error) => {
-            console.error("Upload error:", error);
-            toast({
-              variant: 'destructive',
-              title: 'Upload Failed',
-              description: error.message || 'An unexpected error occurred during upload. Please try again.',
-            });
-            setIsSubmitting(false);
-            setUploadProgress(null);
-          }, 
-          () => {
-            getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-              const applicationData = {
-                jobId: job.id,
-                jobTitle: job.title,
-                userId: user.uid,
-                userName: user.displayName || user.email,
-                userEmail: user.email,
-                phone: applicantPhone,
-                resumeUrl: downloadURL,
-                submittedAt: serverTimestamp(),
-              };
 
-              setDoc(newApplicationRef, applicationData).then(() => {
-                toast({
-                    title: 'Application Submitted!',
-                    description: 'Thank you for applying. We will review your application and be in touch.',
-                });
-    
-                setApplicantPhone('');
-                setResumeFile(null);
-                const fileInput = document.getElementById('resume') as HTMLInputElement;
-                if (fileInput) {
-                    fileInput.value = '';
-                }
-                setIsSubmitting(false);
-                setUploadProgress(null);
-              }).catch((firestoreError) => {
-                console.error("Firestore save error:", firestoreError);
-                toast({
-                    variant: 'destructive',
-                    title: 'Submission Failed',
-                    description: 'Your resume was uploaded, but we failed to save your application. Please try again.',
-                });
-                setIsSubmitting(false);
-                setUploadProgress(null);
-              });
-            }).catch((err) => {
-                console.error("Get Download URL error:", err);
-                toast({
-                  variant: 'destructive',
-                  title: 'Submission Failed',
-                  description: err.message || 'An unexpected error occurred after upload. Please try again.',
-                });
-                setIsSubmitting(false);
-                setUploadProgress(null);
-            });
-          }
-        );
-    } catch (error) {
-        console.error("Application submission error:", error);
-        toast({
-            variant: 'destructive',
-            title: 'Submission Failed',
-            description: 'An unexpected error occurred. Please try again.',
+        await new Promise<void>((resolve, reject) => {
+          uploadTask.on('state_changed',
+            (snapshot) => {
+              const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+              setUploadProgress(progress);
+            },
+            (error) => {
+              console.error("Upload error:", error);
+              reject(error);
+            },
+            async () => {
+              resumeUrl = await getDownloadURL(uploadTask.snapshot.ref);
+              resolve();
+            }
+          );
         });
-        setIsSubmitting(false);
-        setUploadProgress(null);
+      }
+
+      // Step 2: Save the application data to Firestore
+      const applicationData = {
+        jobId: job.id,
+        jobTitle: job.title,
+        userId: user.uid,
+        userName: user.displayName || user.email,
+        userEmail: user.email,
+        phone: applicantPhone,
+        resumeUrl: resumeUrl, // This will be an empty string if no file was uploaded
+        submittedAt: serverTimestamp(),
+      };
+
+      await setDoc(newApplicationRef, applicationData);
+
+      toast({
+        title: 'Application Submitted!',
+        description: 'Thank you for applying. We will review your application and be in touch.',
+      });
+
+      // Reset form
+      setApplicantPhone('');
+      setResumeFile(null);
+      const fileInput = document.getElementById('resume') as HTMLInputElement;
+      if (fileInput) {
+        fileInput.value = '';
+      }
+
+    } catch (error) {
+      console.error("Application submission error:", error);
+      toast({
+        variant: 'destructive',
+        title: 'Submission Failed',
+        description: 'An unexpected error occurred. Please try again.',
+      });
+    } finally {
+      setIsSubmitting(false);
+      setUploadProgress(null);
     }
   };
 
@@ -169,9 +155,9 @@ function ApplicationForm({ job }: { job: Job }) {
                 <Input id="phone" placeholder="+1 234 567 890" value={applicantPhone} onChange={e => setApplicantPhone(e.target.value)} disabled={isSubmitting} />
             </div>
             <div className="space-y-2">
-            <Label htmlFor="resume">Resume (PDF, max 5MB)</Label>
+            <Label htmlFor="resume">Resume (Optional, PDF, max 5MB)</Label>
                 <div className="relative">
-                <Input id="resume" type="file" accept=".pdf" onChange={handleFileChange} required className="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20" disabled={isSubmitting}/>
+                <Input id="resume" type="file" accept=".pdf" onChange={handleFileChange} className="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20" disabled={isSubmitting}/>
             </div>
             {resumeFile && !isSubmitting && (
                 <div className="flex items-center gap-2 text-sm text-muted-foreground mt-2">
@@ -268,5 +254,3 @@ export default function JobDetailsPage() {
     </div>
   );
 }
-
-    

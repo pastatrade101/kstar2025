@@ -260,7 +260,7 @@
         "resumeUrl": { "type": "string" },
         "submittedAt": { "type": "string", "format": "date-time" }
       },
-      "required": ["jobId", "jobTitle", "userId", "userName", "userEmail", "resumeUrl", "submittedAt"]
+      "required": ["jobId", "jobTitle", "userId", "userName", "userEmail", "submittedAt"]
     }
   },
   "auth": {
@@ -391,5 +391,3 @@
     "rules": "rules_version = '2';\nservice firebase.storage {\n  match /b/{bucket}/o {\n    // Resume uploads: allow writes for authenticated users, but only for PDF files up to 5MB.\n    // The resume is stored with the application ID, only accessible by the user who owns it and admins.\n    match /resumes/{applicationId}/{fileName} {\n      allow read: if request.auth != null;\n      allow write: if request.auth != null\n                   && request.resource.size < 5 * 1024 * 1024\n                   && request.resource.contentType == 'application/pdf';\n    }\n  }\n}"
   }
 }
-
-    
