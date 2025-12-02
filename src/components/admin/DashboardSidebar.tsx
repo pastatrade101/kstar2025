@@ -19,7 +19,7 @@ const navigation = [
   { name: 'News & Events', href: '/admin/news', icon: Newspaper },
   { name: 'Contact Submissions', href: '/admin/contacts', icon: Mail },
   { name: 'Volunteers', href: '/admin/volunteers', icon: HeartHandshake },
-  { name: 'Users', href: '#', icon: Users },
+  { name: 'Users', href: '/admin/users', icon: Users },
   { name: 'Analytics', href: '#', icon: BarChart3 },
   { name: 'Calendar', href: '#', icon: Calendar },
   { name: 'Reports', href: '#', icon: FileText },
