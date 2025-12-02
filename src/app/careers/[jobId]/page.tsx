@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { useFirestore, useDoc } from '@/firebase';
+import { useState, useEffect } from 'react';
+import { useFirestore, useDoc, useUser } from '@/firebase';
 import { doc, collection, serverTimestamp, setDoc } from 'firebase/firestore';
 import { useMemoFirebase } from '@/firebase/provider';
 import { useParams, useRouter } from 'next/navigation';
@@ -15,7 +15,7 @@ import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { Progress } from '@/components/ui/progress';
-
+import { AuthGate } from '@/components/auth-gate';
 
 type Job = {
   id: string;
@@ -30,18 +30,11 @@ type Job = {
   } | null;
 };
 
-export default function JobDetailsPage() {
-  const router = useRouter();
-  const params = useParams();
+function ApplicationForm({ job }: { job: Job }) {
+  const { user } = useUser();
   const { toast } = useToast();
-  const jobId = params.jobId as string;
-
   const firestore = useFirestore();
-  const jobDocRef = useMemoFirebase(() => (firestore && jobId ? doc(firestore, 'jobs', jobId) : null), [firestore, jobId]);
-  const { data: job, isLoading, error } = useDoc<Job>(jobDocRef);
 
-  const [applicantName, setApplicantName] = useState('');
-  const [applicantEmail, setApplicantEmail] = useState('');
   const [applicantPhone, setApplicantPhone] = useState('');
   const [resumeFile, setResumeFile] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -69,8 +62,8 @@ export default function JobDetailsPage() {
 
   const onApplicationSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!job || !resumeFile || !applicantName || !applicantEmail || !applicationsCollectionRef) {
-      toast({ variant: 'destructive', title: 'Missing Information', description: 'Please fill out all required fields and upload your resume.' });
+    if (!job || !resumeFile || !user || !applicationsCollectionRef) {
+      toast({ variant: 'destructive', title: 'Missing Information', description: 'Please upload your resume to submit.' });
       return;
     }
 
@@ -79,7 +72,6 @@ export default function JobDetailsPage() {
 
     try {
         const storage = getStorage();
-        // Create a new document reference with a unique ID first
         const newApplicationRef = doc(applicationsCollectionRef);
         const newApplicationId = newApplicationRef.id;
     
@@ -103,12 +95,12 @@ export default function JobDetailsPage() {
           }, 
           () => {
             getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-              // Save application to Firestore using the pre-generated document reference
               const applicationData = {
                 jobId: job.id,
                 jobTitle: job.title,
-                name: applicantName,
-                email: applicantEmail,
+                userId: user.uid,
+                userName: user.displayName || user.email,
+                userEmail: user.email,
                 phone: applicantPhone,
                 resumeUrl: downloadURL,
                 submittedAt: serverTimestamp(),
@@ -120,9 +112,6 @@ export default function JobDetailsPage() {
                     description: 'Thank you for applying. We will review your application and be in touch.',
                 });
     
-                // Reset form
-                setApplicantName('');
-                setApplicantEmail('');
                 setApplicantPhone('');
                 setResumeFile(null);
                 const fileInput = document.getElementById('resume') as HTMLInputElement;
@@ -165,7 +154,63 @@ export default function JobDetailsPage() {
     }
   };
 
-  if (isLoading) {
+  return (
+    <Card>
+        <CardHeader>
+        <CardTitle>Apply for this Position</CardTitle>
+        <CardDescription>
+            You are applying as <span className="font-semibold text-primary">{user?.displayName || user?.email}</span>.
+        </CardDescription>
+        </CardHeader>
+        <CardContent>
+        <form onSubmit={onApplicationSubmit} className="space-y-6">
+            <div className="space-y-2">
+                <Label htmlFor="phone">Phone Number (Optional)</Label>
+                <Input id="phone" placeholder="+1 234 567 890" value={applicantPhone} onChange={e => setApplicantPhone(e.target.value)} disabled={isSubmitting} />
+            </div>
+            <div className="space-y-2">
+            <Label htmlFor="resume">Resume (PDF, max 5MB)</Label>
+                <div className="relative">
+                <Input id="resume" type="file" accept=".pdf" onChange={handleFileChange} required className="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20" disabled={isSubmitting}/>
+            </div>
+            {resumeFile && !isSubmitting && (
+                <div className="flex items-center gap-2 text-sm text-muted-foreground mt-2">
+                <FileText className="h-4 w-4" />
+                <span>{resumeFile.name}</span>
+                </div>
+            )}
+            </div>
+            
+            {isSubmitting && uploadProgress !== null && (
+            <div className="space-y-2">
+                <Label>Uploading Resume...</Label>
+                <Progress value={uploadProgress} className="w-full" />
+                <p className="text-sm text-muted-foreground text-center">{Math.round(uploadProgress)}%</p>
+            </div>
+            )}
+
+            <Button type="submit" className="w-full" disabled={isSubmitting}>
+            {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Send className="mr-2 h-4 w-4" />}
+            {isSubmitting ? 'Submitting...' : 'Submit Application'}
+            </Button>
+        </form>
+        </CardContent>
+    </Card>
+  )
+}
+
+export default function JobDetailsPage() {
+  const router = useRouter();
+  const params = useParams();
+  const jobId = params.jobId as string;
+  const { user, isUserLoading } = useUser();
+
+  const firestore = useFirestore();
+  const jobDocRef = useMemoFirebase(() => (firestore && jobId ? doc(firestore, 'jobs', jobId) : null), [firestore, jobId]);
+  const { data: job, isLoading, error } = useDoc<Job>(jobDocRef);
+
+
+  if (isLoading || isUserLoading) {
     return (
       <div className="flex justify-center items-center h-[60vh]">
         <Loader2 className="h-12 w-12 animate-spin text-primary" />
@@ -216,55 +261,12 @@ export default function JobDetailsPage() {
           </div>
 
           <div className="lg:col-span-1">
-            <Card>
-              <CardHeader>
-                <CardTitle>Apply for this Position</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <form onSubmit={onApplicationSubmit} className="space-y-6">
-                  <div className="space-y-2">
-                    <Label htmlFor="name">Full Name</Label>
-                    <Input id="name" placeholder="John Doe" required value={applicantName} onChange={e => setApplicantName(e.target.value)} disabled={isSubmitting} />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
-                    <Input id="email" type="email" placeholder="john.doe@example.com" required value={applicantEmail} onChange={e => setApplicantEmail(e.target.value)} disabled={isSubmitting} />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="phone">Phone Number (Optional)</Label>
-                    <Input id="phone" placeholder="+1 234 567 890" value={applicantPhone} onChange={e => setApplicantPhone(e.target.value)} disabled={isSubmitting} />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="resume">Resume (PDF, max 5MB)</Label>
-                      <div className="relative">
-                      <Input id="resume" type="file" accept=".pdf" onChange={handleFileChange} required className="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20" disabled={isSubmitting}/>
-                    </div>
-                    {resumeFile && !isSubmitting && (
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground mt-2">
-                        <FileText className="h-4 w-4" />
-                        <span>{resumeFile.name}</span>
-                      </div>
-                    )}
-                  </div>
-                  
-                  {isSubmitting && uploadProgress !== null && (
-                    <div className="space-y-2">
-                      <Label>Uploading Resume...</Label>
-                      <Progress value={uploadProgress} className="w-full" />
-                      <p className="text-sm text-muted-foreground text-center">{Math.round(uploadProgress)}%</p>
-                    </div>
-                  )}
-
-                  <Button type="submit" className="w-full" disabled={isSubmitting}>
-                    {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Send className="mr-2 h-4 w-4" />}
-                    {isSubmitting ? 'Submitting...' : 'Submit Application'}
-                  </Button>
-                </form>
-              </CardContent>
-            </Card>
+             { user ? <ApplicationForm job={job} /> : <AuthGate /> }
           </div>
         </div>
       </div>
     </div>
   );
 }
+
+    

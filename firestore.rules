@@ -51,12 +51,15 @@ service cloud.firestore {
     }
 
     match /job_applications/{applicationId} {
-      allow create: if true; // Anyone can submit an application
-      allow get, update, delete: if request.auth != null; // Admins can manage individual applications
+      // Allow creation only if the user is authenticated and the userId matches their own UID.
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
+      // Admins can read, update, or delete any individual application.
+      allow get, update, delete: if request.auth != null; 
     }
 
-    match /job_applications {
-        allow list: if request.auth != null; // Admins can list all applications
+    match /job_applications/{allApplications=**} {
+      // Admins can list all applications.
+      allow list: if request.auth != null;
     }
     
     // Fallback for any other path - deny by default
@@ -65,3 +68,5 @@ service cloud.firestore {
     }
   }
 }
+
+    

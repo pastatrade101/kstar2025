@@ -25,8 +25,8 @@ type JobApplication = {
   id: string;
   jobId: string;
   jobTitle: string;
-  name: string;
-  email: string;
+  userName: string;
+  userEmail: string;
   phone?: string;
   resumeUrl: string;
   submittedAt: {
@@ -102,9 +102,9 @@ export default function JobApplicationsPage() {
                     )}
                     {applications?.map((item) => (
                         <TableRow key={item.id} className='dark:border-slate-800'>
-                            <TableCell className="font-medium">{item.name}</TableCell>
+                            <TableCell className="font-medium">{item.userName}</TableCell>
                             <TableCell>
-                                <div>{item.email}</div>
+                                <div>{item.userEmail}</div>
                                 {item.phone && <div className="text-muted-foreground text-xs">{item.phone}</div>}
                             </TableCell>
                             <TableCell>
@@ -155,3 +155,4 @@ export default function JobApplicationsPage() {
   );
 }
 
+    
