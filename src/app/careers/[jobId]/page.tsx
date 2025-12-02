@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useFirestore, useDoc, addDocumentNonBlocking } from '@/firebase';
+import { useFirestore, useDoc, setDocumentNonBlocking } from '@/firebase';
 import { doc, collection, serverTimestamp, setDoc } from 'firebase/firestore';
 import { useMemoFirebase } from '@/firebase/provider';
 import { useParams, useRouter } from 'next/navigation';
@@ -77,70 +77,92 @@ export default function JobDetailsPage() {
     setIsSubmitting(true);
     setUploadProgress(0);
 
-    const storage = getStorage();
-    // Create a new document reference with a unique ID first
-    const newApplicationRef = doc(applicationsCollectionRef);
-    const newApplicationId = newApplicationRef.id;
+    try {
+        const storage = getStorage();
+        // Create a new document reference with a unique ID first
+        const newApplicationRef = doc(applicationsCollectionRef);
+        const newApplicationId = newApplicationRef.id;
+    
+        const storageRef = ref(storage, `resumes/${newApplicationId}/${resumeFile.name}`);
+        const uploadTask = uploadBytesResumable(storageRef, resumeFile);
+    
+        uploadTask.on('state_changed', 
+          (snapshot) => {
+            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            setUploadProgress(progress);
+          }, 
+          (error) => {
+            console.error("Upload error:", error);
+            toast({
+              variant: 'destructive',
+              title: 'Upload Failed',
+              description: error.message || 'An unexpected error occurred during upload. Please try again.',
+            });
+            setIsSubmitting(false);
+            setUploadProgress(null);
+          }, 
+          () => {
+            getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+              // Save application to Firestore using the pre-generated document reference
+              const applicationData = {
+                jobId: job.id,
+                jobTitle: job.title,
+                name: applicantName,
+                email: applicantEmail,
+                phone: applicantPhone,
+                resumeUrl: downloadURL,
+                submittedAt: serverTimestamp(),
+              };
 
-    const storageRef = ref(storage, `resumes/${newApplicationId}/${resumeFile.name}`);
-    const uploadTask = uploadBytesResumable(storageRef, resumeFile);
-
-    uploadTask.on('state_changed', 
-      (snapshot) => {
-        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-        setUploadProgress(progress);
-      }, 
-      (error) => {
-        console.error("Upload error:", error);
+              setDoc(newApplicationRef, applicationData).then(() => {
+                toast({
+                    title: 'Application Submitted!',
+                    description: 'Thank you for applying. We will review your application and be in touch.',
+                });
+    
+                // Reset form
+                setApplicantName('');
+                setApplicantEmail('');
+                setApplicantPhone('');
+                setResumeFile(null);
+                const fileInput = document.getElementById('resume') as HTMLInputElement;
+                if (fileInput) {
+                    fileInput.value = '';
+                }
+                setIsSubmitting(false);
+                setUploadProgress(null);
+              }).catch((firestoreError) => {
+                console.error("Firestore save error:", firestoreError);
+                toast({
+                    variant: 'destructive',
+                    title: 'Submission Failed',
+                    description: 'Your resume was uploaded, but we failed to save your application. Please try again.',
+                });
+                setIsSubmitting(false);
+                setUploadProgress(null);
+              });
+            }).catch((err) => {
+                console.error("Get Download URL error:", err);
+                toast({
+                  variant: 'destructive',
+                  title: 'Submission Failed',
+                  description: err.message || 'An unexpected error occurred after upload. Please try again.',
+                });
+                setIsSubmitting(false);
+                setUploadProgress(null);
+            });
+          }
+        );
+    } catch (error) {
+        console.error("Application submission error:", error);
         toast({
-          variant: 'destructive',
-          title: 'Upload Failed',
-          description: error.message || 'An unexpected error occurred during upload. Please try again.',
+            variant: 'destructive',
+            title: 'Submission Failed',
+            description: 'An unexpected error occurred. Please try again.',
         });
         setIsSubmitting(false);
         setUploadProgress(null);
-      }, 
-      () => {
-        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-          // Save application to Firestore using the pre-generated document reference
-          setDoc(newApplicationRef, {
-            jobId: job.id,
-            jobTitle: job.title,
-            name: applicantName,
-            email: applicantEmail,
-            phone: applicantPhone,
-            resumeUrl: downloadURL,
-            submittedAt: serverTimestamp(),
-          });
-
-          toast({
-            title: 'Application Submitted!',
-            description: 'Thank you for applying. We will review your application and be in touch.',
-          });
-
-          // Reset form
-          setApplicantName('');
-          setApplicantEmail('');
-          setApplicantPhone('');
-          setResumeFile(null);
-          const fileInput = document.getElementById('resume') as HTMLInputElement;
-          if (fileInput) {
-            fileInput.value = '';
-          }
-
-        }).catch((err) => {
-            console.error("Application submission error:", err);
-            toast({
-              variant: 'destructive',
-              title: 'Submission Failed',
-              description: err.message || 'An unexpected error occurred. Please try again.',
-            });
-        }).finally(() => {
-            setIsSubmitting(false);
-            setUploadProgress(null);
-        });
-      }
-    );
+    }
   };
 
   if (isLoading) {
@@ -246,3 +268,5 @@ export default function JobDetailsPage() {
     </div>
   );
 }
+
+    
