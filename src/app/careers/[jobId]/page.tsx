@@ -6,7 +6,7 @@ import { doc, collection, serverTimestamp } from 'firebase/firestore';
 import { useMemoFirebase } from '@/firebase/provider';
 import { useParams, useRouter } from 'next/navigation';
 import { Loader2, MapPin, Briefcase, Clock, ArrowLeft, Upload, FileText, Send } from 'lucide-react';
-import HomeClient from '@/app/home-client';
+import HomeClient from '@/components/home-client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -78,7 +78,7 @@ export default function JobDetailsPage() {
     try {
       // 1. Upload resume to Firebase Storage
       const storage = getStorage();
-      const storageRef = ref(storage, `resumes/${applicationsCollectionRef.id}/${resumeFile.name}`);
+      const storageRef = ref(storage, `resumes/${applicationsCollectionRef.id}/${Date.now()}_${resumeFile.name}`);
       await uploadBytes(storageRef, resumeFile);
       const resumeUrl = await getDownloadURL(storageRef);
 
@@ -103,6 +103,11 @@ export default function JobDetailsPage() {
       setApplicantEmail('');
       setApplicantPhone('');
       setResumeFile(null);
+      // We also need to reset the file input element itself
+      const fileInput = document.getElementById('resume') as HTMLInputElement;
+      if (fileInput) {
+        fileInput.value = '';
+      }
       
     } catch (err: any) {
       console.error("Application submission error:", err);
@@ -216,4 +221,3 @@ export default function JobDetailsPage() {
     </HomeClient>
   );
 }
-

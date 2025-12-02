@@ -292,7 +292,7 @@
           "schema": {
             "$ref": "#/backend/entities/Instructor"
           },
-          "description": "Stores information about instructors.  No specific authorization fields are needed, as access is managed through structural segregation (separate collection).",
+          "description": "Stores information about instructors.  No specific authorization fields are needed, as access is managed through structural segregation (separate.collection).",
           "params": [
             {
               "name": "instructorId",
