@@ -14,17 +14,14 @@ export function initiateAnonymousSignIn(authInstance: Auth): Promise<void> {
 }
 
 /**
- * Creates a new user with email and password, and updates their profile.
+ * Creates a new user with email and password.
  * This is an async function that should be awaited to handle completion and errors.
  * @param authInstance The Firebase Auth instance.
  * @param email The user's email.
  * @param password The user's password.
- * @param displayName The user's display name.
  */
-export async function signUpWithEmailAndPassword(authInstance: Auth, email: string, password: string, displayName: string): Promise<void> {
-  const userCredential = await createUserWithEmailAndPassword(authInstance, email, password);
-  const user = userCredential.user;
-  await updateProfile(user, { displayName });
+export async function signUpWithEmailAndPassword(authInstance: Auth, email: string, password: string): Promise<void> {
+  await createUserWithEmailAndPassword(authInstance, email, password);
 }
 
 

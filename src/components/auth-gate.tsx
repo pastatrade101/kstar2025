@@ -26,7 +26,6 @@ const loginSchema = z.object({
 });
 
 const registerSchema = z.object({
-  name: z.string().min(2, 'Name is too short'),
   email: z.string().email(),
   password: z.string().min(6, 'Password must be at least 6 characters'),
 });
@@ -45,7 +44,7 @@ export function AuthGate() {
 
   const registerForm = useForm<z.infer<typeof registerSchema>>({
     resolver: zodResolver(registerSchema),
-    defaultValues: { name: '', email: '', password: '' },
+    defaultValues: { email: '', password: '' },
   });
 
   function onLoginSubmit(values: z.infer<typeof loginSchema>) {
@@ -74,7 +73,7 @@ export function AuthGate() {
   async function onRegisterSubmit(values: z.infer<typeof registerSchema>) {
     setIsLoading(true);
     try {
-        await signUpWithEmailAndPassword(auth, values.email, values.password, values.name);
+        await signUpWithEmailAndPassword(auth, values.email, values.password);
         toast({
             title: "Account Created!",
             description: "You have been successfully signed up and logged in.",
@@ -134,17 +133,6 @@ export function AuthGate() {
             ) : (
                 <Form {...registerForm}>
                     <form onSubmit={registerForm.handleSubmit(onRegisterSubmit)} className="space-y-4">
-                        <FormField
-                            control={registerForm.control}
-                            name="name"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Full Name</FormLabel>
-                                    <FormControl><Input type="text" placeholder="John Doe" {...field} /></FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
                         <FormField
                             control={registerForm.control}
                             name="email"
