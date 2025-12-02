@@ -1,11 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useFirestore, useDoc, useUser } from '@/firebase';
 import { doc, collection, serverTimestamp, setDoc } from 'firebase/firestore';
 import { useMemoFirebase } from '@/firebase/provider';
 import { useParams, useRouter } from 'next/navigation';
-import { Loader2, MapPin, Briefcase, Clock, ArrowLeft, Upload, FileText, Send } from 'lucide-react';
+import { Loader2, MapPin, Briefcase, ArrowLeft, Send } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -13,9 +13,8 @@ import { Separator } from '@/components/ui/separator';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { Progress } from '@/components/ui/progress';
 import { AuthGate } from '@/components/auth-gate';
+import { Textarea } from '@/components/ui/textarea';
 
 type Job = {
   id: string;
@@ -36,24 +35,8 @@ function ApplicationForm({ job }: { job: Job }) {
   const firestore = useFirestore();
 
   const [applicantPhone, setApplicantPhone] = useState('');
-  const [resumeFile, setResumeFile] = useState<File | null>(null);
+  const [coverLetter, setCoverLetter] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState<number | null>(null);
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      const file = e.target.files[0];
-      if (file.type !== 'application/pdf') {
-        toast({ variant: 'destructive', title: 'Invalid File Type', description: 'Please upload a PDF file.' });
-        return;
-      }
-      if (file.size > 5 * 1024 * 1024) { // 5MB
-        toast({ variant: 'destructive', title: 'File Too Large', description: 'Please upload a file smaller than 5MB.' });
-        return;
-      }
-      setResumeFile(file);
-    }
-  };
 
   const onApplicationSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -63,41 +46,10 @@ function ApplicationForm({ job }: { job: Job }) {
     }
 
     setIsSubmitting(true);
-    setUploadProgress(0);
 
-    // Step 1: Create a new document reference in Firestore to get a unique ID.
     const newApplicationRef = doc(collection(firestore, 'job_applications'));
-    const newApplicationId = newApplicationRef.id;
 
     try {
-      let resumeUrl = '';
-
-      if (resumeFile) {
-        // Step 2: Use the unique ID for the storage path and upload the file.
-        const storage = getStorage();
-        const storageRef = ref(storage, `resumes/${newApplicationId}/${resumeFile.name}`);
-        const uploadTask = uploadBytesResumable(storageRef, resumeFile);
-
-        await new Promise<void>((resolve, reject) => {
-          uploadTask.on('state_changed',
-            (snapshot) => {
-              const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-              setUploadProgress(progress);
-            },
-            (error) => {
-              console.error("Upload error:", error);
-              reject(error); // Reject the promise on error
-            },
-            async () => {
-              // On success, get the download URL.
-              resumeUrl = await getDownloadURL(uploadTask.snapshot.ref);
-              resolve(); // Resolve the promise on completion
-            }
-          );
-        });
-      }
-      
-      // Step 3: Save the application data (including the URL) to Firestore.
       const applicationData = {
         jobId: job.id,
         jobTitle: job.title,
@@ -105,7 +57,7 @@ function ApplicationForm({ job }: { job: Job }) {
         userName: user.displayName || user.email,
         userEmail: user.email,
         phone: applicantPhone,
-        resumeUrl: resumeUrl,
+        coverLetter: coverLetter,
         submittedAt: serverTimestamp(),
       };
 
@@ -118,11 +70,7 @@ function ApplicationForm({ job }: { job: Job }) {
 
       // Reset form
       setApplicantPhone('');
-      setResumeFile(null);
-      const fileInput = document.getElementById('resume') as HTMLInputElement;
-      if (fileInput) {
-        fileInput.value = '';
-      }
+      setCoverLetter('');
 
     } catch (error) {
       console.error("Application submission error:", error);
@@ -133,7 +81,6 @@ function ApplicationForm({ job }: { job: Job }) {
       });
     } finally {
       setIsSubmitting(false);
-      setUploadProgress(null);
     }
   };
 
@@ -152,25 +99,9 @@ function ApplicationForm({ job }: { job: Job }) {
                 <Input id="phone" placeholder="+1 234 567 890" value={applicantPhone} onChange={e => setApplicantPhone(e.target.value)} disabled={isSubmitting} />
             </div>
             <div className="space-y-2">
-            <Label htmlFor="resume">Resume (Optional, PDF, max 5MB)</Label>
-                <div className="relative">
-                <Input id="resume" type="file" accept=".pdf" onChange={handleFileChange} className="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20" disabled={isSubmitting}/>
+                <Label htmlFor="coverLetter">Cover Letter</Label>
+                <Textarea id="coverLetter" placeholder="Tell us why you're a good fit for this role..." value={coverLetter} onChange={e => setCoverLetter(e.target.value)} disabled={isSubmitting} rows={8} />
             </div>
-            {resumeFile && !isSubmitting && (
-                <div className="flex items-center gap-2 text-sm text-muted-foreground mt-2">
-                <FileText className="h-4 w-4" />
-                <span>{resumeFile.name}</span>
-                </div>
-            )}
-            </div>
-            
-            {isSubmitting && uploadProgress !== null && (
-            <div className="space-y-2">
-                <Label>Uploading Resume...</Label>
-                <Progress value={uploadProgress} className="w-full" />
-                <p className="text-sm text-muted-foreground text-center">{Math.round(uploadProgress)}%</p>
-            </div>
-            )}
 
             <Button type="submit" className="w-full" disabled={isSubmitting || !user}>
             {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Send className="mr-2 h-4 w-4" />}

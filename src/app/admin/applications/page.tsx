@@ -3,7 +3,7 @@
 import { useFirestore, useCollection, deleteDocumentNonBlocking } from '@/firebase';
 import { collection, query, orderBy, doc } from 'firebase/firestore';
 import { useMemoFirebase } from '@/firebase/provider';
-import { Loader2, Trash2, Users, Download, Briefcase, ExternalLink } from 'lucide-react';
+import { Loader2, Trash2, Users, Download, Briefcase, ExternalLink, FileText } from 'lucide-react';
 import { format } from 'date-fns';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -28,7 +28,7 @@ type JobApplication = {
   userName: string;
   userEmail: string;
   phone?: string;
-  resumeUrl: string;
+  coverLetter: string;
   submittedAt: {
     seconds: number;
     nanoseconds: number;
@@ -74,7 +74,7 @@ export default function JobApplicationsPage() {
                         <TableHead>Contact</TableHead>
                         <TableHead>Applied For</TableHead>
                         <TableHead>Submitted On</TableHead>
-                        <TableHead>Resume</TableHead>
+                        <TableHead>Cover Letter</TableHead>
                         <TableHead className="text-right">Actions</TableHead>
                     </TableRow>
                 </TableHeader>
@@ -116,13 +116,10 @@ export default function JobApplicationsPage() {
                             <TableCell>
                                 {item.submittedAt ? format(new Date(item.submittedAt.seconds * 1000), 'PPP') : 'N/A'}
                             </TableCell>
-                            <TableCell>
-                                <Button asChild variant="outline" size="sm">
-                                    <a href={item.resumeUrl} target="_blank" rel="noopener noreferrer">
-                                        <Download className="mr-2 h-4 w-4" />
-                                        Download
-                                    </a>
-                                </Button>
+                            <TableCell className="max-w-sm">
+                                <p className='whitespace-pre-wrap text-sm text-muted-foreground line-clamp-4'>
+                                    {item.coverLetter || '-'}
+                                </p>
                             </TableCell>
                             <TableCell className="text-right">
                                 <AlertDialog>
@@ -154,5 +151,3 @@ export default function JobApplicationsPage() {
     </Card>
   );
 }
-
-    
