@@ -3,7 +3,7 @@
 import { useFirestore, useCollection, deleteDocumentNonBlocking, updateDocumentNonBlocking, useUser, useDoc } from '@/firebase';
 import { collection, query, orderBy, doc, where } from 'firebase/firestore';
 import { useMemoFirebase } from '@/firebase/provider';
-import { Loader2, Trash2, Users, Download, Briefcase, ExternalLink, FileText, ChevronDown } from 'lucide-react';
+import { Loader2, Trash2, Users, Download, Briefcase, ExternalLink, FileText, ChevronDown, Link as LinkIcon, FileJson } from 'lucide-react';
 import { format } from 'date-fns';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -43,6 +43,8 @@ type JobApplication = {
   userEmail: string;
   phone?: string;
   coverLetter: string;
+  linkedinUrl?: string;
+  cvUrl?: string;
   submittedAt: {
     seconds: number;
     nanoseconds: number;
@@ -116,7 +118,7 @@ export default function JobApplicationsPage() {
                         <TableHead>Applied For</TableHead>
                         <TableHead>Submitted</TableHead>
                         <TableHead>Status</TableHead>
-                        <TableHead>Cover Letter</TableHead>
+                        <TableHead>Documents</TableHead>
                         <TableHead className="text-right">Actions</TableHead>
                     </TableRow>
                 </TableHeader>
@@ -144,21 +146,21 @@ export default function JobApplicationsPage() {
                     )}
                     {applications?.map((item) => (
                         <TableRow key={item.id} className='dark:border-slate-800'>
-                            <TableCell className="font-medium">{item.userName}</TableCell>
-                            <TableCell>
+                            <TableCell className="font-medium align-top">{item.userName}</TableCell>
+                            <TableCell className="align-top">
                                 <div>{item.userEmail}</div>
                                 {item.phone && <div className="text-muted-foreground text-xs">{item.phone}</div>}
                             </TableCell>
-                            <TableCell>
+                            <TableCell className="align-top">
                                 <Link href={`/careers/${item.jobId}`} target="_blank" className="hover:underline flex items-center gap-1">
                                     {item.jobTitle}
                                     <ExternalLink className="h-3 w-3" />
                                 </Link>
                             </TableCell>
-                            <TableCell>
+                            <TableCell className="align-top">
                                 {item.submittedAt ? format(new Date(item.submittedAt.seconds * 1000), 'PPP') : 'N/A'}
                             </TableCell>
-                            <TableCell>
+                            <TableCell className="align-top">
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
                                     <Button variant="ghost" className={`text-xs h-7 px-2 font-semibold ${statusColors[item.status]}`}>
@@ -178,10 +180,10 @@ export default function JobApplicationsPage() {
                                     </DropdownMenuContent>
                                 </DropdownMenu>
                             </TableCell>
-                            <TableCell>
+                            <TableCell className="space-y-2 align-top">
                                 <Dialog>
                                     <DialogTrigger asChild>
-                                        <Button variant="outline" size="sm">
+                                        <Button variant="outline" size="sm" className='w-full justify-start'>
                                             <FileText className="mr-2 h-4 w-4" />
                                             View Letter
                                         </Button>
@@ -198,8 +200,24 @@ export default function JobApplicationsPage() {
                                         </div>
                                     </DialogContent>
                                 </Dialog>
+                                {item.linkedinUrl && (
+                                    <Button variant="outline" size="sm" asChild className='w-full justify-start'>
+                                        <a href={item.linkedinUrl} target="_blank" rel="noopener noreferrer">
+                                            <LinkIcon className="mr-2 h-4 w-4" />
+                                            LinkedIn
+                                        </a>
+                                    </Button>
+                                )}
+                                {item.cvUrl && (
+                                    <Button variant="outline" size="sm" asChild className='w-full justify-start'>
+                                        <a href={item.cvUrl} target="_blank" rel="noopener noreferrer">
+                                            <FileJson className="mr-2 h-4 w-4" />
+                                            CV
+                                        </a>
+                                    </Button>
+                                )}
                             </TableCell>
-                            <TableCell className="text-right">
+                            <TableCell className="text-right align-top">
                                 <AlertDialog>
                                     <AlertDialogTrigger asChild>
                                         <Button variant="ghost" size="icon">
@@ -229,3 +247,5 @@ export default function JobApplicationsPage() {
     </Card>
   );
 }
+
+    

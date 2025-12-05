@@ -260,7 +260,8 @@
         "type": { "type": "string", "enum": ["Full-time", "Part-time", "Contract", "Internship"] },
         "description": { "type": "string" },
         "postedAt": { "type": "string", "format": "date-time" },
-        "applicationDeadline": { "type": "string", "format": "date" }
+        "applicationDeadline": { "type": "string", "format": "date" },
+        "coverImageUrl": { "type": "string", "format": "uri" }
       },
       "required": ["title", "department", "location", "type", "description", "postedAt", "applicationDeadline"]
     },
@@ -277,6 +278,8 @@
         "userEmail": { "type": "string", "format": "email" },
         "phone": { "type": "string" },
         "coverLetter": { "type": "string" },
+        "linkedinUrl": { "type": "string", "format": "uri" },
+        "cvUrl": { "type": "string", "format": "uri" },
         "submittedAt": { "type": "string", "format": "date-time" },
         "status": {
           "type": "string",
@@ -424,3 +427,5 @@
     "rules": "rules_version = '2';\nservice firebase.storage {\n  match /b/{bucket}/o {\n    // No rules needed as file uploads have been removed\n  }\n}"
   }
 }
+
+    

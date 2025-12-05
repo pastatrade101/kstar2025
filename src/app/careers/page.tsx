@@ -6,9 +6,10 @@ import { useMemoFirebase } from '@/firebase/provider';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, MapPin, Briefcase, Clock, ArrowRight, CalendarDays } from 'lucide-react';
+import { Loader2, MapPin, Briefcase, Clock, ArrowRight, CalendarDays, Image as ImageIcon } from 'lucide-react';
 import Link from 'next/link';
 import { formatDistanceToNow, format } from 'date-fns';
+import Image from 'next/image';
 
 type Job = {
   id: string;
@@ -22,6 +23,7 @@ type Job = {
     nanoseconds: number;
   } | null;
   applicationDeadline: string;
+  coverImageUrl?: string;
 };
 
 export default function CareersPage() {
@@ -61,7 +63,16 @@ export default function CareersPage() {
           {jobs && jobs.length > 0 && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {jobs.map((job) => (
-                <Card key={job.id} className="flex flex-col">
+                <Card key={job.id} className="flex flex-col group">
+                  <div className="aspect-video relative overflow-hidden rounded-t-lg">
+                    {job.coverImageUrl ? (
+                        <Image src={job.coverImageUrl} alt={job.title} fill className="object-cover group-hover:scale-105 transition-transform duration-300" />
+                    ) : (
+                        <div className="w-full h-full bg-muted flex items-center justify-center">
+                            <ImageIcon className="w-12 h-12 text-muted-foreground" />
+                        </div>
+                    )}
+                  </div>
                   <CardHeader>
                     <CardTitle>{job.title}</CardTitle>
                     <CardDescription>{job.department}</CardDescription>
@@ -102,3 +113,5 @@ export default function CareersPage() {
     </div>
   );
 }
+
+    

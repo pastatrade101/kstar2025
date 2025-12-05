@@ -5,7 +5,7 @@ import { useFirestore, useDoc, useUser, useCollection, addDocumentNonBlocking } 
 import { doc, collection, serverTimestamp, query, where, limit } from 'firebase/firestore';
 import { useMemoFirebase } from '@/firebase/provider';
 import { useParams, useRouter } from 'next/navigation';
-import { Loader2, MapPin, Briefcase, ArrowLeft, Send, CheckCircle2, CalendarDays } from 'lucide-react';
+import { Loader2, MapPin, Briefcase, ArrowLeft, Send, CheckCircle2, CalendarDays, Link as LinkIcon, FileJson } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -16,6 +16,7 @@ import { useToast } from '@/hooks/use-toast';
 import { AuthGate } from '@/components/auth-gate';
 import { Textarea } from '@/components/ui/textarea';
 import { format } from 'date-fns';
+import Image from 'next/image';
 
 type Job = {
   id: string;
@@ -29,6 +30,7 @@ type Job = {
     nanoseconds: number;
   } | null;
   applicationDeadline: string;
+  coverImageUrl?: string;
 };
 
 type JobApplication = {
@@ -46,9 +48,10 @@ function ApplicationForm({ job, onApplicationSuccess }: { job: Job, onApplicatio
   const firestore = useFirestore();
   const applicationsCollectionRef = useMemoFirebase(() => collection(firestore, 'job_applications'), [firestore]);
 
-
   const [applicantPhone, setApplicantPhone] = useState('');
   const [coverLetter, setCoverLetter] = useState('');
+  const [linkedinUrl, setLinkedinUrl] = useState('');
+  const [cvUrl, setCvUrl] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const onApplicationSubmit = async (e: React.FormEvent) => {
@@ -69,6 +72,8 @@ function ApplicationForm({ job, onApplicationSuccess }: { job: Job, onApplicatio
         userEmail: user.email,
         phone: applicantPhone,
         coverLetter: coverLetter,
+        linkedinUrl: linkedinUrl,
+        cvUrl: cvUrl,
         submittedAt: serverTimestamp(),
         status: 'Received',
       };
@@ -83,6 +88,8 @@ function ApplicationForm({ job, onApplicationSuccess }: { job: Job, onApplicatio
       // Reset form and notify parent
       setApplicantPhone('');
       setCoverLetter('');
+      setLinkedinUrl('');
+      setCvUrl('');
       onApplicationSuccess();
 
     } catch (error) {
@@ -107,13 +114,23 @@ function ApplicationForm({ job, onApplicationSuccess }: { job: Job, onApplicatio
         </CardHeader>
         <CardContent>
         <form onSubmit={onApplicationSubmit} className="space-y-6">
-            <div className="space-y-2">
-                <Label htmlFor="phone">Phone Number (Optional)</Label>
-                <Input id="phone" placeholder="+1 234 567 890" value={applicantPhone} onChange={e => setApplicantPhone(e.target.value)} disabled={isSubmitting} />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                    <Label htmlFor="phone">Phone Number (Optional)</Label>
+                    <Input id="phone" placeholder="+1 234 567 890" value={applicantPhone} onChange={e => setApplicantPhone(e.target.value)} disabled={isSubmitting} />
+                </div>
+                <div className="space-y-2">
+                    <Label htmlFor="linkedin">LinkedIn URL (Optional)</Label>
+                    <Input id="linkedin" type="url" placeholder="https://linkedin.com/in/..." value={linkedinUrl} onChange={e => setLinkedinUrl(e.target.value)} disabled={isSubmitting} />
+                </div>
+            </div>
+             <div className="space-y-2">
+                <Label htmlFor="cv">CV/Resume URL (Optional)</Label>
+                <Input id="cv" type="url" placeholder="https://example.com/resume.pdf" value={cvUrl} onChange={e => setCvUrl(e.target.value)} disabled={isSubmitting} />
             </div>
             <div className="space-y-2">
                 <Label htmlFor="coverLetter">Cover Letter</Label>
-                <Textarea id="coverLetter" placeholder="Tell us why you're a good fit for this role..." value={coverLetter} onChange={e => setCoverLetter(e.target.value)} disabled={isSubmitting} rows={8} />
+                <Textarea id="coverLetter" placeholder="Tell us why you're a good fit for this role..." value={coverLetter} onChange={e => setCoverLetter(e.target.value)} disabled={isSubmitting} rows={8} required/>
             </div>
 
             <Button type="submit" className="w-full" disabled={isSubmitting || !user}>
@@ -199,7 +216,13 @@ export default function JobDetailsPage() {
 
   return (
     <div className="bg-secondary/30 pt-20">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-24">
+        {job.coverImageUrl && (
+             <div className="h-64 md:h-80 w-full relative">
+                <Image src={job.coverImageUrl} alt={job.title} fill className="object-cover" />
+                <div className="absolute inset-0 bg-black/50" />
+            </div>
+        )}
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24">
         <Button variant="ghost" onClick={() => router.back()} className="mb-8">
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back to All Jobs
@@ -238,3 +261,5 @@ export default function JobDetailsPage() {
     </div>
   );
 }
+
+    

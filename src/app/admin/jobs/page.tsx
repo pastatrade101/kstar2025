@@ -31,7 +31,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
-import { Loader2, PlusCircle, Trash2, Briefcase, MapPin, Clock, Calendar as CalendarIcon, CalendarDays } from 'lucide-react';
+import { Loader2, PlusCircle, Trash2, Briefcase, MapPin, Clock, Calendar as CalendarIcon, CalendarDays, Image as ImageIcon } from 'lucide-react';
 import { format, formatDistanceToNow } from 'date-fns';
 import { useFirestore, useCollection, addDocumentNonBlocking, deleteDocumentNonBlocking } from '@/firebase';
 import { collection, query, orderBy, doc, serverTimestamp } from 'firebase/firestore';
@@ -41,6 +41,7 @@ import { Badge } from '@/components/ui/badge';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import Image from 'next/image';
 
 
 const formSchema = z.object({
@@ -52,6 +53,7 @@ const formSchema = z.object({
   applicationDeadline: z.date({
     required_error: 'An application deadline is required.',
   }),
+  coverImageUrl: z.string().url({ message: 'Please enter a valid URL.' }).optional().or(z.literal('')),
 });
 
 type Job = z.infer<typeof formSchema> & {
@@ -77,6 +79,7 @@ export default function ManageJobsPage() {
       location: 'Dar es Salaam, Tanzania',
       type: 'Full-time',
       description: '',
+      coverImageUrl: '',
     },
   });
 
@@ -94,6 +97,7 @@ export default function ManageJobsPage() {
         type: 'Full-time',
         description: '',
         applicationDeadline: undefined,
+        coverImageUrl: '',
     });
   }
 
@@ -215,6 +219,19 @@ export default function ManageJobsPage() {
                     </FormItem>
                   )}
                 />
+                 <FormField
+                  control={form.control}
+                  name="coverImageUrl"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Cover Image URL (Optional)</FormLabel>
+                      <FormControl>
+                        <Input type="url" placeholder="https://example.com/image.jpg" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
                 <FormField
                   control={form.control}
                   name="description"
@@ -282,8 +299,19 @@ export default function ManageJobsPage() {
                           {jobItems?.map((item) => (
                               <TableRow key={item.id} className='dark:border-slate-800'>
                                   <TableCell className="font-medium align-top">
-                                      <div className='font-bold text-base'>{item.title}</div>
-                                      <div className='text-muted-foreground'>{item.department}</div>
+                                    <div className="flex items-center gap-4">
+                                        {item.coverImageUrl ? (
+                                            <Image src={item.coverImageUrl} alt={item.title} width={64} height={64} className="rounded-md object-cover aspect-square" />
+                                        ) : (
+                                            <div className="w-16 h-16 bg-muted rounded-md flex items-center justify-center">
+                                                <ImageIcon className="w-8 h-8 text-muted-foreground" />
+                                            </div>
+                                        )}
+                                        <div>
+                                            <div className='font-bold text-base'>{item.title}</div>
+                                            <div className='text-muted-foreground'>{item.department}</div>
+                                        </div>
+                                    </div>
                                   </TableCell>
                                   <TableCell className='align-top'>
                                     <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1">
@@ -337,3 +365,5 @@ export default function ManageJobsPage() {
     </div>
   );
 }
+
+    
