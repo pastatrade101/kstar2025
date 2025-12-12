@@ -88,7 +88,7 @@ import {
 
               <div className="hidden lg:block relative h-[500px]">
                 <Image
-                    src="https://images.unsplash.com/photo-1593113598332-cd288d649433?w=1920&q=80"
+                    src="https://firebasestorage.googleapis.com/v0/b/studio-4061903538-cceaf.firebasestorage.app/o/73996.jpg?alt=media&token=887b0866-bea8-4499-84c3-ddb420e2db2d"
                     alt="Children in a learning environment"
                     fill
                     className="object-cover rounded-2xl shadow-xl"
