@@ -75,7 +75,7 @@ import {
 
               <div className="hidden lg:block relative h-[500px]">
                 <Image
-                    src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1920&q=80"
+                    src="https://firebasestorage.googleapis.com/v0/b/studio-4061903538-cceaf.firebasestorage.app/o/127331.jpg?alt=media&token=3c00cb38-3c05-4cc0-87e0-912177275fef"
                     alt="Data analytics dashboard"
                     fill
                     className="object-cover rounded-2xl shadow-xl"
