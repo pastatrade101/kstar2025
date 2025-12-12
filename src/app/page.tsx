@@ -1,3 +1,4 @@
+
 import {
   ArrowRight,
   Target,
@@ -90,12 +91,12 @@ export default function Home() {
                 <div className="relative">
                   <div className="relative rounded-2xl overflow-hidden shadow-2xl">
                     <Image 
-                      src={heroImage?.imageUrl ?? ''}
-                      alt={heroImage?.description ?? 'Professional workspace'}
+                      src="https://firebasestorage.googleapis.com/v0/b/studio-4061903538-cceaf.firebasestorage.app/o/icon%404x.png?alt=media&token=45e36cf0-d0aa-41b8-8039-698aaa6e29e7"
+                      alt="Kstar Group Logo"
                       width={1080}
                       height={1200}
-                      className="w-full h-full md:h-[600px] object-cover"
-                      data-ai-hint={heroImage?.imageHint}
+                      className="w-full h-full md:h-[600px] object-contain"
+                      data-ai-hint="company logo"
                       priority
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-primary/30 to-transparent" />
