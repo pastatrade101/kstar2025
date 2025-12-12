@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useIsMobile } from '@/hooks/use-mobile';
+import Image from 'next/image';
 
 interface DashboardSidebarProps {
   isOpen: boolean;
@@ -57,9 +58,13 @@ export function DashboardSidebar({ isOpen, onClose }: DashboardSidebarProps) {
           {/* Logo & Close button */}
           <div className="flex h-16 items-center justify-between px-6 border-b border-slate-800 shrink-0">
             <Link href="/admin/dashboard" className="flex items-center gap-3">
-              <div className="size-8 rounded-lg bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center">
-                <span className="text-white font-bold">A</span>
-              </div>
+              <Image
+                src="https://firebasestorage.googleapis.com/v0/b/studio-4061903538-cceaf.firebasestorage.app/o/icon%404x.png?alt=media&token=45e36cf0-d0aa-41b8-8039-698aaa6e29e7"
+                alt="Logo"
+                width={32}
+                height={32}
+                className="rounded-lg"
+              />
               <span className="text-white font-semibold">Admin Panel</span>
             </Link>
             <Button

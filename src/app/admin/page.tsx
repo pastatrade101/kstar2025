@@ -19,6 +19,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { Loader2 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import Image from 'next/image';
 
 const formSchema = z.object({
   email: z.string().email({
@@ -66,9 +67,13 @@ export default function AdminLoginPage() {
       <Card className="w-full max-w-sm border-slate-200 dark:border-slate-800 dark:bg-slate-900">
         <CardHeader>
           <div className="flex items-center gap-3 mb-2">
-            <div className="size-10 rounded-lg bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center">
-              <span className="text-white font-bold text-xl">A</span>
-            </div>
+            <Image 
+              src="https://firebasestorage.googleapis.com/v0/b/studio-4061903538-cceaf.firebasestorage.app/o/icon%404x.png?alt=media&token=45e36cf0-d0aa-41b8-8039-698aaa6e29e7"
+              alt="Logo"
+              width={40}
+              height={40}
+              className="rounded-lg"
+            />
             <CardTitle className='text-2xl text-slate-900 dark:text-white'>Admin Panel Login</CardTitle>
           </div>
           <CardDescription>
