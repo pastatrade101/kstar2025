@@ -125,7 +125,7 @@ import {
               </div>
                 <div>
                 <div className='rounded-2xl shadow-xl overflow-hidden'>
-                  <Image src="https://firebasestorage.googleapis.com/v0/b/studio-4061903538-cceaf.firebasestorage.app/o/127331.jpg?alt=media&token=3c00cb38-3c05-4cc0-87e0-912177275fef" alt="Team analyzing data" width={800} height={600} className="w-full h-full object-cover" data-ai-hint="team data analysis"/>
+                  <Image src="https://firebasestorage.googleapis.com/v0/b/studio-4061903538-cceaf.firebasestorage.app/o/4864%20(1).jpg?alt=media&token=2c80ae9e-65c0-45af-8f51-23580deed6f7" alt="Team analyzing data" width={800} height={600} className="w-full h-full object-cover" data-ai-hint="team data analysis"/>
                 </div>
               </div>
             </div>
