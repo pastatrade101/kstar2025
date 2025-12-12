@@ -158,7 +158,7 @@ export default function Home() {
               </div>
                <div>
                 <div className='rounded-2xl shadow-xl overflow-hidden'>
-                  <Image src="https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=800&q=80" alt="Our Team" width={800} height={600} className="w-full h-full object-cover" data-ai-hint="professional team meeting"/>
+                  <Image src="https://firebasestorage.googleapis.com/v0/b/studio-4061903538-cceaf.firebasestorage.app/o/4864%20(1).jpg?alt=media&token=2c80ae9e-65c0-45af-8f51-23580deed6f7" alt="Our Team" width={800} height={600} className="w-full h-full object-cover" data-ai-hint="professional team meeting"/>
                 </div>
               </div>
             </div>
