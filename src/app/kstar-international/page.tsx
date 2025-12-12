@@ -110,7 +110,7 @@ export default function KstarInternationalPage() {
 
              <div className="hidden lg:block relative h-[500px]">
                 <Image
-                    src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1920&q=80"
+                    src="https://firebasestorage.googleapis.com/v0/b/studio-4061903538-cceaf.firebasestorage.app/o/107221.jpg?alt=media&token=3f127461-6909-48d6-8fd8-e5dcd6f9c10f"
                     alt="Creative individuals working together"
                     fill
                     className="object-cover rounded-2xl shadow-xl"
