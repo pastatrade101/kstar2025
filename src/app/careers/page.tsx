@@ -100,7 +100,7 @@ export default function CareersPage() {
                   <CardFooter>
                     <Button asChild className="w-full">
                       <Link href={`/careers/${job.id}`}>
-                        View Details <ArrowRight className="ml-2 h-4 w-4" />
+                        Apply Now <ArrowRight className="ml-2 h-4 w-4" />
                       </Link>
                     </Button>
                   </CardFooter>
@@ -113,5 +113,3 @@ export default function CareersPage() {
     </div>
   );
 }
-
-    
