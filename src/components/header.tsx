@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState } from 'react';
@@ -145,7 +146,7 @@ export default function Header() {
                 kstar (T) Group
               </div>
               <div className="text-xs text-muted-foreground">
-                Excellence in Every Field
+                Turn Your Desires Into Reality
               </div>
             </div>
           </Link>
