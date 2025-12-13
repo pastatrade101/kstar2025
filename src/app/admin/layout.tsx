@@ -37,40 +37,40 @@ export default function AdminLayout({
   );
   const { data: userProfile, isLoading: isProfileLoading } = useDoc<UserProfile>(userProfileRef);
 
+  const isLoading = isUserLoading || (user && isProfileLoading);
+
   useEffect(() => {
-    const isLoading = isUserLoading || isProfileLoading;
-    
+    // Wait until all loading is complete before making routing decisions
     if (isLoading) {
       return;
     }
-    
-    // If not on the main login page, and there's no user, redirect to login.
-    if (pathname !== '/admin' && !user) {
+
+    // If loading is done, and there is no user, redirect to the login page (unless they are already there)
+    if (!user && pathname !== '/admin') {
       router.push('/admin');
       return;
     }
 
-    // If there is a user but they are not an admin, redirect them away from any admin page.
-    if (user && userProfile?.role !== 'admin') {
-      router.push('/');
-      return;
-    }
-
-    // If an admin is on the login page, redirect them to the dashboard.
-    if (user && userProfile?.role === 'admin' && pathname === '/admin') {
+    // If a user is logged in
+    if (user) {
+      // If they are an admin and are on the login page, send them to the dashboard
+      if (userProfile?.role === 'admin' && pathname === '/admin') {
         router.push('/admin/dashboard');
+      }
+      // If they are NOT an admin, redirect them away from any admin page
+      else if (userProfile?.role !== 'admin') {
+        router.push('/');
+      }
     }
-
-  }, [user, userProfile, isUserLoading, isProfileLoading, router, pathname]);
-
-  const isLoading = isUserLoading || (user && isProfileLoading);
+  }, [user, userProfile, isLoading, router, pathname]);
   
-  // This allows the login page to render without waiting for auth state.
+  // Render the login page immediately without the layout if the user is not logged in
   if (pathname === '/admin' && !user) {
     return <>{children}</>;
   }
   
-  if (isLoading || (user && userProfile?.role !== 'admin')) {
+  // Show a loading screen while we verify the user's role
+  if (isLoading) {
     return (
       <div className="flex h-screen items-center justify-center bg-slate-100 dark:bg-slate-900">
         <Loader2 className="h-12 w-12 animate-spin" />
@@ -96,7 +96,7 @@ export default function AdminLayout({
     );
   }
 
-  // Fallback for edge cases, e.g. user logs out on an admin page
+  // Fallback for any edge cases, like a non-admin user whose redirect is pending.
   return (
     <div className="flex h-screen items-center justify-center bg-slate-100 dark:bg-slate-900">
       <Loader2 className="h-12 w-12 animate-spin" />
