@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -13,6 +14,7 @@ import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
+    DropdownMenuLabel,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
   } from '@/components/ui/dropdown-menu';
@@ -211,7 +213,7 @@ export default function JobApplicationsPage() {
                         <TableHead className="w-[80px]">
                             <div className="flex items-center gap-3">
                                 <Checkbox
-                                    checked={selectedRows.length > 0 && selectedRows.length === paginatedApplications?.length}
+                                    checked={selectedRows.length > 0 && paginatedApplications?.length > 0 && selectedRows.length === paginatedApplications?.length}
                                     onCheckedChange={handleSelectAll}
                                 />
                                 #
