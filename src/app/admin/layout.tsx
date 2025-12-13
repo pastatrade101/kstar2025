@@ -1,3 +1,4 @@
+
 'use client';
 import { useState, useEffect } from 'react';
 import { useUser, useFirestore, useDoc } from '@/firebase';
@@ -43,15 +44,19 @@ export default function AdminLayout({
       return;
     }
     
-    if (!user && pathname !== '/admin') {
+    // If not on the main login page, and there's no user, redirect to login.
+    if (pathname !== '/admin' && !user) {
       router.push('/admin');
       return;
     }
 
+    // If there is a user but they are not an admin, redirect them away from any admin page.
     if (user && userProfile?.role !== 'admin') {
       router.push('/');
+      return;
     }
 
+    // If an admin is on the login page, redirect them to the dashboard.
     if (user && userProfile?.role === 'admin' && pathname === '/admin') {
         router.push('/admin/dashboard');
     }
@@ -60,30 +65,41 @@ export default function AdminLayout({
 
   const isLoading = isUserLoading || (user && isProfileLoading);
   
-  if (pathname === '/admin') {
+  // This allows the login page to render without waiting for auth state.
+  if (pathname === '/admin' && !user) {
     return <>{children}</>;
   }
   
-  if (isLoading || !user || userProfile?.role !== 'admin') {
+  if (isLoading || (user && userProfile?.role !== 'admin')) {
     return (
       <div className="flex h-screen items-center justify-center bg-slate-100 dark:bg-slate-900">
         <Loader2 className="h-12 w-12 animate-spin" />
       </div>
     );
   }
-  
+
+  // Only render the full admin layout if user is a confirmed admin
+  if (user && userProfile?.role === 'admin') {
+    return (
+      <div className="flex h-screen overflow-hidden bg-slate-100 dark:bg-slate-900/40">
+          <DashboardSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+          <div className={cn(
+              "relative flex flex-1 flex-col overflow-y-auto overflow-x-hidden transition-all duration-300",
+              sidebarOpen && !isMobile ? "lg:ml-64" : "ml-0"
+          )}>
+              <DashboardHeader onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
+              <main className="flex-1 p-4 sm:p-6 lg:p-8">
+                  {children}
+              </main>
+          </div>
+      </div>
+    );
+  }
+
+  // Fallback for edge cases, e.g. user logs out on an admin page
   return (
-    <div className="flex h-screen overflow-hidden bg-slate-100 dark:bg-slate-900/40">
-        <DashboardSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-        <div className={cn(
-            "relative flex flex-1 flex-col overflow-y-auto overflow-x-hidden transition-all duration-300",
-            sidebarOpen && !isMobile ? "lg:ml-64" : "ml-0"
-        )}>
-            <DashboardHeader onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
-            <main className="flex-1 p-4 sm:p-6 lg:p-8">
-                {children}
-            </main>
-        </div>
+    <div className="flex h-screen items-center justify-center bg-slate-100 dark:bg-slate-900">
+      <Loader2 className="h-12 w-12 animate-spin" />
     </div>
   );
 }
