@@ -172,6 +172,19 @@ export default function JobApplicationsPage() {
 
   const isLoading = isProfileLoading || (isAdmin && isLoadingApplications);
 
+  if (!isAdmin && !isProfileLoading) {
+    return (
+        <Card>
+            <CardHeader>
+                <CardTitle>Access Denied</CardTitle>
+            </CardHeader>
+            <CardContent>
+                <p>You do not have permission to view this page.</p>
+            </CardContent>
+        </Card>
+    );
+  }
+
   return (
     <Card className='dark:bg-slate-900 dark:border-slate-800'>
         <CardHeader>
@@ -420,5 +433,3 @@ export default function JobApplicationsPage() {
     </Card>
   );
 }
-
-    
