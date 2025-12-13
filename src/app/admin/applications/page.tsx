@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useFirestore, useCollection, deleteDocumentNonBlocking, updateDocumentNonBlocking, useUser, useDoc } from '@/firebase';
 import { collection, query, orderBy, doc, writeBatch } from 'firebase/firestore';
 import { useMemoFirebase } from '@/firebase/provider';
@@ -33,6 +33,7 @@ import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 type ApplicationStatus = 'Pending' | 'Received' | 'Whitelisted' | 'Not Selected';
 
@@ -70,9 +71,10 @@ export default function JobApplicationsPage() {
   const firestore = useFirestore();
   const { user } = useUser();
 
-  // State for pagination and selection
+  // State for pagination, selection, and filtering
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
+  const [filterStatus, setFilterStatus] = useState<ApplicationStatus | 'All'>('All');
   
   const userProfileRef = useMemoFirebase(
     () => (firestore && user ? doc(firestore, 'users', user.uid) : null),
@@ -97,12 +99,22 @@ export default function JobApplicationsPage() {
 
   const { data: applications, isLoading: isLoadingApplications, error } = useCollection<JobApplication>(applicationsQuery);
 
+  // Filtering logic
+  const filteredApplications = useMemo(() => {
+    if (!applications) return [];
+    if (filterStatus === 'All') return applications;
+    return applications.filter(app => app.status === filterStatus);
+  }, [applications, filterStatus]);
+
   // Pagination logic
-  const paginatedApplications = applications?.slice(
-    (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE
-  );
-  const totalPages = applications ? Math.ceil(applications.length / ITEMS_PER_PAGE) : 0;
+  const paginatedApplications = useMemo(() => {
+    return filteredApplications?.slice(
+      (currentPage - 1) * ITEMS_PER_PAGE,
+      currentPage * ITEMS_PER_PAGE
+    );
+  }, [filteredApplications, currentPage]);
+
+  const totalPages = filteredApplications ? Math.ceil(filteredApplications.length / ITEMS_PER_PAGE) : 0;
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
 
   const handleStatusChange = (id: string, status: ApplicationStatus) => {
@@ -133,7 +145,7 @@ export default function JobApplicationsPage() {
   };
   
   // Selection logic
-  const handleSelectAll = (checked: boolean) => {
+  const handleSelectAll = (checked: boolean | string) => {
     if (checked) {
       setSelectedRows(paginatedApplications?.map(app => app.id) || []);
     } else {
@@ -146,6 +158,12 @@ export default function JobApplicationsPage() {
       prev.includes(id) ? prev.filter(rowId => rowId !== id) : [...prev, id]
     );
   };
+  
+  // Reset page and selection on filter change
+  useEffect(() => {
+    setCurrentPage(1);
+    setSelectedRows([]);
+  }, [filterStatus]);
 
   useEffect(() => {
     setSelectedRows([]); // Clear selection when page changes
@@ -206,6 +224,16 @@ export default function JobApplicationsPage() {
             </div>
         </CardHeader>
         <CardContent>
+            <Tabs value={filterStatus} onValueChange={(value) => setFilterStatus(value as ApplicationStatus | 'All')}>
+              <TabsList className="mb-4">
+                <TabsTrigger value="All">All</TabsTrigger>
+                <TabsTrigger value="Received">Received</TabsTrigger>
+                <TabsTrigger value="Pending">Pending</TabsTrigger>
+                <TabsTrigger value="Whitelisted">Whitelisted</TabsTrigger>
+                <TabsTrigger value="Not Selected">Not Selected</TabsTrigger>
+              </TabsList>
+            </Tabs>
+
             <div className="border rounded-md">
             <Table>
                 <TableHeader>
@@ -245,12 +273,12 @@ export default function JobApplicationsPage() {
                     {!isLoading && (!paginatedApplications || paginatedApplications.length === 0) && (
                         <TableRow>
                             <TableCell colSpan={8} className="text-center text-muted-foreground h-48">
-                                No applications found.
+                                No applications found for this filter.
                             </TableCell>
                         </TableRow>
                     )}
                     {paginatedApplications?.map((item, index) => (
-                        <TableRow key={item.id} className='dark:border-slate-800' data-state={selectedRows.includes(item.id) && 'selected'}>
+                        <TableRow key={item.id} className='dark:border-slate-800' data-state={selectedRows.includes(item.id) ? 'selected' : undefined}>
                             <TableCell>
                                 <div className="flex items-center gap-3">
                                 <Checkbox
@@ -364,7 +392,7 @@ export default function JobApplicationsPage() {
             {/* Pagination Controls */}
             <div className="flex items-center justify-between mt-4 text-sm">
                 <div className="text-muted-foreground">
-                    {selectedRows.length} of {applications?.length} row(s) selected.
+                    {selectedRows.length} of {filteredApplications?.length} row(s) selected.
                 </div>
                 <div className="flex items-center gap-2">
                     <span className="text-muted-foreground">
@@ -392,3 +420,5 @@ export default function JobApplicationsPage() {
     </Card>
   );
 }
+
+    
