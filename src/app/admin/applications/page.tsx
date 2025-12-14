@@ -3,7 +3,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { useFirestore, useCollection, deleteDocumentNonBlocking, updateDocumentNonBlocking, useUser, useDoc } from '@/firebase';
-import { collection, query, orderBy, doc, writeBatch } from 'firebase/firestore';
+import { collection, query, orderBy, doc, writeBatch, collectionGroup } from 'firebase/firestore';
 import { useMemoFirebase } from '@/firebase/provider';
 import { Loader2, Trash2, Briefcase, ExternalLink, FileText, ChevronDown, Link as LinkIcon, FileJson, MoreHorizontal } from 'lucide-react';
 import { format } from 'date-fns';
@@ -56,6 +56,8 @@ type JobApplication = {
     nanoseconds: number;
   } | null;
   status: ApplicationStatus;
+  // This will be populated by the collectionGroup query
+  path?: string;
 };
 
 const statusColors: Record<ApplicationStatus, string> = {
@@ -84,20 +86,46 @@ export default function JobApplicationsPage() {
 
   const isAdmin = userProfile?.role === 'admin';
 
-  const applicationsCollectionRef = useMemoFirebase(
-    () => (firestore && isAdmin ? collection(firestore, 'job_applications') : null),
+  // Use a collectionGroup query to get all job_applications from all users
+  const applicationsCollectionGroup = useMemoFirebase(
+    () => (firestore && isAdmin ? collectionGroup(firestore, 'job_applications') : null),
     [firestore, isAdmin]
   );
 
   const applicationsQuery = useMemoFirebase(
     () =>
-      applicationsCollectionRef
-        ? query(applicationsCollectionRef, orderBy('submittedAt', 'desc'))
+    applicationsCollectionGroup
+        ? query(applicationsCollectionGroup, orderBy('submittedAt', 'desc'))
         : null,
-    [applicationsCollectionRef]
+    [applicationsCollectionGroup]
   );
+  
+  // Custom hook logic to handle collectionGroup with path
+  const useCollectionGroupWithPath = <T>(q: Query | null) => {
+    const [data, setData] = useState<any[] | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<Error | null>(null);
+  
+    useEffect(() => {
+      if (!q) {
+        setIsLoading(false);
+        return;
+      }
+      const unsubscribe = onSnapshot(q, (snapshot) => {
+        const results = snapshot.docs.map(d => ({ ...d.data(), id: d.id, path: d.ref.path }));
+        setData(results);
+        setIsLoading(false);
+      }, (err) => {
+        setError(err);
+        setIsLoading(false);
+      });
+      return () => unsubscribe();
+    }, [q]);
+  
+    return { data, isLoading, error };
+  }
 
-  const { data: applications, isLoading: isLoadingApplications, error } = useCollection<JobApplication>(applicationsQuery);
+  const { data: applications, isLoading: isLoadingApplications, error } = useCollectionGroupWithPath(applicationsQuery);
 
   // Filtering logic
   const filteredApplications = useMemo(() => {
@@ -117,9 +145,9 @@ export default function JobApplicationsPage() {
   const totalPages = filteredApplications ? Math.ceil(filteredApplications.length / ITEMS_PER_PAGE) : 0;
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
 
-  const handleStatusChange = (id: string, status: ApplicationStatus) => {
-    if (!firestore) return;
-    const itemRef = doc(firestore, 'job_applications', id);
+  const handleStatusChange = (path: string, status: ApplicationStatus) => {
+    if (!firestore || !path) return;
+    const itemRef = doc(firestore, path);
     updateDocumentNonBlocking(itemRef, { status });
   };
 
@@ -127,8 +155,8 @@ export default function JobApplicationsPage() {
   const handleBulkDelete = () => {
     if (!firestore || selectedRows.length === 0) return;
     const batch = writeBatch(firestore);
-    selectedRows.forEach(id => {
-        const itemRef = doc(firestore, 'job_applications', id);
+    selectedRows.forEach(path => {
+        const itemRef = doc(firestore, path);
         batch.delete(itemRef);
     });
     batch.commit().then(() => setSelectedRows([]));
@@ -137,8 +165,8 @@ export default function JobApplicationsPage() {
   const handleBulkStatusChange = (status: ApplicationStatus) => {
     if (!firestore || selectedRows.length === 0) return;
     const batch = writeBatch(firestore);
-    selectedRows.forEach(id => {
-        const itemRef = doc(firestore, 'job_applications', id);
+    selectedRows.forEach(path => {
+        const itemRef = doc(firestore, path);
         batch.update(itemRef, { status });
     });
     batch.commit().then(() => setSelectedRows([]));
@@ -147,15 +175,15 @@ export default function JobApplicationsPage() {
   // Selection logic
   const handleSelectAll = (checked: boolean | string) => {
     if (checked) {
-      setSelectedRows(paginatedApplications?.map(app => app.id) || []);
+      setSelectedRows(paginatedApplications?.map(app => app.path) || []);
     } else {
       setSelectedRows([]);
     }
   };
 
-  const handleRowSelect = (id: string) => {
+  const handleRowSelect = (path: string) => {
     setSelectedRows(prev => 
-      prev.includes(id) ? prev.filter(rowId => rowId !== id) : [...prev, id]
+      prev.includes(path) ? prev.filter(rowPath => rowPath !== path) : [...prev, path]
     );
   };
   
@@ -291,12 +319,12 @@ export default function JobApplicationsPage() {
                         </TableRow>
                     )}
                     {paginatedApplications?.map((item, index) => (
-                        <TableRow key={item.id} className='dark:border-slate-800' data-state={selectedRows.includes(item.id) ? 'selected' : undefined}>
+                        <TableRow key={item.id} className='dark:border-slate-800' data-state={selectedRows.includes(item.path!) ? 'selected' : undefined}>
                             <TableCell>
                                 <div className="flex items-center gap-3">
                                 <Checkbox
-                                    checked={selectedRows.includes(item.id)}
-                                    onCheckedChange={() => handleRowSelect(item.id)}
+                                    checked={selectedRows.includes(item.path!)}
+                                    onCheckedChange={() => handleRowSelect(item.path!)}
                                 />
                                 {startIndex + index + 1}
                                 </div>
@@ -369,7 +397,7 @@ export default function JobApplicationsPage() {
                                          {Object.keys(statusColors).map((status) => (
                                             <DropdownMenuItem
                                             key={status}
-                                            onSelect={() => handleStatusChange(item.id, status as ApplicationStatus)}
+                                            onSelect={() => handleStatusChange(item.path!, status as ApplicationStatus)}
                                             >
                                                 <Badge className={`mr-2 ${statusColors[status as ApplicationStatus]}`}>{status}</Badge>
                                             </DropdownMenuItem>
@@ -390,7 +418,7 @@ export default function JobApplicationsPage() {
                                                 </AlertDialogHeader>
                                                 <AlertDialogFooter>
                                                 <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                                <AlertDialogAction onClick={() => deleteDocumentNonBlocking(doc(firestore, 'job_applications', item.id))} className="bg-red-600 hover:bg-red-700">Delete</AlertDialogAction>
+                                                <AlertDialogAction onClick={() => deleteDocumentNonBlocking(doc(firestore, item.path!))} className="bg-red-600 hover:bg-red-700">Delete</AlertDialogAction>
                                                 </AlertDialogFooter>
                                             </AlertDialogContent>
                                         </AlertDialog>
@@ -433,3 +461,5 @@ export default function JobApplicationsPage() {
     </Card>
   );
 }
+
+    

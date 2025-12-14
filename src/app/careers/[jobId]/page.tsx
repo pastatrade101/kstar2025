@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -46,7 +47,11 @@ function ApplicationForm({ job, onApplicationSuccess }: { job: Job, onApplicatio
   const { user } = useUser();
   const { toast } = useToast();
   const firestore = useFirestore();
-  const applicationsCollectionRef = useMemoFirebase(() => collection(firestore, 'job_applications'), [firestore]);
+  // The collection reference now points to the subcollection under the current user
+  const applicationsCollectionRef = useMemoFirebase(
+    () => (user ? collection(firestore, 'users', user.uid, 'job_applications') : null),
+    [firestore, user]
+  );
 
   const [applicantPhone, setApplicantPhone] = useState('');
   const [coverLetter, setCoverLetter] = useState('');
@@ -56,7 +61,7 @@ function ApplicationForm({ job, onApplicationSuccess }: { job: Job, onApplicatio
 
   const onApplicationSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!job || !user || !firestore) {
+    if (!job || !user || !firestore || !applicationsCollectionRef) {
       toast({ variant: 'destructive', title: 'Error', description: 'Could not submit application. Please try again.' });
       return;
     }
@@ -67,7 +72,7 @@ function ApplicationForm({ job, onApplicationSuccess }: { job: Job, onApplicatio
       const applicationData = {
         jobId: job.id,
         jobTitle: job.title,
-        userId: user.uid,
+        userId: user.uid, // Keep userId for admin-side queries
         userName: user.displayName || user.email,
         userEmail: user.email,
         phone: applicantPhone,
@@ -178,11 +183,11 @@ export default function JobDetailsPage() {
   const jobDocRef = useMemoFirebase(() => (firestore && jobId ? doc(firestore, 'jobs', jobId) : null), [firestore, jobId]);
   const { data: job, isLoading, error } = useDoc<Job>(jobDocRef);
   
+  // Query the user-specific subcollection
   const userApplicationQuery = useMemoFirebase(() => {
     if (!firestore || !user || !jobId) return null;
     return query(
-      collection(firestore, 'job_applications'),
-      where('userId', '==', user.uid),
+      collection(firestore, 'users', user.uid, 'job_applications'),
       where('jobId', '==', jobId),
       limit(1)
     );
