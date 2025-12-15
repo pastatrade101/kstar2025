@@ -6,7 +6,7 @@ import { useFirestore, useDoc, useUser, useCollection, addDocumentNonBlocking } 
 import { doc, collection, serverTimestamp, query, where, limit } from 'firebase/firestore';
 import { useMemoFirebase } from '@/firebase/provider';
 import { useParams, useRouter } from 'next/navigation';
-import { Loader2, MapPin, Briefcase, ArrowLeft, Send, CheckCircle2, CalendarDays, Link as LinkIcon, FileJson } from 'lucide-react';
+import { Loader2, MapPin, Briefcase, ArrowLeft, Send, CheckCircle2, CalendarDays, Link as LinkIcon, FileJson, UserCheck } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -173,6 +173,23 @@ function ApplicationStatus({ application }: { application: JobApplication }) {
     );
   }
 
+  function AuthPrompt() {
+    return (
+        <Card className="bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 text-center">
+             <CardHeader>
+                <UserCheck className="mx-auto h-12 w-12 text-blue-600 dark:text-blue-500 mb-4" />
+                <CardTitle className="text-blue-800 dark:text-blue-300">Create an Account or Sign In to Apply</CardTitle>
+                <CardDescription className="text-blue-700 dark:text-blue-400">
+                    To apply for this position, you need to be logged in. It only takes a moment to create an account.
+                </CardDescription>
+            </CardHeader>
+            <CardContent>
+                <AuthGate />
+            </CardContent>
+        </Card>
+    )
+  }
+
 export default function JobDetailsPage() {
   const router = useRouter();
   const params = useParams();
@@ -257,7 +274,7 @@ export default function JobDetailsPage() {
           </div>
 
           <div className="lg:col-span-1">
-             { !user && <AuthGate /> }
+             { !user && <AuthPrompt /> }
              { user && hasApplied && userApplication && <ApplicationStatus application={userApplication[0]} /> }
              { user && !hasApplied && <ApplicationForm job={job} onApplicationSuccess={refetchApplication}/> }
           </div>
@@ -266,5 +283,3 @@ export default function JobDetailsPage() {
     </div>
   );
 }
-
-    
