@@ -1,12 +1,12 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useFirestore, useDoc, useUser, useCollection, addDocumentNonBlocking } from '@/firebase';
 import { doc, collection, serverTimestamp, query, where, limit } from 'firebase/firestore';
 import { useMemoFirebase } from '@/firebase/provider';
 import { useParams, useRouter } from 'next/navigation';
-import { Loader2, MapPin, Briefcase, ArrowLeft, Send, CheckCircle2, CalendarDays, Link as LinkIcon, FileJson, UserCheck } from 'lucide-react';
+import { Loader2, MapPin, Briefcase, ArrowLeft, Send, CheckCircle2, CalendarDays, UserCheck } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -18,6 +18,7 @@ import { AuthGate } from '@/components/auth-gate';
 import { Textarea } from '@/components/ui/textarea';
 import { format } from 'date-fns';
 import Image from 'next/image';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 
 type Job = {
   id: string;
@@ -173,28 +174,14 @@ function ApplicationStatus({ application }: { application: JobApplication }) {
     );
   }
 
-  function AuthPrompt() {
-    return (
-        <Card className="bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 text-center">
-             <CardHeader>
-                <UserCheck className="mx-auto h-12 w-12 text-blue-600 dark:text-blue-500 mb-4" />
-                <CardTitle className="text-blue-800 dark:text-blue-300">Create an Account or Sign In to Apply</CardTitle>
-                <CardDescription className="text-blue-700 dark:text-blue-400">
-                    To apply for this position, you need to be logged in. It only takes a moment to create an account.
-                </CardDescription>
-            </CardHeader>
-            <CardContent>
-                <AuthGate />
-            </CardContent>
-        </Card>
-    )
-  }
-
 export default function JobDetailsPage() {
   const router = useRouter();
   const params = useParams();
   const jobId = params.jobId as string;
   const { user, isUserLoading } = useUser();
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const applicationFormRef = useRef<HTMLDivElement>(null);
+
 
   const firestore = useFirestore();
   const jobDocRef = useMemoFirebase(() => (firestore && jobId ? doc(firestore, 'jobs', jobId) : null), [firestore, jobId]);
@@ -213,6 +200,16 @@ export default function JobDetailsPage() {
   const { data: userApplication, isLoading: isLoadingApplication, refetch: refetchApplication } = useCollection<JobApplication>(userApplicationQuery);
   const hasApplied = userApplication && userApplication.length > 0;
   
+  const handleApplyClick = () => {
+    if (user) {
+        // If user is logged in, scroll to the application form
+        applicationFormRef.current?.scrollIntoView({ behavior: 'smooth' });
+    } else {
+        // If user is not logged in, open the auth modal
+        setIsAuthModalOpen(true);
+    }
+  };
+
   if (isLoading || isUserLoading || isLoadingApplication) {
     return (
       <div className="flex justify-center items-center h-[60vh]">
@@ -267,14 +264,35 @@ export default function JobDetailsPage() {
                 <span>Deadline: {format(new Date(job.applicationDeadline), 'PPP')}</span>
               </div>
             </div>
-            <Separator />
+            
+            <Dialog open={isAuthModalOpen} onOpenChange={setIsAuthModalOpen}>
+                <Button onClick={handleApplyClick} size="lg" disabled={hasApplied}>
+                    {hasApplied ? 'Already Applied' : 'Apply Now'}
+                </Button>
+                <DialogContent className="sm:max-w-[425px]">
+                    <DialogHeader>
+                        <DialogTitle className="flex items-center gap-2">
+                            <UserCheck />
+                            Sign In to Apply
+                        </DialogTitle>
+                        <DialogDescription>
+                            You need to be logged in to apply for this position. Create an account or sign in below.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="py-4">
+                        <AuthGate />
+                    </div>
+                </DialogContent>
+            </Dialog>
+
+
+            <Separator className="my-8" />
             <div className="prose dark:prose-invert max-w-none mt-8 whitespace-pre-wrap">
               <p>{job.description}</p>
             </div>
           </div>
 
-          <div className="lg:col-span-1">
-             { !user && <AuthPrompt /> }
+          <div ref={applicationFormRef} className="lg:col-span-2 lg:col-start-1">
              { user && hasApplied && userApplication && <ApplicationStatus application={userApplication[0]} /> }
              { user && !hasApplied && <ApplicationForm job={job} onApplicationSuccess={refetchApplication}/> }
           </div>
@@ -283,3 +301,5 @@ export default function JobDetailsPage() {
     </div>
   );
 }
+
+    
