@@ -40,28 +40,25 @@ export default function AdminLayout({
   const isLoading = isUserLoading || (user && isProfileLoading);
 
   useEffect(() => {
-    // Wait until all loading is complete before making routing decisions
     if (isLoading) {
       return;
     }
 
-    // If a user is logged in
     if (user) {
-      // If they are NOT an admin, redirect them away from any admin page
-      if (userProfile?.role !== 'admin') {
+      // User is logged in, check their role.
+      if (userProfile?.role === 'admin') {
+        // User is an admin. If they are on the login page, redirect to dashboard.
+        if (pathname === '/admin') {
+          router.push('/admin/dashboard');
+        }
+      } else {
+        // User is not an admin, redirect them away from any admin page.
         router.push('/');
-        return;
-      }
-      // If they are an admin and are on the login page, send them to the dashboard
-      if (pathname === '/admin') {
-        router.push('/admin/dashboard');
-        return;
       }
     } else {
-      // If loading is done, and there is no user, redirect to the login page (unless they are already there)
+      // No user is logged in. Redirect to login page if they aren't already there.
       if (pathname !== '/admin') {
         router.push('/admin');
-        return;
       }
     }
   }, [user, userProfile, isLoading, router, pathname]);
