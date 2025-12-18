@@ -121,6 +121,13 @@ function ApplicationForm({ job, onApplicationSuccess }: { job: Job, onApplicatio
         </CardHeader>
         <CardContent>
         <form onSubmit={onApplicationSubmit} className="space-y-6">
+            <Alert>
+              <Info className="h-4 w-4" />
+              <AlertTitle>Important Note</AlertTitle>
+              <AlertDescription>
+                This position is based in Dodoma. The company does not provide housing or transport allowances.
+              </AlertDescription>
+            </Alert>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                     <Label htmlFor="phone">Phone Number (Optional)</Label>
