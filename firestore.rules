@@ -28,12 +28,17 @@ service cloud.firestore {
       // Allow users to update their own profile (but not their role), or if an admin is making the change.
       allow update: if (request.auth != null && request.auth.uid == userId && request.resource.data.role == resource.data.role) || isAdmin();
 
-      // Job Applications subcollection for individual users
+      // A user can create/update/delete their own applications. This rule allows the write.
       match /job_applications/{applicationId} {
-        // A user can manage their own applications, OR an admin can manage any application.
-        allow read, list, write, delete: if (request.auth != null && request.auth.uid == userId) || isAdmin();
+        allow write, read, list: if request.auth != null && request.auth.uid == userId;
       }
     }
+    
+    // Admins need a separate rule on the collection group to be able to list/read/write across ALL users.
+    match /{path=**}/job_applications/{applicationId} {
+      allow read, list, write: if isAdmin();
+    }
+
 
     // Publicly readable content, admin-only writes
     match /courses/{courseId} {

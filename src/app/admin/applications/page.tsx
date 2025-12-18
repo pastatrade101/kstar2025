@@ -27,7 +27,6 @@ import {
     AlertDialogFooter,
     AlertDialogHeader,
     AlertDialogTitle,
-    AlertDialogTrigger,
   } from '@/components/ui/alert-dialog';
 import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
@@ -69,6 +68,36 @@ const statusColors: Record<ApplicationStatus, string> = {
 
 const ITEMS_PER_PAGE = 10;
 
+// Custom hook to handle collectionGroup with path
+const useCollectionGroupWithPath = (q: Query | null) => {
+  const [data, setData] = useState<any[] | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+
+  useEffect(() => {
+    if (!q) {
+      setData([]);
+      setIsLoading(false);
+      return;
+    }
+
+    setIsLoading(true);
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const results = snapshot.docs.map(d => ({ ...d.data(), id: d.id, path: d.ref.path }));
+      setData(results);
+      setIsLoading(false);
+    }, (err) => {
+      console.error("CollectionGroup snapshot error:", err);
+      setError(new Error("Missing or insufficient permissions."));
+      setIsLoading(false);
+    });
+    return () => unsubscribe();
+  }, [q]);
+
+  return { data, isLoading, error };
+}
+
+
 export default function JobApplicationsPage() {
   const firestore = useFirestore();
   const { user } = useUser();
@@ -99,31 +128,6 @@ export default function JobApplicationsPage() {
         : null,
     [applicationsCollectionGroup]
   );
-  
-  // Custom hook logic to handle collectionGroup with path
-  const useCollectionGroupWithPath = (q: Query | null) => {
-    const [data, setData] = useState<any[] | null>(null);
-    const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState<Error | null>(null);
-  
-    useEffect(() => {
-      if (!q) {
-        setIsLoading(false);
-        return;
-      }
-      const unsubscribe = onSnapshot(q, (snapshot) => {
-        const results = snapshot.docs.map(d => ({ ...d.data(), id: d.id, path: d.ref.path }));
-        setData(results);
-        setIsLoading(false);
-      }, (err) => {
-        setError(err);
-        setIsLoading(false);
-      });
-      return () => unsubscribe();
-    }, [q]);
-  
-    return { data, isLoading, error };
-  }
 
   const { data: applications, isLoading: isLoadingApplications, error } = useCollectionGroupWithPath(applicationsQuery);
 
@@ -198,7 +202,7 @@ export default function JobApplicationsPage() {
   }, [currentPage]);
 
 
-  const isLoading = isProfileLoading || (isAdmin && isLoadingApplications);
+  const isLoading = isProfileLoading || isLoadingApplications;
 
   if (!isAdmin && !isProfileLoading) {
     return (
@@ -461,5 +465,3 @@ export default function JobApplicationsPage() {
     </Card>
   );
 }
-
-    
