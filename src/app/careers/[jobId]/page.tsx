@@ -6,7 +6,7 @@ import { useFirestore, useDoc, useUser, useCollection, addDocumentNonBlocking } 
 import { doc, collection, serverTimestamp, query, where, limit } from 'firebase/firestore';
 import { useMemoFirebase } from '@/firebase/provider';
 import { useParams, useRouter } from 'next/navigation';
-import { Loader2, MapPin, Briefcase, ArrowLeft, Send, CheckCircle2, CalendarDays, UserCheck } from 'lucide-react';
+import { Loader2, MapPin, Briefcase, ArrowLeft, Send, CheckCircle2, CalendarDays, UserCheck, Info } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -19,6 +19,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { format } from 'date-fns';
 import Image from 'next/image';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 type Job = {
   id: string;
@@ -130,9 +131,18 @@ function ApplicationForm({ job, onApplicationSuccess }: { job: Job, onApplicatio
                     <Input id="linkedin" type="url" placeholder="https://linkedin.com/in/..." value={linkedinUrl} onChange={e => setLinkedinUrl(e.target.value)} disabled={isSubmitting} />
                 </div>
             </div>
-             <div className="space-y-2">
-                <Label htmlFor="cv">CV/Resume URL (Optional)</Label>
-                <Input id="cv" type="url" placeholder="https://example.com/resume.pdf" value={cvUrl} onChange={e => setCvUrl(e.target.value)} disabled={isSubmitting} />
+             <div className="space-y-4">
+                <Alert>
+                    <Info className="h-4 w-4" />
+                    <AlertTitle>Important: CV Submission</AlertTitle>
+                    <AlertDescription>
+                        Please attach a Google Drive link for your CV. Ensure the link is public and has no permission restrictions so our team can view it.
+                    </AlertDescription>
+                </Alert>
+                <div className="space-y-2">
+                    <Label htmlFor="cv">CV/Resume URL (Optional)</Label>
+                    <Input id="cv" type="url" placeholder="https://drive.google.com/..." value={cvUrl} onChange={e => setCvUrl(e.target.value)} disabled={isSubmitting} />
+                </div>
             </div>
             <div className="space-y-2">
                 <Label htmlFor="coverLetter">Cover Letter</Label>
@@ -301,5 +311,3 @@ export default function JobDetailsPage() {
     </div>
   );
 }
-
-    
