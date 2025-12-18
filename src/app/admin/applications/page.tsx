@@ -155,6 +155,12 @@ export default function JobApplicationsPage() {
     const itemRef = doc(firestore, path);
     updateDocumentNonBlocking(itemRef, { status });
   };
+  
+  const handleSingleDelete = (path: string) => {
+    if (!firestore) return;
+    const itemRef = doc(firestore, path);
+    deleteDocumentNonBlocking(itemRef);
+  };
 
   // Bulk actions
   const handleBulkDelete = () => {
@@ -423,7 +429,7 @@ export default function JobApplicationsPage() {
                                                 </AlertDialogHeader>
                                                 <AlertDialogFooter>
                                                 <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                                <AlertDialogAction onClick={() => deleteDocumentNonBlocking(doc(firestore, item.path!))} className="bg-red-600 hover:bg-red-700">Delete</AlertDialogAction>
+                                                <AlertDialogAction onClick={() => handleSingleDelete(item.path!)} className="bg-red-600 hover:bg-red-700">Delete</AlertDialogAction>
                                                 </AlertDialogFooter>
                                             </AlertDialogContent>
                                         </AlertDialog>
@@ -466,3 +472,5 @@ export default function JobApplicationsPage() {
     </Card>
   );
 }
+
+    
