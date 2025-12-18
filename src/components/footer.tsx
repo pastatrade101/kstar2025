@@ -1,3 +1,4 @@
+
 import Image from 'next/image';
 import Link from 'next/link';
 import { Facebook, Twitter, Instagram, Linkedin, Youtube, Mail, MapPin, Phone } from 'lucide-react';
@@ -53,16 +54,6 @@ export default function Footer() {
             <div>
               <h3 className="font-semibold mb-4 text-foreground">Contact Us</h3>
               <ul className="space-y-3 text-sm">
-                <li className="flex items-start gap-3">
-                  <MapPin className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
-                  <span className="text-muted-foreground">
-                    S.L.P 12345, Dar es Salaam, Tanzania
-                  </span>
-                </li>
-                <li className="flex items-center gap-3">
-                  <Phone className="h-5 w-5 text-primary flex-shrink-0" />
-                  <span className="text-muted-foreground">+255 123 456 789</span>
-                </li>
                 <li className="flex items-center gap-3">
                   <Mail className="h-5 w-5 text-primary flex-shrink-0" />
                   <span className="text-muted-foreground">info@kstar.com</span>
