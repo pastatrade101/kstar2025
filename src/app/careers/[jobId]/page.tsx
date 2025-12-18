@@ -6,7 +6,7 @@ import { useFirestore, useDoc, useUser, useCollection, addDocumentNonBlocking } 
 import { doc, collection, serverTimestamp, query, where, limit } from 'firebase/firestore';
 import { useMemoFirebase } from '@/firebase/provider';
 import { useParams, useRouter } from 'next/navigation';
-import { Loader2, MapPin, Briefcase, ArrowLeft, Send, CheckCircle2, CalendarDays, UserCheck, Info } from 'lucide-react';
+import { Loader2, MapPin, Briefcase, ArrowLeft, Send, CheckCircle2, CalendarDays, UserCheck, TriangleAlert } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -121,8 +121,8 @@ function ApplicationForm({ job, onApplicationSuccess }: { job: Job, onApplicatio
         </CardHeader>
         <CardContent>
         <form onSubmit={onApplicationSubmit} className="space-y-6">
-            <Alert>
-              <Info className="h-4 w-4" />
+            <Alert variant="destructive">
+              <TriangleAlert className="h-4 w-4" />
               <AlertTitle>Important Note</AlertTitle>
               <AlertDescription>
                 This position is based in Dodoma. The company does not provide housing or transport allowances.
@@ -139,8 +139,8 @@ function ApplicationForm({ job, onApplicationSuccess }: { job: Job, onApplicatio
                 </div>
             </div>
              <div className="space-y-4">
-                <Alert>
-                    <Info className="h-4 w-4" />
+                <Alert variant="destructive">
+                    <TriangleAlert className="h-4 w-4" />
                     <AlertTitle>Important: CV Submission</AlertTitle>
                     <AlertDescription>
                         Please attach a Google Drive link for your CV. Ensure the link is public and has no permission restrictions so our team can view it.
@@ -318,3 +318,5 @@ export default function JobDetailsPage() {
     </div>
   );
 }
+
+    
