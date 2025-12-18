@@ -2,8 +2,8 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import { useFirestore, useCollection, deleteDocumentNonBlocking, updateDocumentNonBlocking, useUser, useDoc } from '@/firebase';
-import { collection, query, orderBy, doc, writeBatch, collectionGroup } from 'firebase/firestore';
+import { useFirestore, deleteDocumentNonBlocking, updateDocumentNonBlocking, useUser, useDoc } from '@/firebase';
+import { collection, query, orderBy, doc, writeBatch, collectionGroup, onSnapshot, type Query } from 'firebase/firestore';
 import { useMemoFirebase } from '@/firebase/provider';
 import { Loader2, Trash2, Briefcase, ExternalLink, FileText, ChevronDown, Link as LinkIcon, FileJson, MoreHorizontal } from 'lucide-react';
 import { format } from 'date-fns';
@@ -101,7 +101,7 @@ export default function JobApplicationsPage() {
   );
   
   // Custom hook logic to handle collectionGroup with path
-  const useCollectionGroupWithPath = <T>(q: Query | null) => {
+  const useCollectionGroupWithPath = (q: Query | null) => {
     const [data, setData] = useState<any[] | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<Error | null>(null);
