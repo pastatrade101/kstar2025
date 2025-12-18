@@ -2,9 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import Chatbot from '@/components/chatbot';
-import { FirebaseClientProvider } from '@/firebase';
-import { ThemeProvider } from '@/components/theme-provider';
-import AppShell from '@/components/AppShell';
+import { Providers } from './providers';
 
 export const metadata: Metadata = {
   title: 'kstar (T) Group',
@@ -25,20 +23,11 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
       </head>
       <body className="font-body antialiased">
-        <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-        >
-          <FirebaseClientProvider>
-            <AppShell>
-              {children}
-            </AppShell>
-            <Chatbot />
-            <Toaster />
-          </FirebaseClientProvider>
-        </ThemeProvider>
+        <Providers>
+          {children}
+          <Chatbot />
+          <Toaster />
+        </Providers>
       </body>
     </html>
   );
