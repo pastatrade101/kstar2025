@@ -5,7 +5,7 @@ import { Badge } from '../ui/badge';
 import { ScrollArea } from '../ui/scroll-area';
 import { useFirestore, useCollection, useUser, useDoc } from '@/firebase';
 import { useMemoFirebase } from '@/firebase/provider';
-import { collection, query, orderBy, limit, doc } from 'firebase/firestore';
+import { collection, query, orderBy, limit, doc, collectionGroup } from 'firebase/firestore';
 import { useMemo } from 'react';
 import { formatDistanceToNow } from 'date-fns';
 import { Loader2 } from 'lucide-react';
@@ -64,8 +64,8 @@ export function RecentActivity() {
   const contactsQuery = useMemoFirebase(() => (contactsCollectionRef ? query(contactsCollectionRef, orderBy('submittedAt', 'desc'), limit(5)) : null), [contactsCollectionRef]);
   const { data: recentContacts, isLoading: isLoadingContacts } = useCollection<ContactSubmission>(contactsQuery);
 
-  const applicationsCollectionRef = useMemoFirebase(() => (firestore && isAdmin ? collection(firestore, 'job_applications') : null), [firestore, isAdmin]);
-  const applicationsQuery = useMemoFirebase(() => (applicationsCollectionRef ? query(applicationsCollectionRef, orderBy('submittedAt', 'desc'), limit(5)) : null), [applicationsCollectionRef]);
+  const applicationsCollectionGroup = useMemoFirebase(() => (firestore && isAdmin ? collectionGroup(firestore, 'job_applications') : null), [firestore, isAdmin]);
+  const applicationsQuery = useMemoFirebase(() => (applicationsCollectionGroup ? query(applicationsCollectionGroup, orderBy('submittedAt', 'desc'), limit(5)) : null), [applicationsCollectionGroup]);
   const { data: recentApplications, isLoading: isLoadingApplications } = useCollection<JobApplication>(applicationsQuery);
 
 
