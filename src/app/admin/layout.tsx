@@ -45,32 +45,34 @@ export default function AdminLayout({
       return;
     }
 
-    // If loading is done, and there is no user, redirect to the login page (unless they are already there)
-    if (!user && pathname !== '/admin') {
-      router.push('/admin');
-      return;
-    }
-
     // If a user is logged in
     if (user) {
-      // If they are an admin and are on the login page, send them to the dashboard
-      if (userProfile?.role === 'admin' && pathname === '/admin') {
-        router.push('/admin/dashboard');
-      }
       // If they are NOT an admin, redirect them away from any admin page
-      else if (userProfile?.role !== 'admin') {
+      if (userProfile?.role !== 'admin') {
         router.push('/');
+        return;
+      }
+      // If they are an admin and are on the login page, send them to the dashboard
+      if (pathname === '/admin') {
+        router.push('/admin/dashboard');
+        return;
+      }
+    } else {
+      // If loading is done, and there is no user, redirect to the login page (unless they are already there)
+      if (pathname !== '/admin') {
+        router.push('/admin');
+        return;
       }
     }
   }, [user, userProfile, isLoading, router, pathname]);
   
-  // Render the login page immediately without the layout if the user is not logged in
-  if (pathname === '/admin' && !user) {
+  // Render the login page immediately without the layout if the user is not logged in and on the login page
+  if (!isLoading && !user && pathname === '/admin') {
     return <>{children}</>;
   }
   
-  // Show a loading screen while we verify the user's role
-  if (isLoading) {
+  // Show a loading screen while we verify the user's role or redirect
+  if (isLoading || (user && userProfile?.role !== 'admin') || (!user && pathname !== '/admin')) {
     return (
       <div className="flex h-screen items-center justify-center bg-slate-100 dark:bg-slate-900">
         <Loader2 className="h-12 w-12 animate-spin" />
@@ -96,10 +98,6 @@ export default function AdminLayout({
     );
   }
 
-  // Fallback for any edge cases, like a non-admin user whose redirect is pending.
-  return (
-    <div className="flex h-screen items-center justify-center bg-slate-100 dark:bg-slate-900">
-      <Loader2 className="h-12 w-12 animate-spin" />
-    </div>
-  );
+  // Fallback for any edge cases, render login page
+  return <>{children}</>;
 }
