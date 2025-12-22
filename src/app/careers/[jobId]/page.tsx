@@ -59,20 +59,20 @@ function ApplicationForm({ job, onApplicationSuccess }: { job: Job, onApplicatio
   const onApplicationSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!job || !user || !firestore) {
-      toast({ variant: 'destructive', title: 'Error', description: 'Could not submit application. Please try again.' });
+      toast({ variant: 'destructive', title: 'Error', description: 'Could not submit application. Please log in and try again.' });
       return;
     }
 
     setIsSubmitting(true);
 
     try {
-      // Correctly reference the subcollection under the specific user
+      // **FIX:** Explicitly create the collection reference to the user's subcollection.
       const applicationsCollectionRef = collection(firestore, 'users', user.uid, 'job_applications');
       
       const applicationData = {
         jobId: job.id,
         jobTitle: job.title,
-        userId: user.uid, // Keep userId for admin-side queries
+        userId: user.uid,
         userName: user.displayName || user.email,
         userEmail: user.email,
         phone: applicantPhone,
@@ -80,7 +80,7 @@ function ApplicationForm({ job, onApplicationSuccess }: { job: Job, onApplicatio
         linkedinUrl: linkedinUrl,
         cvUrl: cvUrl,
         submittedAt: serverTimestamp(),
-        status: 'Received',
+        status: 'Received' as const,
       };
 
       await addDoc(applicationsCollectionRef, applicationData);
