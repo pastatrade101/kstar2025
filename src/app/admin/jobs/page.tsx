@@ -33,8 +33,8 @@ import {
 import { cn } from '@/lib/utils';
 import { Loader2, PlusCircle, Trash2, Briefcase, MapPin, Clock, Calendar as CalendarIcon, CalendarDays, Image as ImageIcon } from 'lucide-react';
 import { format, formatDistanceToNow } from 'date-fns';
-import { useFirestore, useCollection, addDocumentNonBlocking, deleteDocumentNonBlocking } from '@/firebase';
-import { collection, query, orderBy, doc, serverTimestamp } from 'firebase/firestore';
+import { useFirestore, useCollection, deleteDocumentNonBlocking } from '@/firebase';
+import { collection, query, orderBy, doc, serverTimestamp, addDoc } from 'firebase/firestore';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useMemoFirebase } from '@/firebase/provider';
 import { Badge } from '@/components/ui/badge';
@@ -83,13 +83,14 @@ export default function ManageJobsPage() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    if (!jobsCollectionRef) return;
     const dataToSave = {
       ...values,
       postedAt: serverTimestamp(),
       applicationDeadline: format(values.applicationDeadline, 'yyyy-MM-dd'),
     };
-    addDocumentNonBlocking(jobsCollectionRef, dataToSave);
+    await addDoc(jobsCollectionRef, dataToSave);
     form.reset({
         title: '',
         department: '',
@@ -365,5 +366,3 @@ export default function ManageJobsPage() {
     </div>
   );
 }
-
-    

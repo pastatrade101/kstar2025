@@ -14,8 +14,8 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { useFirestore, addDocumentNonBlocking } from '@/firebase';
-import { collection, serverTimestamp } from 'firebase/firestore';
+import { useFirestore } from '@/firebase';
+import { collection, serverTimestamp, addDoc } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 import { useMemoFirebase } from '@/firebase/provider';
 import { Loader2 } from 'lucide-react';
@@ -41,7 +41,7 @@ export default function ContactForm() {
   const { toast } = useToast();
   const firestore = useFirestore();
   const submissionsCollectionRef = useMemoFirebase(
-    () => collection(firestore, 'contact_submissions'),
+    () => (firestore ? collection(firestore, 'contact_submissions') : null),
     [firestore]
   );
 
@@ -56,13 +56,14 @@ export default function ContactForm() {
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
+    if (!submissionsCollectionRef) return;
     setIsSubmitting(true);
     try {
       const dataToSave = {
         ...values,
         submittedAt: serverTimestamp(),
       };
-      await addDocumentNonBlocking(submissionsCollectionRef, dataToSave);
+      await addDoc(submissionsCollectionRef, dataToSave);
       
       toast({
         title: 'Message Sent!',

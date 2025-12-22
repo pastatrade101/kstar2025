@@ -2,8 +2,8 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { useFirestore, useDoc, useUser, useCollection, addDocumentNonBlocking } from '@/firebase';
-import { doc, collection, serverTimestamp, query, where, limit } from 'firebase/firestore';
+import { useFirestore, useDoc, useUser, useCollection } from '@/firebase';
+import { doc, collection, serverTimestamp, query, where, limit, addDoc } from 'firebase/firestore';
 import { useMemoFirebase } from '@/firebase/provider';
 import { useParams, useRouter } from 'next/navigation';
 import { Loader2, MapPin, Briefcase, ArrowLeft, Send, CheckCircle2, CalendarDays, UserCheck, TriangleAlert } from 'lucide-react';
@@ -85,7 +85,7 @@ function ApplicationForm({ job, onApplicationSuccess }: { job: Job, onApplicatio
         status: 'Received',
       };
 
-      await addDocumentNonBlocking(applicationsCollectionRef, applicationData);
+      await addDoc(applicationsCollectionRef, applicationData);
 
       toast({
         title: 'Application Submitted!',
@@ -147,8 +147,8 @@ function ApplicationForm({ job, onApplicationSuccess }: { job: Job, onApplicatio
                     </AlertDescription>
                 </Alert>
                 <div className="space-y-2">
-                    <Label htmlFor="cv">CV/Resume URL (Optional)</Label>
-                    <Input id="cv" type="url" placeholder="https://drive.google.com/..." value={cvUrl} onChange={e => setCvUrl(e.target.value)} disabled={isSubmitting} />
+                    <Label htmlFor="cv">CV/Resume URL</Label>
+                    <Input id="cv" type="url" placeholder="https://drive.google.com/..." value={cvUrl} onChange={e => setCvUrl(e.target.value)} disabled={isSubmitting} required/>
                 </div>
             </div>
             <div className="space-y-2">
@@ -318,5 +318,3 @@ export default function JobDetailsPage() {
     </div>
   );
 }
-
-    

@@ -21,8 +21,8 @@ import {
 } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { useFirestore, addDocumentNonBlocking } from '@/firebase';
-import { collection, serverTimestamp } from 'firebase/firestore';
+import { useFirestore } from '@/firebase';
+import { collection, serverTimestamp, addDoc } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 import { useMemoFirebase } from '@/firebase/provider';
 import { Loader2, HeartHandshake } from 'lucide-react';
@@ -48,7 +48,7 @@ export default function GetInvolvedPage() {
   const { toast } = useToast();
   const firestore = useFirestore();
   const registrationsCollectionRef = useMemoFirebase(
-    () => collection(firestore, 'volunteer_registrations'),
+    () => (firestore ? collection(firestore, 'volunteer_registrations') : null),
     [firestore]
   );
 
@@ -65,13 +65,14 @@ export default function GetInvolvedPage() {
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
+    if (!registrationsCollectionRef) return;
     setIsSubmitting(true);
     try {
       const dataToSave = {
         ...values,
         registeredAt: serverTimestamp(),
       };
-      await addDocumentNonBlocking(registrationsCollectionRef, dataToSave);
+      await addDoc(registrationsCollectionRef, dataToSave);
       
       toast({
         title: 'Registration Successful!',

@@ -38,8 +38,8 @@ import {
 import { cn } from '@/lib/utils';
 import { Calendar as CalendarIcon, Loader2, PlusCircle, Trash2 } from 'lucide-react';
 import { format } from 'date-fns';
-import { useFirestore, useCollection, addDocumentNonBlocking, deleteDocumentNonBlocking } from '@/firebase';
-import { collection, query, orderBy, doc } from 'firebase/firestore';
+import { useFirestore, useCollection, deleteDocumentNonBlocking } from '@/firebase';
+import { collection, query, orderBy, doc, addDoc } from 'firebase/firestore';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useMemoFirebase } from '@/firebase/provider';
 import Image from 'next/image';
@@ -74,12 +74,13 @@ export default function ManageNewsPage() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    if (!newsCollectionRef) return;
     const dataToSave = {
       ...values,
       date: format(values.date, 'yyyy-MM-dd'),
     };
-    addDocumentNonBlocking(newsCollectionRef, dataToSave);
+    await addDoc(newsCollectionRef, dataToSave);
     form.reset({
         title: '',
         content: '',
