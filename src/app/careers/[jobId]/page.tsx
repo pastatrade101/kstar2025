@@ -49,11 +49,6 @@ function ApplicationForm({ job, onApplicationSuccess }: { job: Job, onApplicatio
   const { user } = useUser();
   const { toast } = useToast();
   const firestore = useFirestore();
-  // The collection reference now points to the subcollection under the current user
-  const applicationsCollectionRef = useMemoFirebase(
-    () => (user ? collection(firestore, 'users', user.uid, 'job_applications') : null),
-    [firestore, user]
-  );
 
   const [applicantPhone, setApplicantPhone] = useState('');
   const [coverLetter, setCoverLetter] = useState('');
@@ -63,7 +58,7 @@ function ApplicationForm({ job, onApplicationSuccess }: { job: Job, onApplicatio
 
   const onApplicationSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!job || !user || !firestore || !applicationsCollectionRef) {
+    if (!job || !user || !firestore) {
       toast({ variant: 'destructive', title: 'Error', description: 'Could not submit application. Please try again.' });
       return;
     }
@@ -71,6 +66,9 @@ function ApplicationForm({ job, onApplicationSuccess }: { job: Job, onApplicatio
     setIsSubmitting(true);
 
     try {
+      // Correctly reference the subcollection under the specific user
+      const applicationsCollectionRef = collection(firestore, 'users', user.uid, 'job_applications');
+      
       const applicationData = {
         jobId: job.id,
         jobTitle: job.title,
@@ -318,5 +316,3 @@ export default function JobDetailsPage() {
     </div>
   );
 }
-
-    
