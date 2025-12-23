@@ -2,7 +2,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { useFirestore, useDoc, useUser, useCollection } from '@/firebase';
+import { useFirestore, useDoc, useUser, useCollection, errorEmitter, FirestorePermissionError } from '@/firebase';
 import { doc, collection, serverTimestamp, query, where, limit, addDoc } from 'firebase/firestore';
 import { useMemoFirebase } from '@/firebase/provider';
 import { useParams, useRouter } from 'next/navigation';
@@ -56,7 +56,7 @@ function ApplicationForm({ job, onApplicationSuccess }: { job: Job, onApplicatio
   const [cvUrl, setCvUrl] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const onApplicationSubmit = async (e: React.FormEvent) => {
+  const onApplicationSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!job || !user || !firestore) {
       toast({ variant: 'destructive', title: 'Error', description: 'Could not submit application. Please log in and try again.' });
@@ -65,48 +65,55 @@ function ApplicationForm({ job, onApplicationSuccess }: { job: Job, onApplicatio
 
     setIsSubmitting(true);
 
-    try {
-      // **FIX:** Explicitly create the collection reference to the user's subcollection.
-      const applicationsCollectionRef = collection(firestore, 'users', user.uid, 'job_applications');
-      
-      const applicationData = {
-        jobId: job.id,
-        jobTitle: job.title,
-        userId: user.uid,
-        userName: user.displayName || user.email,
-        userEmail: user.email,
-        phone: applicantPhone,
-        coverLetter: coverLetter,
-        linkedinUrl: linkedinUrl,
-        cvUrl: cvUrl,
-        submittedAt: serverTimestamp(),
-        status: 'Received' as const,
-      };
+    const applicationsCollectionRef = collection(firestore, 'users', user.uid, 'job_applications');
+    const applicationData = {
+      jobId: job.id,
+      jobTitle: job.title,
+      userId: user.uid,
+      userName: user.displayName || user.email,
+      userEmail: user.email,
+      phone: applicantPhone,
+      coverLetter: coverLetter,
+      linkedinUrl: linkedinUrl,
+      cvUrl: cvUrl,
+      submittedAt: serverTimestamp(),
+      status: 'Received' as const,
+    };
+    
+    addDoc(applicationsCollectionRef, applicationData)
+      .then(() => {
+        toast({
+          title: 'Application Submitted!',
+          description: 'Thank you for applying. We will review your application and be in touch.',
+        });
 
-      await addDoc(applicationsCollectionRef, applicationData);
+        // Reset form and notify parent
+        setApplicantPhone('');
+        setCoverLetter('');
+        setLinkedinUrl('');
+        setCvUrl('');
+        onApplicationSuccess();
+      })
+      .catch((serverError) => {
+        console.error("Application submission error:", serverError);
 
-      toast({
-        title: 'Application Submitted!',
-        description: 'Thank you for applying. We will review your application and be in touch.',
+        // Create and emit a contextual error for debugging security rules
+        const permissionError = new FirestorePermissionError({
+            path: applicationsCollectionRef.path,
+            operation: 'create',
+            requestResourceData: applicationData,
+        });
+        errorEmitter.emit('permission-error', permissionError);
+
+        toast({
+          variant: 'destructive',
+          title: 'Submission Failed',
+          description: 'An unexpected error occurred. You may not have permission to perform this action. Please try again.',
+        });
+      })
+      .finally(() => {
+        setIsSubmitting(false);
       });
-
-      // Reset form and notify parent
-      setApplicantPhone('');
-      setCoverLetter('');
-      setLinkedinUrl('');
-      setCvUrl('');
-      onApplicationSuccess();
-
-    } catch (error) {
-      console.error("Application submission error:", error);
-      toast({
-        variant: 'destructive',
-        title: 'Submission Failed',
-        description: 'An unexpected error occurred. Please try again.',
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
   };
 
   return (
@@ -316,3 +323,5 @@ export default function JobDetailsPage() {
     </div>
   );
 }
+
+    
