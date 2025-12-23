@@ -11,8 +11,12 @@ service cloud.firestore {
     // User profiles
     match /users/{userId} {
       allow read: if true;
+      // Allow a user to create their own profile, or an admin to create any.
       allow create: if (request.auth != null && request.auth.uid == userId && request.resource.data.role == 'user') || isAdmin();
+      // Allow a user to update their own profile (but not change their role), or an admin to update any.
       allow update: if (request.auth != null && request.auth.uid == userId && request.resource.data.role == resource.data.role) || isAdmin();
+      // Allow user to write to subcollections (like job_applications)
+      allow write: if request.auth != null && request.auth.uid == userId;
 
       // A user can create/update/delete their own applications. This rule allows the write.
       match /job_applications/{applicationId} {
@@ -20,7 +24,7 @@ service cloud.firestore {
       }
     }
     
-    // Admins need a separate rule on the collection group to be able to list/read/write across ALL users.
+    // Admins need a separate rule on the collection group to be able to list/read across ALL users.
     match /{path=**}/job_applications/{applicationId} {
       allow list, read: if isAdmin();
     }
