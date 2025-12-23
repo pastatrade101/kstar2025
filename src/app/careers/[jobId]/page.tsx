@@ -56,7 +56,7 @@ function ApplicationForm({ job, onApplicationSuccess }: { job: Job, onApplicatio
   const [cvUrl, setCvUrl] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const onApplicationSubmit = (e: React.FormEvent) => {
+  const onApplicationSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!job || !user || !firestore) {
       toast({ variant: 'destructive', title: 'Error', description: 'Could not submit application. Please log in and try again.' });
@@ -80,8 +80,8 @@ function ApplicationForm({ job, onApplicationSuccess }: { job: Job, onApplicatio
       status: 'Received' as const,
     };
     
-    addDoc(applicationsCollectionRef, applicationData)
-      .then(() => {
+    try {
+        await addDoc(applicationsCollectionRef, applicationData);
         toast({
           title: 'Application Submitted!',
           description: 'Thank you for applying. We will review your application and be in touch.',
@@ -93,8 +93,7 @@ function ApplicationForm({ job, onApplicationSuccess }: { job: Job, onApplicatio
         setLinkedinUrl('');
         setCvUrl('');
         onApplicationSuccess();
-      })
-      .catch((serverError) => {
+      } catch (serverError: any) {
         console.error("Application submission error:", serverError);
 
         // Create and emit a contextual error for debugging security rules
@@ -108,12 +107,11 @@ function ApplicationForm({ job, onApplicationSuccess }: { job: Job, onApplicatio
         toast({
           variant: 'destructive',
           title: 'Submission Failed',
-          description: 'An unexpected error occurred. You may not have permission to perform this action. Please try again.',
+          description: serverError.message || 'An unexpected error occurred. Please try again.',
         });
-      })
-      .finally(() => {
+      } finally {
         setIsSubmitting(false);
-      });
+      }
   };
 
   return (
@@ -324,4 +322,3 @@ export default function JobDetailsPage() {
   );
 }
 
-    
