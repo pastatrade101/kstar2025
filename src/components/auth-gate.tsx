@@ -79,7 +79,7 @@ export function AuthGate() {
             title: "Account Created!",
             description: "You have been successfully signed up and logged in.",
         });
-        router.push('/');
+        router.push('/careers');
     } catch (error: any) {
         toast({
             variant: "destructive",
